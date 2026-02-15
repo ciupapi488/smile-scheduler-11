@@ -1,24 +1,8 @@
-import { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
-import { format } from "date-fns";
 import { Smile, Shield, Clock, CalendarCheck } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { WeeklyCalendar } from "@/components/booking/WeeklyCalendar";
-import { TimeSlotPicker } from "@/components/booking/TimeSlotPicker";
-import { BookingModal } from "@/components/booking/BookingModal";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { Link } from "react-router-dom";
-
-interface Slot {
-  id: string;
-  slot_date: string;
-  slot_time: string;
-  status: string;
-}
 
 const features = [
   {
@@ -39,72 +23,6 @@ const features = [
 ];
 
 const Index = () => {
-  const { user, isLoading } = useAuth();
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [slots, setSlots] = useState<Slot[]>([]);
-  const [isFetchingSlots, setIsFetchingSlots] = useState(false);
-  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (selectedDate && user) {
-      fetchSlots(selectedDate);
-    }
-  }, [selectedDate, user]);
-
-  const fetchSlots = async (date: Date) => {
-    setIsFetchingSlots(true);
-    try {
-      const { data, error } = await supabase
-        .from("appointment_slots")
-        .select("id, slot_date, slot_time, status")
-        .eq("slot_date", format(date, "yyyy-MM-dd"))
-        .order("slot_time");
-
-      if (error) throw error;
-      setSlots(data || []);
-    } catch (error: any) {
-      console.error("Error fetching slots:", error);
-      toast.error("Failed to load available times");
-    } finally {
-      setIsFetchingSlots(false);
-    }
-  };
-
-  const handleSlotSelect = (slot: Slot) => {
-    setSelectedSlot({ ...slot, slot_date: selectedDate ? format(selectedDate, "yyyy-MM-dd") : "" });
-    setIsModalOpen(true);
-  };
-
-  const handleBookingConfirm = async (name: string, phone: string) => {
-    if (!selectedSlot || !user) return;
-
-    try {
-      const { error } = await supabase
-        .from("appointment_slots")
-        .update({
-          status: "booked",
-          booked_by: user.id,
-          patient_name: name,
-          patient_phone: phone,
-        })
-        .eq("id", selectedSlot.id);
-
-      if (error) throw error;
-
-      toast.success("Appointment booked successfully!");
-      setIsModalOpen(false);
-      setSelectedSlot(null);
-      
-      if (selectedDate) {
-        fetchSlots(selectedDate);
-      }
-    } catch (error: any) {
-      console.error("Error booking appointment:", error);
-      toast.error(error.message || "Failed to book appointment");
-    }
-  };
-
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -122,18 +40,16 @@ const Index = () => {
                 Your smile deserves the best. Book your appointment today and experience 
                 exceptional dental care with our expert team.
               </p>
-              {!user && (
-                <Button
-                  asChild
-                  size="lg"
-                  className="mt-8 animate-fade-in bg-white text-primary hover:bg-white/90"
-                >
-                  <Link to="/auth">
-                    <CalendarCheck className="mr-2 h-5 w-5" />
-                    Book Your Appointment
-                  </Link>
-                </Button>
-              )}
+              <Button
+                asChild
+                size="lg"
+                className="mt-8 animate-fade-in bg-white text-primary hover:bg-white/90"
+              >
+                <Link to="/rezervare">
+                  <CalendarCheck className="mr-2 h-5 w-5" />
+                  Book Your Appointment
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
@@ -166,58 +82,29 @@ const Index = () => {
               <div className="mb-10 text-center">
                 <h2 className="text-3xl font-bold text-foreground">Book an Appointment</h2>
                 <p className="mt-3 text-muted-foreground">
-                  Select a date to see available time slots
+                  Quick and easy online appointment booking
                 </p>
               </div>
 
-              {isLoading ? (
-                <div className="flex h-64 items-center justify-center">
-                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-                </div>
-              ) : !user ? (
-                <div className="rounded-xl border bg-card p-8 text-center shadow-card">
-                  <CalendarCheck className="mx-auto h-12 w-12 text-muted-foreground" />
-                  <h3 className="mt-4 text-xl font-semibold text-foreground">
-                    Sign in to book an appointment
-                  </h3>
-                  <p className="mt-2 text-muted-foreground">
-                    Please sign in with your email to view available slots and book appointments
-                  </p>
-                  <Button asChild className="mt-6">
-                    <Link to="/auth">Sign In with Email</Link>
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  <WeeklyCalendar
-                    selectedDate={selectedDate}
-                    onDateSelect={setSelectedDate}
-                  />
-
-                  {selectedDate && (
-                    <TimeSlotPicker
-                      date={selectedDate}
-                      slots={slots}
-                      isLoading={isFetchingSlots}
-                      onSlotSelect={handleSlotSelect}
-                    />
-                  )}
-                </div>
-              )}
+              <div className="rounded-xl border bg-card p-8 text-center shadow-card">
+                <CalendarCheck className="mx-auto h-12 w-12 text-primary" />
+                <h3 className="mt-4 text-xl font-semibold text-foreground">
+                  Ready to book your appointment?
+                </h3>
+                <p className="mt-2 text-muted-foreground">
+                  Click the button below to fill out our simple booking form
+                </p>
+                <Button asChild className="mt-6" size="lg">
+                  <Link to="/rezervare">
+                    <CalendarCheck className="mr-2 h-5 w-5" />
+                    Book Your Appointment
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>
       </main>
-
-      <BookingModal
-        slot={selectedSlot}
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedSlot(null);
-        }}
-        onConfirm={handleBookingConfirm}
-      />
 
       <Footer />
     </div>
