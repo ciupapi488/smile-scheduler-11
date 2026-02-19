@@ -1,0 +1,542 @@
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+
+type Language = "ro" | "en";
+
+interface LanguageContextType {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: string) => string;
+}
+
+const translations = {
+  ro: {
+    // Navigation
+    "nav.home": "Acasă",
+    "nav.team": "Echipa",
+    "nav.appointments": "Programările Mele",
+    "nav.admin": "Admin",
+    "nav.myAccount": "Contul Meu",
+    "nav.signOut": "Deconectare",
+    "nav.doctorPortal": "Portal Doctor",
+    "nav.gallery": "Lucrări",
+    "nav.services": "Servicii",
+    "nav.home": "Acasă",
+    "nav.book": "Programează-te",
+
+    // Hero
+    "hero.title": "Clinica Dr. Lung",
+    "hero.subtitle": "Stomatologie · Radiologie dentară",
+    "hero.subtitleFull": "Stomatologie · Radiologie dentară",
+    "hero.description": "Zâmbetul tău merită ce e mai bun. Programează-te astăzi și experimentează îngrijire dentară excepțională cu echipa noastră de specialiști.",
+    "hero.cta": "Programează-te Acum",
+
+    // Features
+    "features.gentle.title": "Îngrijire Gentle",
+    "features.gentle.desc": "Experiență dentară confortabilă, fără anxietate",
+    "features.expert.title": "Echipă Expert",
+    "features.expert.desc": "Profesioniști dentari cu vastă experiență",
+    "features.flexible.title": "Program Flexibil",
+    "features.flexible.desc": "Programări care se adaptează programului tău",
+
+    // About
+    "about.title": "Cine suntem?",
+    "about.description1": "Clinica Dr. Lung este o clinică stomatologică modernă din Cluj-Napoca, cu o experiență de peste 15 ani în domeniul stomatologiei și radiologiei dentare.",
+    "about.description2": "Echipa noastră este formată din medici stomatologi cu specializări în diverse domenii: chirurgie orală, implantologie, ortodonție, endodonție și estetică dentară.",
+    "about.why": "De ce să ne alegi?",
+    "about.equipment": "Echipament modern de radiologie digitală",
+    "about.training": "Medici specializați cu pregătire continuă",
+    "about.sterilization": "Sterilizare riguroasă conform standardelor europene",
+    "about.pricing": "Prețuri transparente și tratament personalizat",
+    "about.schedule": "Program flexibil inclusiv sâmbăta",
+
+    // Stats
+    "stats.years": "Ani experiență",
+    "stats.patients": "Pacienți mulțumiți",
+    "stats.support": "Suport urgențe",
+
+    // Location
+    "location.title": "Unde ne găsești?",
+    "location.subtitle": "Vizitează-ne la clinică în Cluj-Napoca",
+    "location.address": "Adresă",
+    "location.street": "Strada Caracal, Nr. 29",
+    "location.city": "Cluj-Napoca, Județul Cluj",
+    "location.postal": "Cod poștal: 400124",
+    "location.phone": "Telefon",
+    "location.phoneNumber": "0722 123 456",
+    "location.phoneDesc": "Programări și urgențe",
+    "location.email": "Email",
+    "location.emailAddress": "contact@clinicadrlung.ro",
+    "location.hours": "Program",
+    "location.weekdays": "Luni - Vineri: 08:00 - 20:00",
+    "location.saturday": "Sâmbătă: 09:00 - 14:00",
+    "location.sunday": "Duminică: Închis (urgențe)",
+    "location.mon": "Luni",
+    "location.tue": "Marți",
+    "location.wed": "Miercuri",
+    "location.thu": "Joi",
+    "location.fri": "Vineri",
+    "location.sat": "Sâmbătă",
+    "location.sun": "Duminică",
+    "location.closed": "Închis",
+    "location.emergency": "(urgențe)",
+
+    // Booking
+    "booking.title": "Programează-te Online",
+    "booking.subtitle": "Rezervare rapidă și simplă în câțiva pași",
+    "booking.ready": "Ești pregătit să te programezi?",
+    "booking.description": "Click pe butonul de mai jos pentru a completa formularul de programare",
+
+    // Team Page
+    "team.title": "Echipa Noastră",
+    "team.subtitle": "Medici stomatologi cu experiență, dedicați sănătății și frumuseții zâmbetului tău",
+    "team.doctors": "Medici Specialiști",
+    "team.experience": "Ani de Experiență",
+    "team.patients": "Pacienți Tratați",
+    "team.reviews": "recenzii",
+    "team.languages.spoken": "Limbi Vorbite",
+    "team.languages.ro": "Română",
+    "team.languages.en": "Engleză",
+    "team.languages.de": "Germană",
+    "team.languages.es": "Spaniolă",
+    "team.languages.fr": "Franceză",
+    "team.languages.nl": "Olandeză",
+    "team.specialization": "Specializare",
+    "team.education": "Educație",
+    "team.expertise": "Arie de Expertiză",
+    "team.achievements": "Realizări Notabile",
+    "team.certifications": "Certificări",
+    "team.languages": "Limbi Vorbite",
+    "team.experienceYears": "ani exp.",
+    "team.bookNow": "Fă o Programare",
+
+    // Login
+    "login.title": "Autentificare Pacient",
+    "login.description": "Accesați contul pentru a vedea programările",
+    "login.email": "Email",
+    "login.password": "Parolă",
+    "login.signIn": "Autentificare",
+    "login.signingIn": "Se autentifică...",
+    "login.noAccount": "Nu ai cont încă?",
+    "login.createAccount": "Creează cont",
+    "login.back": "Înapoi la site",
+    "login.verificationNeeded": "Email-ul nu a fost confirmat. Verificați inbox-ul (inclusiv Spam/Junk).",
+    "login.resend": "Retrimite email de confirmare",
+    "login.invalidCredentials": "Email sau parolă incorectă",
+
+    // Register
+    "register.title": "Creează Cont",
+    "register.subtitle": "Înregistrează-te la Clinica Dr. Lung pentru programări online",
+    "register.firstName": "Prenume",
+    "register.lastName": "Nume",
+    "register.phone": "Telefon",
+    "register.password": "Parolă",
+    "register.confirmPassword": "Confirmă Parola",
+    "register.passwordHint": "Minim 8 caractere",
+    "register.acceptTerms": "Accept",
+    "register.terms": "termenii și condițiile",
+    "register.and": "și",
+    "register.privacy": "politica de confidențialitate",
+    "register.create": "Creează Cont",
+    "register.creating": "Se creează contul...",
+    "register.hasAccount": "Ai deja cont?",
+    "register.signIn": "Autentifică-te",
+    "register.passwordMismatch": "Parolele nu coincid",
+    "register.passwordShort": "Parola trebuie să aibă cel puțin 8 caractere",
+    "register.termsRequired": "Trebuie să acceptați termenii și condițiile",
+
+    // Register Success
+    "register.success.title": "Verificați Email-ul!",
+    "register.success.sentTo": "Am trimis un email de confirmare la:",
+    "register.success.steps": "Pași următori:",
+    "register.success.step1": "Deschideți email-ul",
+    "register.success.step2": "Click pe linkul de confirmare",
+    "register.success.step3": "Contul va fi activat automat",
+    "register.success.checkSpam": "Nu uitați să verificați și folderul Spam/Junk.",
+    "register.success.continue": "Continuă către programare",
+    "register.success.back": "Înapoi la site",
+
+    // Verify
+    "verify.loading": "Se verifică...",
+    "verify.confirmTitle": "Is this you?",
+    "verify.yes": "YES",
+    "verify.notYou": "If this is not you, close this page.",
+    "verify.verifying": "Se verifică...",
+    "verify.success": "Verificat!",
+    "verify.successMessage": "Email-ul a fost verificat! Acum te poți autentifica.",
+    "verify.goLogin": "Mergi la Login",
+    "verify.goHome": "Înapoi la site",
+    "verify.error": "Verificare Eșuată",
+    "verify.errorMessage": "Verificarea a eșuat. Linkul poate fi expirat.",
+    "verify.createNew": "Creează cont nou",
+
+    // Dashboard
+    "dashboard.title": "Panou Pacient",
+    "dashboard.welcome": "Bun venit",
+    "dashboard.upcoming": "Programări Viitoare",
+    "dashboard.past": "Istoric Programări",
+    "dashboard.noAppointments": "Nu aveți programări viitoare",
+    "dashboard.bookNow": "Programează-te acum",
+    "dashboard.total": "Total Programări",
+    "dashboard.future": "Programări Viitoare",
+    "dashboard.status.confirmed": "Confirmată",
+    "dashboard.status.completed": "Finalizată",
+    "dashboard.status.cancelled": "Anulată",
+    "dashboard.status.no_show": "Nu a venit",
+    "dashboard.status.noShow": "No-show",
+    "dashboard.contact": "Contact Rapid",
+    "dashboard.refresh": "Reîmprospătează",
+    "dashboard.cancel": "Anulează",
+    "dashboard.calendar": "Calendar",
+    "dashboard.profile": "Profil",
+    "dashboard.logout": "Ieșire",
+    "dashboard.loading": "Se încarcă...",
+    "dashboard.notAuthenticated": "Nu sunteți autentificat",
+    "dashboard.goToLogin": "Mergi la login",
+
+    // Booking Form
+    "booking.step": "Pas",
+    "booking.selectDentist": "Alege Doctorul",
+    "booking.selectDate": "Alege Data",
+    "booking.selectTime": "Alege Ora",
+    "booking.selectService": "Alege Serviciul",
+    "booking.serviceLabel": "Serviciu",
+    "booking.confirm": "Confirmă Programarea",
+    "booking.service.consultation": "Consultație",
+    "booking.service.detartraj": "Detartraj",
+    "booking.service.plomba": "Plombă",
+    "booking.service.extractie": "Extracție",
+    "booking.service.albire": "Albire dentară",
+    "booking.service.implant": "Implant dentar",
+    "booking.service.ortodontie": "Ortodonție",
+    "booking.backToDentists": "Înapoi la doctori",
+    "booking.backToDate": "Înapoi la dată",
+    "booking.backToTime": "Înapoi la ore",
+    "booking.backToService": "Înapoi la serviciu",
+    "booking.selectedDentist": "Doctor selectat",
+    "booking.selectedDate": "Data selectată",
+    "booking.selectedTime": "Ora selectată",
+    "booking.selectedService": "Serviciu selectat",
+    "booking.price": "Preț",
+    "booking.confirmButton": "Confirmă Programarea",
+    "booking.processing": "Se procesează...",
+    "booking.cancel": "Anulează",
+    "booking.success": "Appointment Confirmed!",
+    "booking.successMessage": "Programarea ta a fost confirmată cu succes!",
+    "booking.viewAppointments": "Vezi Programările",
+    "booking.authRequired": "Trebuie să fiți autentificat pentru a face o programare.",
+    "booking.goToLogin": "Mergi la Login",
+    "booking.checkingAuth": "Se verifică autentificarea...",
+
+    // Footer
+    "footer.description": "Oferim servicii stomatologice complete cu tehnologie modernă și o echipă dedicată sănătății zâmbetului tău.",
+    "footer.contact": "Contact",
+    "footer.hours": "Program",
+    "footer.rights": "Toate drepturile rezervate.",
+    "footer.gdpr": "GDPR: Datele personale sunt prelucrate conform Regulamentului (UE) 2016/679 exclusiv pentru programări și îngrijire medicală.",
+
+    // Dentist Dashboard
+    "dentist.today": "Astăzi",
+    "dentist.thisMonth": "Luna aceasta",
+    "dentist.uniquePatients": "Pacienți unici",
+    "dentist.completed": "Finalizate",
+    "dentist.appointments": "Programări",
+    "dentist.search": "Caută pacient...",
+    "dentist.all": "Toate",
+    "dentist.confirmed": "Confirmate",
+    "dentist.cancelled": "Anulate",
+    "dentist.noShow": "No-show",
+    "dentist.medicalRecord": "Fișa Medicală",
+    "dentist.diagnosis": "Diagnostic",
+    "dentist.treatment": "Tratament efectuat",
+    "dentist.prescriptions": "Rețete/Indicații",
+    "dentist.notes": "Observații",
+    "dentist.cost": "Cost tratament (RON)",
+    "dentist.save": "Salvează și finalizează",
+    "dentist.cancel": "Anulează",
+
+    // Language
+    "lang.ro": "Română",
+    "lang.en": "English",
+  },
+  en: {
+    // Navigation
+    "nav.home": "Home",
+    "nav.team": "Team",
+    "nav.appointments": "My Appointments",
+    "nav.admin": "Admin",
+    "nav.myAccount": "My Account",
+    "nav.signOut": "Sign Out",
+    "nav.doctorPortal": "Doctor Portal",
+    "nav.gallery": "Gallery",
+    "nav.services": "Services",
+    "nav.home": "Home",
+    "nav.book": "Book Now",
+
+    // Hero
+    "hero.title": "Dr. Lung Clinic",
+    "hero.subtitle": "Dentistry · Dental Radiology",
+    "hero.subtitleFull": "Dentistry · Dental Radiology",
+    "hero.description": "Your smile deserves the best. Book your appointment today and experience exceptional dental care with our expert team.",
+    "hero.cta": "Book Now",
+
+    // Features
+    "features.gentle.title": "Gentle Care",
+    "features.gentle.desc": "Comfortable, anxiety-free dental experience",
+    "features.expert.title": "Expert Team",
+    "features.expert.desc": "Highly trained dental professionals",
+    "features.flexible.title": "Flexible Hours",
+    "features.flexible.desc": "Appointments that fit your schedule",
+
+    // About
+    "about.title": "Who We Are?",
+    "about.description1": "Dr. Lung Clinic is a modern dental clinic in Cluj-Napoca, with over 15 years of experience in dentistry and dental radiology.",
+    "about.description2": "Our team consists of dentists with specializations in various fields: oral surgery, implantology, orthodontics, endodontics and dental aesthetics.",
+    "about.why": "Why Choose Us?",
+    "about.equipment": "Modern digital radiology equipment",
+    "about.training": "Specialized doctors with continuous training",
+    "about.sterilization": "Rigorous sterilization according to European standards",
+    "about.pricing": "Transparent prices and personalized treatment",
+    "about.schedule": "Flexible schedule including Saturdays",
+
+    // Stats
+    "stats.years": "Years Experience",
+    "stats.patients": "Happy Patients",
+    "stats.support": "Emergency Support",
+
+    // Location
+    "location.title": "Where to Find Us?",
+    "location.subtitle": "Visit our clinic in Cluj-Napoca",
+    "location.address": "Address",
+    "location.street": "29 Caracal Street",
+    "location.city": "Cluj-Napoca, Cluj County",
+    "location.postal": "Postal code: 400124",
+    "location.phone": "Phone",
+    "location.phoneNumber": "0722 123 456",
+    "location.phoneDesc": "Appointments & emergencies",
+    "location.email": "Email",
+    "location.emailAddress": "contact@clinicadrlung.ro",
+    "location.hours": "Schedule",
+    "location.weekdays": "Mon - Fri: 08:00 - 20:00",
+    "location.saturday": "Saturday: 09:00 - 14:00",
+    "location.sunday": "Sunday: Closed (emergencies)",
+    "location.mon": "Monday",
+    "location.tue": "Tuesday",
+    "location.wed": "Wednesday",
+    "location.thu": "Thursday",
+    "location.fri": "Friday",
+    "location.sat": "Saturday",
+    "location.sun": "Sunday",
+    "location.closed": "Closed",
+    "location.emergency": "(emergencies)",
+
+    // Booking
+    "booking.title": "Book Online",
+    "booking.subtitle": "Quick and easy reservation in a few steps",
+    "booking.ready": "Ready to book?",
+    "booking.description": "Click the button below to fill out the appointment form",
+
+    // Team Page
+    "team.title": "Our Team",
+    "team.subtitle": "Experienced dentists dedicated to the health and beauty of your smile",
+    "team.doctors": "Specialist Doctors",
+    "team.experience": "Years of Experience",
+    "team.patients": "Treated Patients",
+    "team.reviews": "reviews",
+    "team.languages.spoken": "Languages",
+    "team.languages.ro": "Romanian",
+    "team.languages.en": "English",
+    "team.languages.de": "German",
+    "team.languages.es": "Spanish",
+    "team.languages.fr": "French",
+    "team.languages.nl": "Dutch",
+    "team.specialization": "Specialization",
+    "team.education": "Education",
+    "team.expertise": "Area of Expertise",
+    "team.achievements": "Notable Achievements",
+    "team.certifications": "Certifications",
+    "team.languages": "Languages",
+    "team.experienceYears": "years exp.",
+    "team.bookNow": "Book Now",
+
+    // Login
+    "login.title": "Patient Login",
+    "login.description": "Access your account to view appointments",
+    "login.email": "Email",
+    "login.password": "Password",
+    "login.signIn": "Sign In",
+    "login.signingIn": "Signing in...",
+    "login.noAccount": "Don't have an account?",
+    "login.createAccount": "Create account",
+    "login.back": "Back to website",
+    "login.verificationNeeded": "Email not confirmed. Check your inbox (including Spam/Junk).",
+    "login.resend": "Resend verification email",
+    "login.invalidCredentials": "Invalid email or password",
+
+    // Register
+    "register.title": "Create Account",
+    "register.subtitle": "Register at Dr. Lung Clinic for online appointments",
+    "register.firstName": "First Name",
+    "register.lastName": "Last Name",
+    "register.phone": "Phone",
+    "register.password": "Password",
+    "register.confirmPassword": "Confirm Password",
+    "register.passwordHint": "At least 8 characters",
+    "register.acceptTerms": "I accept",
+    "register.terms": "terms and conditions",
+    "register.and": "and",
+    "register.privacy": "privacy policy",
+    "register.create": "Create Account",
+    "register.creating": "Creating account...",
+    "register.hasAccount": "Already have an account?",
+    "register.signIn": "Sign In",
+    "register.passwordMismatch": "Passwords do not match",
+    "register.passwordShort": "Password must be at least 8 characters",
+    "register.termsRequired": "You must accept the terms and conditions",
+
+    // Register Success
+    "register.success.title": "Check Your Email!",
+    "register.success.sentTo": "We have sent a confirmation email to:",
+    "register.success.steps": "Next steps:",
+    "register.success.step1": "Open your email",
+    "register.success.step2": "Click the confirmation link",
+    "register.success.step3": "Your account will be activated automatically",
+    "register.success.checkSpam": "Don't forget to check your Spam/Junk folder.",
+    "register.success.continue": "Continue to booking",
+    "register.success.back": "Back to website",
+
+    // Verify
+    "verify.loading": "Loading...",
+    "verify.confirmTitle": "Is this you?",
+    "verify.yes": "YES",
+    "verify.notYou": "If this is not you, close this page.",
+    "verify.verifying": "Verifying...",
+    "verify.success": "Verified!",
+    "verify.successMessage": "Your email has been verified! You can now log in.",
+    "verify.goLogin": "Go to Login",
+    "verify.goHome": "Back to Website",
+    "verify.error": "Verification Failed",
+    "verify.errorMessage": "Verification failed. The link may have expired.",
+    "verify.createNew": "Create New Account",
+
+    // Dashboard
+    "dashboard.title": "Patient Dashboard",
+    "dashboard.welcome": "Welcome",
+    "dashboard.upcoming": "Upcoming Appointments",
+    "dashboard.past": "Appointment History",
+    "dashboard.noAppointments": "You have no upcoming appointments",
+    "dashboard.bookNow": "Book now",
+    "dashboard.total": "Total Appointments",
+    "dashboard.future": "Upcoming Appointments",
+    "dashboard.status.confirmed": "Confirmed",
+    "dashboard.status.completed": "Completed",
+    "dashboard.status.cancelled": "Cancelled",
+    "dashboard.status.no_show": "No-show",
+    "dashboard.status.noShow": "No-show",
+    "dashboard.contact": "Quick Contact",
+    "dashboard.refresh": "Refresh",
+    "dashboard.cancel": "Cancel",
+    "dashboard.calendar": "Calendar",
+    "dashboard.profile": "Profile",
+    "dashboard.logout": "Logout",
+    "dashboard.loading": "Loading...",
+    "dashboard.notAuthenticated": "You are not authenticated",
+    "dashboard.goToLogin": "Go to Login",
+
+    // Booking Form
+    "booking.step": "Step",
+    "booking.selectDentist": "Select Doctor",
+    "booking.selectDate": "Select Date",
+    "booking.selectTime": "Select Time",
+    "booking.selectService": "Select Service",
+    "booking.serviceLabel": "Service",
+    "booking.confirm": "Confirm Appointment",
+    "booking.service.consultation": "Consultation",
+    "booking.service.detartraj": "Teeth Cleaning",
+    "booking.service.plomba": "Dental Filling",
+    "booking.service.extractie": "Tooth Extraction",
+    "booking.service.albire": "Teeth Whitening",
+    "booking.service.implant": "Dental Implant",
+    "booking.service.ortodontie": "Orthodontics",
+    "booking.backToDentists": "Back to doctors",
+    "booking.backToDate": "Back to date",
+    "booking.backToTime": "Back to hours",
+    "booking.backToService": "Back to services",
+    "booking.selectedDentist": "Selected doctor",
+    "booking.selectedDate": "Selected date",
+    "booking.selectedTime": "Selected time",
+    "booking.selectedService": "Selected service",
+    "booking.price": "Price",
+    "booking.confirmButton": "Confirm Appointment",
+    "booking.processing": "Processing...",
+    "booking.cancel": "Cancel",
+    "booking.success": "Appointment Confirmed!",
+    "booking.successMessage": "Your appointment has been successfully confirmed!",
+    "booking.viewAppointments": "View Appointments",
+    "booking.authRequired": "You must be logged in to make an appointment.",
+    "booking.goToLogin": "Go to Login",
+    "booking.checkingAuth": "Checking authentication...",
+
+    // Footer
+    "footer.description": "We offer complete dental services with modern technology and a team dedicated to the health of your smile.",
+    "footer.contact": "Contact",
+    "footer.hours": "Schedule",
+    "footer.rights": "All rights reserved.",
+    "footer.gdpr": "GDPR: Personal data is processed in accordance with Regulation (EU) 2016/679 exclusively for appointments and medical care.",
+
+    // Dentist Dashboard
+    "dentist.today": "Today",
+    "dentist.thisMonth": "This Month",
+    "dentist.uniquePatients": "Unique Patients",
+    "dentist.completed": "Completed",
+    "dentist.appointments": "Appointments",
+    "dentist.search": "Search patient...",
+    "dentist.all": "All",
+    "dentist.confirmed": "Confirmed",
+    "dentist.cancelled": "Cancelled",
+    "dentist.noShow": "No-show",
+    "dentist.medicalRecord": "Medical Record",
+    "dentist.diagnosis": "Diagnosis",
+    "dentist.treatment": "Treatment Performed",
+    "dentist.prescriptions": "Prescriptions/Instructions",
+    "dentist.notes": "Notes",
+    "dentist.cost": "Treatment Cost (RON)",
+    "dentist.save": "Save and Complete",
+    "dentist.cancel": "Cancel",
+
+    // Language
+    "lang.ro": "Română",
+    "lang.en": "English",
+  }
+};
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguageState] = useState<Language>(() => {
+    const saved = localStorage.getItem("language") as Language;
+    return saved === "en" ? "en" : "ro";
+  });
+
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    localStorage.setItem("language", lang);
+  };
+
+  const t = (key: string): string => {
+    return translations[language][key as keyof typeof translations.ro] || key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export function useLanguage() {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error("useLanguage must be used within a LanguageProvider");
+  }
+  return context;
+}

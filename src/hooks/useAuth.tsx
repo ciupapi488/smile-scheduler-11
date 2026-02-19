@@ -16,6 +16,23 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
 });
 
+// Helper to check admin with timeout
+const checkAdminWithTimeout = async (userId: string, timeoutMs = 2000): Promise<boolean> => {
+  return Promise.race([
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle()
+      .then(({ data }) => !!data)
+      .catch(() => false),
+    new Promise<boolean>((resolve) => 
+      setTimeout(() => resolve(false), timeoutMs)
+    )
+  ]);
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -23,52 +40,79 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
+    let initTimeout: ReturnType<typeof setTimeout>;
+
+    // Failsafe: force loading to false after 3 seconds
+    initTimeout = setTimeout(() => {
+      if (mounted && isLoading) {
+        console.warn("Auth init timeout - forcing isLoading to false");
+        setIsLoading(false);
+      }
+    }, 3000);
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+      async (event, newSession) => {
+        if (!mounted) return;
+
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
         
-        if (session?.user) {
-          // Check if user is admin
-          const { data: roles } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", session.user.id)
-            .eq("role", "admin")
-            .maybeSingle();
-          
-          setIsAdmin(!!roles);
+        if (newSession?.user) {
+          // Check admin with timeout to prevent hanging
+          try {
+            const adminStatus = await checkAdminWithTimeout(newSession.user.id);
+            if (mounted) setIsAdmin(adminStatus);
+          } catch (err) {
+            console.error("Admin check error:", err);
+            if (mounted) setIsAdmin(false);
+          }
         } else {
-          setIsAdmin(false);
+          if (mounted) setIsAdmin(false);
         }
         
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+          clearTimeout(initTimeout);
+        }
       }
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(async ({ data: { session: initialSession } }) => {
+      if (!mounted) return;
+
+      setSession(initialSession);
+      setUser(initialSession?.user ?? null);
       
-      if (session?.user) {
-        supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", session.user.id)
-          .eq("role", "admin")
-          .maybeSingle()
-          .then(({ data: roles }) => {
-            setIsAdmin(!!roles);
-            setIsLoading(false);
-          });
+      if (initialSession?.user) {
+        try {
+          const adminStatus = await checkAdminWithTimeout(initialSession.user.id);
+          if (mounted) setIsAdmin(adminStatus);
+        } catch (err) {
+          console.error("Admin check error:", err);
+          if (mounted) setIsAdmin(false);
+        }
       } else {
+        if (mounted) setIsAdmin(false);
+      }
+      
+      if (mounted) {
         setIsLoading(false);
+        clearTimeout(initTimeout);
+      }
+    }).catch((err) => {
+      console.error("Get session error:", err);
+      if (mounted) {
+        setIsLoading(false);
+        clearTimeout(initTimeout);
       }
     });
 
     return () => {
+      mounted = false;
+      clearTimeout(initTimeout);
       subscription.unsubscribe();
     };
   }, []);

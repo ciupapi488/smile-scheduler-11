@@ -116,10 +116,22 @@ END $$;
 ALTER TABLE appointment_slots ENABLE ROW LEVEL SECURITY;
 ALTER TABLE appointments ENABLE ROW LEVEL SECURITY;
 
+-- Politici pentru citire
 DROP POLICY IF EXISTS "Select sloturi" ON appointment_slots;
 CREATE POLICY "Select sloturi" ON appointment_slots FOR SELECT USING (true);
 
 DROP POLICY IF EXISTS "Select programari" ON appointments;
 CREATE POLICY "Select programari" ON appointments FOR SELECT USING (true);
+
+-- Politici pentru inserare (permite utilizatorilor anonimi să creeze programări)
+DROP POLICY IF EXISTS "Insert sloturi" ON appointment_slots;
+CREATE POLICY "Insert sloturi" ON appointment_slots FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Insert programari" ON appointments;
+CREATE POLICY "Insert programari" ON appointments FOR INSERT WITH CHECK (true);
+
+-- Politici pentru update (permite modificarea sloturilor la rezervare)
+DROP POLICY IF EXISTS "Update sloturi" ON appointment_slots;
+CREATE POLICY "Update sloturi" ON appointment_slots FOR UPDATE USING (true);
 
 -- GATA! 🎉

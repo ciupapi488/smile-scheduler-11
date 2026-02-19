@@ -1,21 +1,41 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import BookingForm from './components/BookingForm';
-import Admin from './pages/Admin';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import Index from './pages/Index';
+import PatientLogin from './pages/patient/Login';
+import PatientRegister from './pages/patient/Register';
+import PatientDashboard from './pages/patient/Dashboard';
+import VerifyEmail from './pages/patient/Verify';
+import DentistLogin from './pages/dentist/Login';
+import DentistDashboard from './pages/dentist/Dashboard';
+import TeamPage from './pages/Team';
+import GalleryPage from './pages/Gallery';
+import ServicesPage from './pages/Services';
+import BookingFormNew from './components/BookingFormNew';
+import AdminLayout from './pages/admin';
 
 function App() {
   return (
     <Router>
-      <nav style={{ padding: '20px', background: '#f8f9fa' }}>
-        <Link to="/" style={{ marginRight: '20px', textDecoration: 'none' }}>Acasă</Link>
-        <Link to="/rezervare" style={{ marginRight: '20px', textDecoration: 'none' }}>Programează-te</Link>
-        <Link to="/admin" style={{ textDecoration: 'none' }}>Admin</Link>
-      </nav>
-      
+      <Toaster position="top-center" richColors />
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/rezervare" element={<BookingForm />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/rezervare" element={<BookingFormNew />} />
+        <Route path="/echipa" element={<TeamPage />} />
+        <Route path="/lucrari" element={<GalleryPage />} />
+        <Route path="/servicii" element={<ServicesPage />} />
+        
+        {/* Patient */}
+        <Route path="/pacient/login" element={<PatientLogin />} />
+        <Route path="/pacient/inregistrare" element={<PatientRegister />} />
+        <Route path="/pacient/verify" element={<VerifyEmail />} />
+        <Route path="/pacient/dashboard" element={<PatientDashboard />} />
+        
+        {/* Dentist */}
+        <Route path="/dentist/login" element={<DentistLogin />} />
+        <Route path="/dentist/dashboard" element={<DentistDashboard />} />
+        
+        {/* Admin */}
+        <Route path="/admin/*" element={<AdminLayout />} />
       </Routes>
     </Router>
   );

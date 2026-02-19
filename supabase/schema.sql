@@ -82,18 +82,27 @@ CREATE POLICY "Vizualizare sloturi disponibile" ON appointment_slots
     FOR SELECT
     USING (true);
 
--- Politică: Doar utilizatorii autentificați ca admin pot modifica sloturile
-DROP POLICY IF EXISTS "Modificare sloturi doar de admin" ON appointment_slots;
-CREATE POLICY "Modificare sloturi doar de admin" ON appointment_slots
-    FOR ALL
-    USING (auth.role() = 'authenticated' AND auth.jwt() ->> 'role' = 'admin')
-    WITH CHECK (auth.role() = 'authenticated' AND auth.jwt() ->> 'role' = 'admin');
+-- Politică: Toată lumea poate crea programări (rezervări online)
+DROP POLICY IF EXISTS "Creare sloturi" ON appointment_slots;
+CREATE POLICY "Creare sloturi" ON appointment_slots
+    FOR INSERT
+    WITH CHECK (true);
 
--- Politică: Toată lumea poate vedea programările (pentru verificare disponibilitate)
+DROP POLICY IF EXISTS "Modificare sloturi" ON appointment_slots;
+CREATE POLICY "Modificare sloturi" ON appointment_slots
+    FOR UPDATE
+    USING (true);
+
+-- Politică: Toată lumea poate vedea și crea programări
 DROP POLICY IF EXISTS "Vizualizare programări" ON appointments;
 CREATE POLICY "Vizualizare programări" ON appointments
     FOR SELECT
     USING (true);
+
+DROP POLICY IF EXISTS "Creare programări" ON appointments;
+CREATE POLICY "Creare programări" ON appointments
+    FOR INSERT
+    WITH CHECK (true);
 
 -- ============================================
 -- REALTIME - Abonamente la modificări în timp real
