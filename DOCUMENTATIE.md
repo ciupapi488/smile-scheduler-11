@@ -1,16 +1,22 @@
-# 📚 Documentație - Sistem de Programări Stomatologice
+# 📚 Documentație - Sistem de Programări Stomatologice "Clinica Dr. Lung"
 
 ## 🎯 Prezentare Generală
 
-Acesta este un sistem complet de programări online pentru cabinete stomatologice, cu protecție la concurență, actualizări în timp real și trimitere de email-uri.
+Acesta este un sistem complet de programări online pentru cabinete stomatologice, dezvoltat pentru **Clinica Dr. Lung**. Sistemul include suport bilingv (Română/Engleză), management multi-utilizator (admin, dentist, pacient), galerie de lucrări și listă de servicii cu prețuri.
 
 ### ✨ Caracteristici Principale
 
+- ✅ **Bilingv (RO/EN)** - Comutare instantanee între limbi
 - ✅ **Programări online** - Clienții pot rezerva direct de pe site
 - ✅ **Protecție la concurență** - Nu se pot programa 2 persoane la aceeași oră
 - ✅ **Actualizări live** - Orele ocupate apar imediat (tăiate cu roșu)
 - ✅ **Email de confirmare** - Clientul primește email cu detaliile
-- ✅ **Protecție anti-reply** - Reply-urile se duc la o adresă separată
+- ✅ **Portale dedicate:**
+  - 👨‍⚕️ **Portal Admin** - Management utilizatori, programări, servicii
+  - 🦷 **Portal Dentist** - Vizualizare programări, pacienți
+  - 👤 **Portal Pacient** - Istoric programări, programare nouă
+- ✅ **Galerie lucrări** - Before/after cu categorii (albire, fațete, implanturi, etc.)
+- ✅ **Servicii și prețuri** - Listă completă cu filtrare pe categorii
 - ✅ **Interfață responsive** - Funcționează pe mobil și desktop
 
 ---
@@ -21,6 +27,7 @@ Acesta este un sistem complet de programări online pentru cabinete stomatologic
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │   FRONTEND      │────▶│    BACKEND      │────▶│   SUPABASE      │
 │   (React)       │     │   (Express)     │     │  (PostgreSQL)   │
+│   Vite + TS     │     │   Node.js       │     │  + Auth         │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
         │                       │
         │                       ▼
@@ -31,39 +38,81 @@ Acesta este un sistem complet de programări online pentru cabinete stomatologic
         ▼
 ┌─────────────────┐
 │   BROWSER       │
+│ - Header nav    │
 │ - Formular      │
-│ - Sloturi live  │
-│ - Status ocupat │
+│ - Portale       │
+│ - Galerie       │
 └─────────────────┘
 ```
 
-### 📁 Structura Fișierelor
+### 📁 Structura Proiectului
 
 ```
 proiect/
 │
 ├── backend/                    # Server Node.js/Express
 │   ├── server.js              # Logica principală backend
+│   ├── services/
+│   │   └── emailService.js    # Serviciu trimitere email
 │   ├── package.json           # Dependențe backend
 │   └── .env                   # Configurare (NU comiteți!)
 │
 ├── src/                       # Frontend React
 │   ├── components/
-│   │   └── BookingForm.tsx   # Formularul de programare
-│   ├── api.ts                 # Funcții API
+│   │   ├── Header.tsx         # Header cu navigație
+│   │   ├── Footer.tsx         # Footer site
+│   │   ├── LanguageSwitcher.tsx  # Comutator RO/EN
+│   │   ├── AuthNav.tsx        # Butoane autentificare
+│   │   └── BookingFormNew.tsx # Formular programare nou
+│   │
+│   ├── hooks/
+│   │   ├── useAuth.tsx        # Hook autentificare
+│   │   └── useLanguage.tsx    # Hook traduceri bilingv
+│   │
 │   ├── pages/
-│   │   ├── Index.tsx         # Pagina principală
-│   │   └── Admin.tsx         # Pagina admin (opțional)
+│   │   ├── Index.tsx          # Pagina principală
+│   │   ├── Team.tsx           # Pagina echipă
+│   │   ├── Gallery.tsx        # Pagina galerie lucrări
+│   │   ├── Services.tsx       # Pagina servicii
+│   │   │
+│   │   ├── admin/             # Portal Admin
+│   │   │   ├── index.tsx
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── Appointments.tsx
+│   │   │   ├── Patients.tsx
+│   │   │   ├── Schedule.tsx
+│   │   │   ├── Services.tsx
+│   │   │   └── EmailTemplates.tsx
+│   │   │
+│   │   ├── dentist/           # Portal Dentist
+│   │   │   ├── Dashboard.tsx
+│   │   │   └── Login.tsx
+│   │   │
+│   │   └── patient/           # Portal Pacient
+│   │       ├── Dashboard.tsx
+│   │       ├── Login.tsx
+│   │       ├── Register.tsx
+│   │       ├── Verify.tsx
+│   │       └── VerifyEmail.tsx
+│   │
+│   ├── api.ts                 # Funcții API
 │   └── integrations/supabase/
 │       ├── client.ts         # Configurare Supabase
 │       └── types.ts          # Tipuri TypeScript
 │
 ├── supabase/
-│   └── schema_simple.sql     # Schema bazei de date
+│   ├── schema.sql            # Schema bazei de date
+│   ├── schema_simple.sql     # Schema simplificată
+│   ├── fix_rls.sql           # Fix politici RLS
+│   └── migrations/           # Migrări bazei de date
+│       ├── 001_phase1_admin_dashboard.sql
+│       ├── 002_dentist_system.sql
+│       └── 20240218_verification_tokens.sql
 │
 ├── .env                       # Variabile frontend (NU comiteți!)
 ├── package.json              # Dependențe frontend
-└── DOCUMENTATIE.md          # Acest fișier
+├── DOCUMENTATIE.md          # Acest fișier (RO)
+└── README.md                # Documentație (EN)
 ```
 
 ---
@@ -72,7 +121,7 @@ proiect/
 
 ### 1. Pre-rechizite
 
-- Node.js instalat
+- Node.js 18+ instalat
 - Cont Gmail (pentru trimiterea emailurilor)
 - Cont Supabase (bază de date gratuită)
 
@@ -80,7 +129,10 @@ proiect/
 
 1. Creează cont pe [supabase.com](https://supabase.com)
 2. Creează un nou proiect
-3. Mergi la **SQL Editor** și rulează fișierul `supabase/schema_simple.sql`
+3. Mergi la **SQL Editor** și rulează fișierele din `supabase/migrations/` în ordine:
+   - `001_phase1_admin_dashboard.sql`
+   - `002_dentist_system.sql`
+   - `20240218_verification_tokens.sql`
 4. Copiază URL-ul și cheile API din **Settings → API**
 
 ### 3. Configurare Backend
@@ -93,11 +145,8 @@ copy .env.example .env
 Editează `backend/.env`:
 ```env
 # Email (Gmail)
-EMAIL_USER=dentistulMeu@gmail.com
+EMAIL_USER=clinica.drlung@gmail.com
 EMAIL_PASS=parola_sau_app_password
-
-# No-Reply (unde merg reply-urile)
-NO_REPLY_USER=popescuiustinian2@gmail.com
 
 # Supabase
 SUPABASE_URL=https://xxxxxx.supabase.co
@@ -141,29 +190,49 @@ Terminal 2 (Frontend):
 npm run dev
 ```
 
-Aplicația va fi disponibilă la `http://localhost:5173`
+Aplicația va fi disponibilă la `http://localhost:8080`
 
 ---
 
 ## 🎮 Cum Funcționează
 
-### Pentru Client (Frontend)
+### Pentru Pacient (Frontend)
 
-1. **Accesează site-ul** și vede pagina principală
-2. **Click "Book Your Appointment"** → ajunge la formular
-3. **Completează datele** (nume, email, telefon)
-4. **Selectează data** → vede toate orele
+1. **Accesează site-ul** și vede pagina principală cu info clinică
+2. **Navigare** prin Header:
+   - **Acasă** - Pagina principală
+   - **Programează-te** - Formular de programare
+   - **Echipa** - Prezentare medici
+   - **Lucrări** - Galerie before/after
+   - **Servicii** - Listă prețuri
+3. **Click "Programează-te"** → ajunge la formular
+4. **Completează datele** (nume, email, telefon)
+5. **Selectează data** → vede toate orele
    - Orele libere: butoane normale
    - Orele ocupate: ~~tăiate cu roșu~~ și cu ✕
-5. **Selectează ora disponibilă**
-6. **Click "Confirmă Programarea"**
-7. **Primește email** de confirmare cu toate detaliile
+6. **Selectează ora disponibilă**
+7. **Click "Confirmă Programarea"**
+8. **Primește email** de confirmare cu toate detaliile
 
-### Pentru Admin (Backend/Supabase)
+### Pentru Dentist
 
-1. **Mergi în Supabase Dashboard** → Table Editor
-2. Vezi toate programările în tabela `appointments`
-3. Poți șterge/modifica manual dacă e necesar
+1. Accesează `/dentist/login`
+2. Login cu credențiale:
+   - Email: `dr.ionescu@dentcare.ro`
+   - Parolă: `dentist123`
+3. **Dashboard** - Vede programările zilei
+4. Poate marca programări ca "completate"
+5. Poate vizualiza istoric pacienți
+
+### Pentru Admin
+
+1. Accesează `/admin` (autentificare necesară)
+2. **Dashboard** - Statistici programări
+3. **Programări** - Management toate programările
+4. **Pacienți** - Listă pacienți
+5. **Orar** - Configurare sloturi disponibile
+6. **Servicii** - Management servicii și prețuri
+7. **Email-uri** - Șabloane email
 
 ---
 
@@ -196,24 +265,12 @@ Utilizatorul A                    Utilizatorul B
 - UPDATE atomic cu condiție `status='available'`
 - Verificare înainte de inserare
 
-### 2. Protecție Anti-Reply la Email
+### 2. Autentificare și Autorizare
 
-```
-Client primește email
-        │
-        ▼
-From: Cabinet Stomatologic <dentist@gmail.com>
-Reply-To: popescuiustinian2@gmail.com  ← Reply-urile vin aici!
-        │
-        ▼
-Client dă Reply
-        │
-        ▼
-Emailul se duce la popescuiustinian2@gmail.com
-        │
-        ▼
-Dentistul NU primește spam! ✅
-```
+- **Supabase Auth** pentru autentificare securizată
+- **RLS (Row Level Security)** pentru protecția datelor
+- **Role-based access** - admin, dentist, patient
+- **Email verification** pentru noi conturi
 
 ### 3. Validări
 
@@ -226,33 +283,38 @@ Dentistul NU primește spam! ✅
 
 ## 📊 Schema Bazei de Date
 
-### Tabela `appointment_slots`
+### Tabele Principale
+
+| Tabelă | Descriere |
+|--------|-----------|
+| `profiles` | Profiluri utilizatori (pacienți, medici, admin) |
+| `appointment_slots` | Sloturi disponibile pentru programări |
+| `appointments` | Programări confirmate |
+| `services` | Servicii stomatologice cu prețuri |
+| `gallery_items` | Elemente galerie before/after |
+| `verification_tokens` | Token-uri verificare email |
+
+### Tabela `profiles`
+
+| Coloană | Tip | Descriere |
+|---------|-----|-----------|
+| `id` | UUID | ID utilizator (legat de auth.users) |
+| `role` | TEXT | 'admin', 'dentist', 'patient' |
+| `first_name` | TEXT | Prenume |
+| `last_name` | TEXT | Nume |
+| `phone` | TEXT | Telefon |
+| `created_at` | TIMESTAMP | Data creării |
+
+### Tabela `services`
 
 | Coloană | Tip | Descriere |
 |---------|-----|-----------|
 | `id` | UUID | ID unic |
-| `slot_date` | DATE | Data programării |
-| `slot_time` | TIME | Ora programării |
-| `status` | TEXT | 'available', 'booked', 'blocked' |
-| `patient_name` | TEXT | Numele pacientului |
-| `patient_phone` | TEXT | Telefon pacient |
-| `booked_by` | TEXT | Email pacient |
-| `created_at` | TIMESTAMP | Când a fost creat |
-
-**Constraint unic:** `(slot_date, slot_time)`
-
-### Tabela `appointments`
-
-| Coloană | Tip | Descriere |
-|---------|-----|-----------|
-| `id` | UUID | ID unic |
-| `slot_id` | UUID | Referință la slot |
-| `name` | TEXT | Numele pacientului |
-| `email` | TEXT | Email pacient |
-| `phone` | TEXT | Telefon pacient |
-| `service` | TEXT | Tipul serviciului |
-| `appointment_date` | DATE | Data |
-| `appointment_time` | TIME | Ora |
+| `name_ro` | TEXT | Denumire RO |
+| `name_en` | TEXT | Denumire EN |
+| `category` | TEXT | Categorie serviciu |
+| `price` | INTEGER | Preț în RON |
+| `duration_minutes` | INTEGER | Durată în minute |
 
 ---
 
@@ -265,16 +327,23 @@ Dentistul NU primește spam! ✅
 | `/api/test` | GET | Test server |
 | `/api/available-slots?date=YYYY-MM-DD` | GET | Obține sloturi libere |
 | `/api/appointments` | POST | Creează programare + trimite email |
+| `/api/auth/login` | POST | Autentificare |
+| `/api/auth/register` | POST | Înregistrare |
 
-### Frontend API Functions
+### Frontend Routes
 
-```typescript
-// Obține sloturi disponibile
-getAvailableSlots(date: string): Promise<string[]>
-
-// Creează programare (via backend)
-createAppointmentViaBackend(data: FormData): Promise<Result>
-```
+| Route | Descriere |
+|-------|-----------|
+| `/` | Pagina principală |
+| `/rezervare` | Formular programare |
+| `/echipa` | Pagina echipă |
+| `/lucrari` | Galerie lucrări |
+| `/servicii` | Listă servicii și prețuri |
+| `/pacient/login` | Login pacient |
+| `/pacient/dashboard` | Dashboard pacient |
+| `/dentist/login` | Login dentist |
+| `/dentist/dashboard` | Dashboard dentist |
+| `/admin/*` | Portal admin |
 
 ---
 
@@ -291,7 +360,9 @@ createAppointmentViaBackend(data: FormData): Promise<Result>
 
 1. Import proiect din GitHub
 2. Setează `VITE_BACKEND_URL` cu URL-ul backend-ului deployat
-3. Deploy!
+3. Build command: `npm run build`
+4. Output directory: `dist`
+5. Deploy!
 
 **Notă**: Nu uita să schimbi `VITE_BACKEND_URL` din `.env` local în URL-ul de producție.
 
@@ -340,6 +411,12 @@ PORT=5001
 VITE_BACKEND_URL=http://localhost:5001
 ```
 
+### Erori TypeScript "NodeJS.Timeout"
+
+**Cauză**: Cod scris pentru Node.js dar rulat în browser
+
+**Soluție**: Folosește `ReturnType<typeof setTimeout>` în loc de `NodeJS.Timeout`
+
 ---
 
 ## 📞 Contact și Suport
@@ -353,6 +430,6 @@ Pentru probleme sau întrebări:
 
 ## 📄 Licență
 
-Acest proiect este proprietatea cabinetului stomatologic.
+Acest proiect este proprietatea **Clinicii Dr. Lung**.
 
-**Creat cu ❤️ pentru dentistul tău!** 🦷
+**Creat cu ❤️ pentru sănătatea dinților tăi!** 🦷
