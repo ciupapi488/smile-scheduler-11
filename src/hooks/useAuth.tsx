@@ -16,7 +16,7 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
 });
 
-// Helper to check admin with timeout
+// Helper to check admin with timeout - checks user_roles table
 const checkAdminWithTimeout = async (userId: string, timeoutMs = 2000): Promise<boolean> => {
   return Promise.race([
     supabase
@@ -25,10 +25,23 @@ const checkAdminWithTimeout = async (userId: string, timeoutMs = 2000): Promise<
       .eq("user_id", userId)
       .eq("role", "admin")
       .maybeSingle()
-      .then(({ data }) => !!data)
-      .catch(() => false),
+      .then(({ data, error }) => {
+        if (error) {
+          // Table might not exist or RLS error - silently fail
+          console.warn("Admin check warning (non-critical):", error.message);
+          return false;
+        }
+        return !!data;
+      })
+      .catch((err) => {
+        console.warn("Admin check failed (non-critical):", err.message);
+        return false;
+      }),
     new Promise<boolean>((resolve) => 
-      setTimeout(() => resolve(false), timeoutMs)
+      setTimeout(() => {
+        console.warn("Admin check timeout");
+        resolve(false);
+      }, timeoutMs)
     )
   ]);
 };
