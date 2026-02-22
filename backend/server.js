@@ -83,25 +83,26 @@ app.get('/api/available-slots', async (req, res) => {
 app.post('/api/appointments', async (req, res) => {
   const { name, email, phone, date, time, service, dentist_id } = req.body;
   
+  console.log('Booking request:', { name, email, date, time, service, dentist_id });
+  
   if (!name || !email || !phone || !date || !time || !service) {
     return res.status(400).json({ error: 'All fields required' });
   }
   
   try {
-    // Check existing appointment same day
+    // Check existing appointment same day (can't filter by status as column doesn't exist)
     const { data: existing } = await supabase
       .from('appointments')
       .select('id')
       .eq('appointment_date', date)
       .eq('email', email)
-      .not('status', 'eq', 'cancelled')
       .maybeSingle();
     
     if (existing) {
       return res.status(409).json({ error: 'Already have an appointment this day', code: 'DOUBLE_BOOKING' });
     }
     
-    // Create slot
+    // Create slot - ONLY include fields that exist in the table
     const slotData = {
       slot_date: date,
       slot_time: time,
@@ -110,17 +111,30 @@ app.post('/api/appointments', async (req, res) => {
       patient_phone: phone,
       booked_by: email
     };
-    if (dentist_id) slotData.dentist_id = dentist_id;
+    // Note: dentist_id is only in appointments table, not in appointment_slots
+    
+    console.log('Creating slot:', slotData);
     
     const { data: newSlot, error: slotError } = await supabase
       .from('appointment_slots')
-      .upsert(slotData, { onConflict: dentist_id ? 'slot_date,slot_time,dentist_id' : 'slot_date,slot_time' })
+      .insert(slotData)
       .select()
       .single();
     
-    if (slotError) throw slotError;
+    if (slotError) {
+      console.error('Slot creation error details:', JSON.stringify(slotError, null, 2));
+      // If slot already exists, return error
+      if (slotError.code === '23505') { // Unique violation
+        return res.status(409).json({ error: 'This time slot is already booked', code: 'SLOT_TAKEN' });
+      }
+      // Return the actual error for debugging
+      return res.status(500).json({ error: slotError.message || 'Slot creation failed', details: slotError });
+    }
     
-    // Create appointment
+    console.log('Slot created:', newSlot);
+    
+    // Create appointment - only include fields that exist in schema
+    // Schema: id, slot_id, name, email, phone, service, appointment_date, appointment_time, created_at, updated_at
     const apptData = {
       slot_id: newSlot.id,
       name,
@@ -128,24 +142,30 @@ app.post('/api/appointments', async (req, res) => {
       phone,
       service,
       appointment_date: date,
-      appointment_time: time,
-      status: 'confirmed',
-      created_by: 'patient_online'
+      appointment_time: time
     };
-    if (dentist_id) apptData.dentist_id = dentist_id;
+    // Note: status, dentist_id, created_by columns do not exist in current schema
     
-    await supabase.from('appointments').insert(apptData);
+    console.log('Creating appointment:', apptData);
+    
+    const { error: apptError } = await supabase.from('appointments').insert(apptData);
+    
+    if (apptError) {
+      console.error('Appointment creation error:', apptError);
+      throw apptError;
+    }
     
     // Send email (don't block on failure)
     emailService.sendBookingConfirmation({
       name, email, phone, appointment_date: date, appointment_time: time, service
     }).catch(err => console.log('Email failed:', err.message));
     
+    console.log('Booking successful');
     res.json({ success: true, message: 'Appointment confirmed' });
     
   } catch (err) {
     console.error('Booking error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: err.message || 'Server error' });
   }
 });
 
