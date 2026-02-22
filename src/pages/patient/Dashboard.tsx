@@ -84,16 +84,11 @@ export default function PatientDashboard() {
 
   const loadAppointments = async (userEmail: string) => {
     try {
-      const response = await fetch(`${API_URL}/api/admin/appointments?limit=100`);
+      const response = await fetch(`${API_URL}/api/patient/appointments?email=${encodeURIComponent(userEmail)}`);
       if (!response.ok) throw new Error('Failed to fetch');
       
       const data = await response.json();
-      
-      const userAppointments = (data.appointments || []).filter(
-        (apt: any) => apt.email === userEmail
-      );
-      
-      setAppointments(userAppointments);
+      setAppointments(data.appointments || []);
     } catch (err) {
       console.error('Error loading appointments:', err);
       setError(t("dashboard.loading"));
@@ -110,10 +105,10 @@ export default function PatientDashboard() {
 
     setCancelling(appointmentId);
     try {
-      const response = await fetch(`${API_URL}/api/admin/appointments/${appointmentId}/cancel`, {
+      const response = await fetch(`${API_URL}/api/patient/appointments/${appointmentId}/cancel`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: 'Anulat de pacient' })
+        body: JSON.stringify({ email: user?.email })
       });
 
       if (response.ok) {

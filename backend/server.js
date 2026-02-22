@@ -349,6 +349,74 @@ app.get('/api/auth/check-verification', async (req, res) => {
 });
 
 // ============================================
+// PATIENT ROUTES
+// ============================================
+
+// Get patient appointments by email
+app.get('/api/patient/appointments', async (req, res) => {
+  const { email } = req.query;
+  
+  if (!email) {
+    return res.status(400).json({ error: 'Email required' });
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('appointments')
+      .select('*')
+      .eq('email', email.toLowerCase().trim())
+      .order('appointment_date', { ascending: false })
+      .limit(100);
+    
+    if (error) throw error;
+    
+    res.json({ appointments: data || [] });
+  } catch (err) {
+    console.error('Error fetching patient appointments:', err);
+    res.json({ appointments: [] });
+  }
+});
+
+// Cancel patient appointment
+app.post('/api/patient/appointments/:id/cancel', async (req, res) => {
+  const { email } = req.body;
+  
+  if (!email) {
+    return res.status(400).json({ error: 'Email required' });
+  }
+  
+  try {
+    // Verify the appointment belongs to this patient
+    const { data: appointment } = await supabase
+      .from('appointments')
+      .select('email')
+      .eq('id', req.params.id)
+      .single();
+    
+    if (!appointment || appointment.email.toLowerCase().trim() !== email.toLowerCase().trim()) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+    
+    // Cancel the appointment
+    await supabase
+      .from('appointments')
+      .update({ status: 'cancelled' })
+      .eq('id', req.params.id);
+    
+    // Free up the slot
+    await supabase
+      .from('appointment_slots')
+      .update({ status: 'available', patient_name: null, patient_phone: null, booked_by: null })
+      .eq('id', req.params.id);
+    
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Cancel error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ============================================
 // ADMIN ROUTES
 // ============================================
 
