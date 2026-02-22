@@ -1,7 +1,9 @@
 // ============================================
 // API Configuration
 // ============================================
-export const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+// Use relative URL in development (goes through Vite proxy)
+// Use env variable in production
+export const API_URL = import.meta.env.DEV ? '' : (import.meta.env.VITE_BACKEND_URL || '');
 
 // ============================================
 // Types
