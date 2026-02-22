@@ -54,6 +54,10 @@ const translations = {
     "stats.patients": "Pacienți mulțumiți",
     "stats.support": "Suport urgențe",
 
+    // AI Symptom Checker
+    "ai.title": "Asistent AI Dentar",
+    "ai.subtitle": "Descrieți simptomele și primiți îndrumare instant",
+
     // Location
     "location.title": "Unde ne găsești?",
     "location.subtitle": "Vizitează-ne la clinică în Cluj-Napoca",

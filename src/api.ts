@@ -173,6 +173,31 @@ export const updateWorkingDay = async (
   return response.ok;
 };
 
+// AI Symptom Checker
+export interface SymptomCheckResult {
+  urgency: string;
+  possibleCause: string;
+  recommendedService: string;
+  confidence: number;
+  color: 'red' | 'orange' | 'blue';
+}
+
+export const checkSymptoms = async (symptoms: string, language: string = 'ro'): Promise<SymptomCheckResult> => {
+  const response = await fetch(`${API_URL}/api/ai/symptom-check`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ symptoms, language }),
+  });
+  
+  const data = await response.json();
+  
+  if (!response.ok) {
+    throw new Error(data.error || 'Error analyzing symptoms');
+  }
+  
+  return data;
+};
+
 // Dashboard stats (simplified)
 export interface DashboardStats {
   today_count: number;

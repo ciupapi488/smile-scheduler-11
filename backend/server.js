@@ -19,6 +19,12 @@ const supabase = createClient(
 const emailService = new EmailService();
 
 // ============================================
+// AI ROUTES
+// ============================================
+const aiRoutes = require('./routes/ai');
+app.use('/api/ai', aiRoutes);
+
+// ============================================
 // PUBLIC ROUTES
 // ============================================
 

@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/hooks/useLanguage";
+import SymptomChecker from "@/components/ai/SymptomChecker";
 
 export default function Index() {
   const { t } = useLanguage();
@@ -74,6 +75,23 @@ export default function Index() {
                   <p className="mt-2 text-gray-600">{feature.description}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* AI Symptom Checker Section */}
+        <section className="py-16 bg-gradient-to-b from-blue-50 to-white">
+          <div className="container">
+            <div className="mx-auto max-w-4xl">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-900">
+                  {t("ai.title") || "Asistent AI Dentar"}
+                </h2>
+                <p className="mt-4 text-gray-600">
+                  {t("ai.subtitle") || "Descrieți simptomele și primiți îndrumare instant"}
+                </p>
+              </div>
+              <SymptomChecker />
             </div>
           </div>
         </section>
