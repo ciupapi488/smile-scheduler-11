@@ -39,6 +39,12 @@ interface UserProfile {
   phone?: string;
 }
 
+interface CancellationData {
+  count: number;
+  isBlocked: boolean;
+  remaining: number;
+}
+
 export default function PatientDashboard() {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -47,6 +53,7 @@ export default function PatientDashboard() {
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const [cancellationData, setCancellationData] = useState<CancellationData>({ count: 0, isBlocked: false, remaining: 3 });
 
   useEffect(() => {
     const init = async () => {
@@ -73,12 +80,27 @@ export default function PatientDashboard() {
         phone: user.user_metadata?.phone || ''
       });
 
-      await loadAppointments(user.email || '');
+      await Promise.all([
+        loadAppointments(user.email || ''),
+        loadCancellationCount(user.email || '')
+      ]);
     } catch (err) {
       console.error('Error checking user:', err);
       setError(t("dashboard.loading"));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadCancellationCount = async (userEmail: string) => {
+    try {
+      const response = await fetch(`${API_URL}/api/patient/cancellations?email=${encodeURIComponent(userEmail)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setCancellationData(data);
+      }
+    } catch (err) {
+      console.error('Error loading cancellation count:', err);
     }
   };
 
@@ -101,7 +123,18 @@ export default function PatientDashboard() {
   };
 
   const handleCancel = async (appointmentId: string) => {
-    if (!confirm(t("dashboard.cancel") + '?')) return;
+    // Check if user is blocked
+    if (cancellationData.isBlocked) {
+      setError(t("dashboard.accountBlockedMessage"));
+      return;
+    }
+
+    // Show warning with cancellation count
+    const warningMessage = t("dashboard.cancelWarning") + 
+      `\n\n${t("dashboard.cancelCount")}: ${cancellationData.count}` +
+      `\n${t("dashboard.cancelRemaining")}: ${cancellationData.remaining}`;
+    
+    if (!confirm(warningMessage)) return;
 
     setCancelling(appointmentId);
     try {
@@ -111,10 +144,27 @@ export default function PatientDashboard() {
         body: JSON.stringify({ email: user?.email })
       });
 
+      const result = await response.json();
+
       if (response.ok) {
+        // Update cancellation data
+        setCancellationData({
+          count: result.cancellationCount,
+          isBlocked: result.isBlocked,
+          remaining: result.remaining
+        });
+        
         if (user?.email) {
           await loadAppointments(user.email);
         }
+        
+        // Show warning if user is now blocked
+        if (result.isBlocked) {
+          setError(t("dashboard.accountBlockedMessage"));
+        }
+      } else if (result.code === 'ACCOUNT_BLOCKED') {
+        setCancellationData({ count: result.count, isBlocked: true, remaining: 0 });
+        setError(t("dashboard.accountBlockedMessage"));
       } else {
         setError(t("dashboard.cancel"));
       }
@@ -254,6 +304,25 @@ END:VCALENDAR`;
                     <span className="text-gray-600">{t("dashboard.future")}</span>
                     <span className="font-semibold">{upcomingAppointments.length}</span>
                   </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">{t("dashboard.cancelCount")}</span>
+                    <span className={`font-semibold ${cancellationData.count >= 2 ? 'text-orange-500' : ''} ${cancellationData.count >= 3 ? 'text-red-600' : ''}`}>
+                      {cancellationData.count}/3
+                    </span>
+                  </div>
+                  {cancellationData.count > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">{t("dashboard.cancelRemaining")}</span>
+                      <span className={`font-semibold ${cancellationData.remaining <= 1 ? 'text-red-600' : 'text-green-600'}`}>
+                        {cancellationData.remaining}
+                      </span>
+                    </div>
+                  )}
+                  {cancellationData.isBlocked && (
+                    <div className="mt-2 p-2 bg-red-100 rounded text-xs text-red-700 text-center">
+                      {t("dashboard.accountBlocked")}
+                    </div>
+                  )}
                 </div>
 
                 <Button className="w-full mt-6" asChild>
@@ -351,10 +420,11 @@ END:VCALENDAR`;
                               variant="destructive" 
                               size="sm"
                               onClick={() => handleCancel(apt.id)}
-                              disabled={cancelling === apt.id}
+                              disabled={cancelling === apt.id || cancellationData.isBlocked}
+                              title={cancellationData.isBlocked ? t("dashboard.accountBlockedMessage") : ""}
                             >
                               <XCircle className="h-4 w-4 mr-1" />
-                              {cancelling === apt.id ? t("dashboard.loading") : t("dashboard.cancel")}
+                              {cancelling === apt.id ? t("dashboard.loading") : cancellationData.isBlocked ? t("dashboard.accountBlocked") : t("dashboard.cancel")}
                             </Button>
                           </div>
                         </div>

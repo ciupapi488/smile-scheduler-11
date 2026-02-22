@@ -397,7 +397,36 @@ app.get('/api/patient/appointments', async (req, res) => {
   }
 });
 
-// Cancel patient appointment
+// Get patient cancellation count
+app.get('/api/patient/cancellations', async (req, res) => {
+  const { email } = req.query;
+  
+  if (!email) {
+    return res.status(400).json({ error: 'Email required' });
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('patient_cancellations')
+      .select('count')
+      .eq('email', email.toLowerCase().trim())
+      .single();
+    
+    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows
+      console.error('Error fetching cancellations:', error);
+    }
+    
+    const count = data?.count || 0;
+    const isBlocked = count >= 3;
+    
+    res.json({ count, isBlocked, remaining: Math.max(0, 3 - count) });
+  } catch (err) {
+    console.error('Error:', err);
+    res.json({ count: 0, isBlocked: false, remaining: 3 });
+  }
+});
+
+// Cancel patient appointment with tracking
 app.post('/api/patient/appointments/:id/cancel', async (req, res) => {
   const { email } = req.body;
   
@@ -405,31 +434,68 @@ app.post('/api/patient/appointments/:id/cancel', async (req, res) => {
     return res.status(400).json({ error: 'Email required' });
   }
   
+  const normalizedEmail = email.toLowerCase().trim();
+  
   try {
-    // Verify the appointment belongs to this patient
+    // Check if user is blocked
+    const { data: cancelData } = await supabase
+      .from('patient_cancellations')
+      .select('count')
+      .eq('email', normalizedEmail)
+      .single();
+    
+    const currentCount = cancelData?.count || 0;
+    
+    if (currentCount >= 3) {
+      return res.status(403).json({ 
+        error: 'Account blocked due to excessive cancellations',
+        code: 'ACCOUNT_BLOCKED',
+        count: currentCount
+      });
+    }
+    
+    // Get appointment details before deleting
     const { data: appointment } = await supabase
       .from('appointments')
-      .select('email')
+      .select('email, slot_id')
       .eq('id', req.params.id)
       .single();
     
-    if (!appointment || appointment.email.toLowerCase().trim() !== email.toLowerCase().trim()) {
+    if (!appointment || appointment.email.toLowerCase().trim() !== normalizedEmail) {
       return res.status(403).json({ error: 'Unauthorized' });
     }
     
-    // Cancel the appointment
-    await supabase
+    // Delete the appointment (no status column)
+    const { error: deleteError } = await supabase
       .from('appointments')
-      .update({ status: 'cancelled' })
+      .delete()
       .eq('id', req.params.id);
+    
+    if (deleteError) throw deleteError;
     
     // Free up the slot
     await supabase
       .from('appointment_slots')
       .update({ status: 'available', patient_name: null, patient_phone: null, booked_by: null })
-      .eq('id', req.params.id);
+      .eq('id', appointment.slot_id);
     
-    res.json({ success: true });
+    // Increment cancellation count
+    const newCount = currentCount + 1;
+    await supabase
+      .from('patient_cancellations')
+      .upsert({
+        email: normalizedEmail,
+        count: newCount,
+        last_cancelled_at: new Date().toISOString()
+      }, { onConflict: 'email' });
+    
+    res.json({ 
+      success: true, 
+      cancellationCount: newCount,
+      isBlocked: newCount >= 3,
+      remaining: Math.max(0, 3 - newCount)
+    });
+    
   } catch (err) {
     console.error('Cancel error:', err);
     res.status(500).json({ error: err.message });
