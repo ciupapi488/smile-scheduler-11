@@ -1,0 +1,22 @@
+# AI Dental Dataset Generator Dependencies
+# Python 3.9+
+
+# Core dependencies
+uuid>=1.30
+random2>=1.0.1
+
+# For progress bar
+tqdm>=4.65.0
+
+# For CSV export
+csv342>=1.0.0
+
+# For Ollama integration (optional)
+requests>=2.28.0
+
+# For data validation
+jsonschema>=4.17.0
+
+# Development dependencies (optional)
+pytest>=7.3.0
+black>=23.0.0

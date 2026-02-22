@@ -1,0 +1,1848 @@
+[
+  {
+    "scenario_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "input_description": "I have a throbbing pain in my upper right molar for 3 days. It's worse at night and the pain is 8/10.",
+    "extracted_symptoms": {
+      "pain_location": ["upper right molar"],
+      "pain_type": "pulsating",
+      "pain_level": 8,
+      "duration": "for 3 days",
+      "triggers": ["hot", "cold"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Acute Irreversible Pulpitis",
+      "differential": ["Symptomatic Apical Periodontitis", "Cracked Tooth"],
+      "confidence": 85
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Root Canal Treatment",
+      "estimated_duration_minutes": 90
+    },
+    "category": "endodontic",
+    "complexity": "moderate",
+    "patient_profile": {"age": 35, "gender": "F", "conditions": ["pregnant"]}
+  },
+  {
+    "scenario_id": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+    "input_description": "My lower left molar has been hurting since yesterday, and now there's swelling and I can taste something bad. Pain is 9/10.",
+    "extracted_symptoms": {
+      "pain_location": ["lower left molar"],
+      "pain_type": "throbbing",
+      "pain_level": 9,
+      "duration": "since yesterday",
+      "triggers": ["biting"],
+      "visual_signs": ["swelling"],
+      "additional_symptoms": ["bad_taste"]
+    },
+    "diagnosis": {
+      "primary": "Acute Periapical Abscess",
+      "differential": ["Periodontal Abscess", "Cellulitis"],
+      "confidence": 90
+    },
+    "recommended_action": {
+      "urgency": "immediate",
+      "service_type": "Emergency Root Canal or Extraction",
+      "estimated_duration_minutes": 120
+    },
+    "category": "endodontic",
+    "complexity": "complex",
+    "patient_profile": {"age": 45, "gender": "M", "conditions": ["diabetic"]}
+  },
+  {
+    "scenario_id": "c3d4e5f6-a7b8-9012-cdef-345678901234",
+    "input_description": "My upper left molar has turned gray and there's a pimple on the gum. Sometimes it drains. No pain currently.",
+    "extracted_symptoms": {
+      "pain_location": ["upper left molar"],
+      "pain_type": "none",
+      "pain_level": 1,
+      "duration": "over a month",
+      "triggers": ["none"],
+      "visual_signs": ["dark_spot"],
+      "additional_symptoms": ["bad_taste"]
+    },
+    "diagnosis": {
+      "primary": "Pulp Necrosis with Chronic Apical Abscess",
+      "differential": ["Internal Resorption", "Calcific Metamorphosis"],
+      "confidence": 88
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Root Canal Treatment",
+      "estimated_duration_minutes": 90
+    },
+    "category": "endodontic",
+    "complexity": "moderate",
+    "patient_profile": {"age": 28, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "d4e5f6a7-b8c9-0123-defa-456789012345",
+    "input_description": "When I bite down on my lower right premolar, it hurts. The pain is sharp and worse when eating.",
+    "extracted_symptoms": {
+      "pain_location": ["lower right premolar"],
+      "pain_type": "sharp",
+      "pain_level": 6,
+      "duration": "a few hours",
+      "triggers": ["biting"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Symptomatic Apical Periodontitis",
+      "differential": ["Cracked Tooth", "High Filling"],
+      "confidence": 75
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Endodontic Evaluation",
+      "estimated_duration_minutes": 45
+    },
+    "category": "endodontic",
+    "complexity": "simple",
+    "patient_profile": {"age": 62, "gender": "M", "conditions": ["hypertension"]}
+  },
+  {
+    "scenario_id": "e5f6a7b8-c9d0-1234-efab-567890123456",
+    "input_description": "My lower left canine is sensitive to cold but the pain goes away quickly. It's been about a week.",
+    "extracted_symptoms": {
+      "pain_location": ["lower left canine"],
+      "pain_type": "sensitive",
+      "pain_level": 4,
+      "duration": "about a week",
+      "triggers": ["cold"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Reversible Pulpitis",
+      "differential": ["Dentin Hypersensitivity", "Incipient Caries"],
+      "confidence": 80
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Restorative Treatment",
+      "estimated_duration_minutes": 60
+    },
+    "category": "endodontic",
+    "complexity": "simple",
+    "patient_profile": {"age": 30, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "f6a7b8c9-d0e1-2345-fabc-678901234567",
+    "input_description": "I have a dull ache in my wisdom tooth that's been constant for 2 weeks. Pain is 7/10.",
+    "extracted_symptoms": {
+      "pain_location": ["wisdom tooth"],
+      "pain_type": "constant",
+      "pain_level": 7,
+      "duration": "for 2 weeks",
+      "triggers": ["none"],
+      "visual_signs": ["swelling"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Impacted Third Molar with Pericoronitis",
+      "differential": ["Root Resorption"],
+      "confidence": 83
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Surgical Extraction",
+      "estimated_duration_minutes": 90
+    },
+    "category": "endodontic",
+    "complexity": "moderate",
+    "patient_profile": {"age": 24, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "a7b8c9d0-e1f2-3456-abcd-789012345678",
+    "input_description": "Shooting pain in my upper right incisor when I drink hot coffee. Started yesterday. Pain level 6/10.",
+    "extracted_symptoms": {
+      "pain_location": ["upper right incisor"],
+      "pain_type": "sharp",
+      "pain_level": 6,
+      "duration": "since yesterday",
+      "triggers": ["hot"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Symptomatic Irreversible Pulpitis",
+      "differential": ["Dentin Hypersensitivity"],
+      "confidence": 78
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Root Canal Treatment",
+      "estimated_duration_minutes": 75
+    },
+    "category": "endodontic",
+    "complexity": "moderate",
+    "patient_profile": {"age": 40, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "b8c9d0e1-f2a3-4567-bcde-890123456789",
+    "input_description": "Burning sensation in my upper left premolar that comes and goes. Had it for over a month, pain 3/10.",
+    "extracted_symptoms": {
+      "pain_location": ["upper left premolar"],
+      "pain_type": "intermittent",
+      "pain_level": 3,
+      "duration": "over a month",
+      "triggers": ["sweet"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Chronic Hyperplastic Pulpitis",
+      "differential": ["Periodontal Disease"],
+      "confidence": 72
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Endodontic Evaluation",
+      "estimated_duration_minutes": 60
+    },
+    "category": "endodontic",
+    "complexity": "moderate",
+    "patient_profile": {"age": 55, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "c9d0e1f2-a3b4-5678-cdef-901234567890",
+    "input_description": "Stabbing pain in lower right molar that started this morning. Can't sleep at night. Pain 9/10.",
+    "extracted_symptoms": {
+      "pain_location": ["lower right molar"],
+      "pain_type": "sharp",
+      "pain_level": 9,
+      "duration": "since this morning",
+      "triggers": ["none"],
+      "visual_signs": ["swelling"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Acute Apical Abscess",
+      "differential": ["Periodontal Abscess"],
+      "confidence": 89
+    },
+    "recommended_action": {
+      "urgency": "immediate",
+      "service_type": "Emergency Endodontic Treatment",
+      "estimated_duration_minutes": 120
+    },
+    "category": "endodontic",
+    "complexity": "complex",
+    "patient_profile": {"age": 38, "gender": "F", "conditions": ["pregnant"]}
+  },
+  {
+    "scenario_id": "d0e1f2a3-b4c5-6789-defa-012345678901",
+    "input_description": "Tender sensation in upper left molar when I bite. Been happening for a few hours. Pain 5/10.",
+    "extracted_symptoms": {
+      "pain_location": ["upper left molar"],
+      "pain_type": "tender",
+      "pain_level": 5,
+      "duration": "a few hours",
+      "triggers": ["biting"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Symptomatic Apical Periodontitis",
+      "differential": ["Cracked Tooth"],
+      "confidence": 74
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Dental Evaluation",
+      "estimated_duration_minutes": 45
+    },
+    "category": "endodontic",
+    "complexity": "simple",
+    "patient_profile": {"age": 42, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "e1f2a3b4-c5d6-7890-efab-123456789012",
+    "input_description": "Sensitive lower right incisor to cold water. Pain goes away quickly. About a week duration.",
+    "extracted_symptoms": {
+      "pain_location": ["lower right incisor"],
+      "pain_type": "sensitive",
+      "pain_level": 3,
+      "duration": "about a week",
+      "triggers": ["cold"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Reversible Pulpitis",
+      "differential": ["Dentin Hypersensitivity"],
+      "confidence": 82
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Restorative Treatment",
+      "estimated_duration_minutes": 45
+    },
+    "category": "endodontic",
+    "complexity": "simple",
+    "patient_profile": {"age": 25, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "f2a3b4c5-d6e7-8901-fabc-234567890123",
+    "input_description": "Throbbing pain in upper right molar worse at night. Started 3 days ago. Pain 8/10.",
+    "extracted_symptoms": {
+      "pain_location": ["upper right molar"],
+      "pain_type": "throbbing",
+      "pain_level": 8,
+      "duration": "for 3 days",
+      "triggers": ["hot", "cold"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Acute Irreversible Pulpitis",
+      "differential": ["Cracked Tooth"],
+      "confidence": 86
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Root Canal Treatment",
+      "estimated_duration_minutes": 90
+    },
+    "category": "endodontic",
+    "complexity": "moderate",
+    "patient_profile": {"age": 50, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "a3b4c5d6-e7f8-9012-abcd-345678901234",
+    "input_description": "My gums bleed when I brush and they look red. It's been about a week.",
+    "extracted_symptoms": {
+      "pain_location": ["gums"],
+      "pain_type": "tender",
+      "pain_level": 2,
+      "duration": "about a week",
+      "triggers": ["none"],
+      "visual_signs": ["redness", "bleeding"],
+      "additional_symptoms": ["bleeding"]
+    },
+    "diagnosis": {
+      "primary": "Generalized Gingivitis",
+      "differential": ["Early Periodontitis", "Pregnancy Gingivitis"],
+      "confidence": 90
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Professional Cleaning",
+      "estimated_duration_minutes": 45
+    },
+    "category": "periodontal",
+    "complexity": "simple",
+    "patient_profile": {"age": 30, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "b4c5d6e7-f8a9-0123-bcde-456789012345",
+    "input_description": "There's a swollen bump on my gum near the lower left molar. It hurts to touch and I have fever since yesterday.",
+    "extracted_symptoms": {
+      "pain_location": ["gums"],
+      "pain_type": "throbbing",
+      "pain_level": 8,
+      "duration": "since yesterday",
+      "triggers": ["none"],
+      "visual_signs": ["swelling", "pus"],
+      "additional_symptoms": ["fever"]
+    },
+    "diagnosis": {
+      "primary": "Periodontal Abscess",
+      "differential": ["Periapical Abscess", "Gingival Abscess"],
+      "confidence": 85
+    },
+    "recommended_action": {
+      "urgency": "immediate",
+      "service_type": "Emergency Periodontal Treatment",
+      "estimated_duration_minutes": 60
+    },
+    "category": "periodontal",
+    "complexity": "complex",
+    "patient_profile": {"age": 48, "gender": "M", "conditions": ["diabetic"]}
+  },
+  {
+    "scenario_id": "c5d6e7f8-a9b0-1234-cdef-567890123456",
+    "input_description": "My teeth feel loose and my gums have receded. I've noticed bad breath over a month.",
+    "extracted_symptoms": {
+      "pain_location": ["whole mouth"],
+      "pain_type": "dull ache",
+      "pain_level": 3,
+      "duration": "over a month",
+      "triggers": ["none"],
+      "visual_signs": ["redness"],
+      "additional_symptoms": ["bad_breath"]
+    },
+    "diagnosis": {
+      "primary": "Chronic Periodontitis",
+      "differential": ["Aggressive Periodontitis"],
+      "confidence": 88
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Periodontal Evaluation",
+      "estimated_duration_minutes": 60
+    },
+    "category": "periodontal",
+    "complexity": "moderate",
+    "patient_profile": {"age": 55, "gender": "M", "conditions": ["smoker"]}
+  },
+  {
+    "scenario_id": "d6e7f8a9-b0c1-2345-defa-678901234567",
+    "input_description": "My gums are very painful, bleeding, and there's gray stuff between my teeth. I also have fever and bad taste.",
+    "extracted_symptoms": {
+      "pain_location": ["gums"],
+      "pain_type": "sharp",
+      "pain_level": 9,
+      "duration": "a few hours",
+      "triggers": ["none"],
+      "visual_signs": ["swelling", "redness", "pus"],
+      "additional_symptoms": ["fever", "bad_taste", "bleeding"]
+    },
+    "diagnosis": {
+      "primary": "Acute Necrotizing Ulcerative Gingivitis",
+      "differential": ["Primary Herpetic Gingivostomatitis"],
+      "confidence": 92
+    },
+    "recommended_action": {
+      "urgency": "immediate",
+      "service_type": "Emergency Periodontal Care",
+      "estimated_duration_minutes": 90
+    },
+    "category": "periodontal",
+      "complexity": "complex",
+    "patient_profile": {"age": 28, "gender": "F", "conditions": ["immunocompromised"]}
+  },
+  {
+    "scenario_id": "e7f8a9b0-c1d2-3456-efab-789012345678",
+    "input_description": "Gum recession around lower front teeth. No pain but sensitivity to cold. For 2 weeks.",
+    "extracted_symptoms": {
+      "pain_location": ["gums"],
+      "pain_type": "sensitive",
+      "pain_level": 2,
+      "duration": "for 2 weeks",
+      "triggers": ["cold"],
+      "visual_signs": ["redness"],
+      "additional_symptoms": ["sensitivity"]
+    },
+    "diagnosis": {
+      "primary": "Gingival Recession with Dentin Hypersensitivity",
+      "differential": ["Periodontitis"],
+      "confidence": 80
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Periodontal Consultation",
+      "estimated_duration_minutes": 45
+    },
+    "category": "periodontal",
+    "complexity": "simple",
+    "patient_profile": {"age": 35, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "f8a9b0c1-d2e3-4567-fabc-890123456789",
+    "input_description": "Deep pocket behind upper right molar with pus drainage. Pain 6/10 for 4 days.",
+    "extracted_symptoms": {
+      "pain_location": ["gums"],
+      "pain_type": "throbbing",
+      "pain_level": 6,
+      "duration": "for 4 days",
+      "triggers": ["none"],
+      "visual_signs": ["pus"],
+      "additional_symptoms": ["bad_taste"]
+    },
+    "diagnosis": {
+      "primary": "Periodontal Abscess",
+      "differential": ["Pericoronal Abscess"],
+      "confidence": 87
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Periodontal Treatment",
+      "estimated_duration_minutes": 60
+    },
+    "category": "periodontal",
+    "complexity": "moderate",
+    "patient_profile": {"age": 42, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "a9b0c1d2-e3f4-5678-abcd-901234567890",
+    "input_description": "Bleeding gums when flossing. Started 3 days ago. No pain but concerned.",
+    "extracted_symptoms": {
+      "pain_location": ["gums"],
+      "pain_type": "none",
+      "pain_level": 0,
+      "duration": "for 3 days",
+      "triggers": ["none"],
+      "visual_signs": ["redness", "bleeding"],
+      "additional_symptoms": ["bleeding"]
+    },
+    "diagnosis": {
+      "primary": "Acute Gingivitis",
+      "differential": ["Early Periodontitis"],
+      "confidence": 85
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Professional Cleaning",
+      "estimated_duration_minutes": 45
+    },
+    "category": "periodontal",
+    "complexity": "simple",
+    "patient_profile": {"age": 26, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "b0c1d2e3-f4a5-6789-bcde-012345678901",
+    "input_description": "Mobile upper left molar with deep pocket. Pain when chewing. 2 weeks duration.",
+    "extracted_symptoms": {
+      "pain_location": ["gums", "upper left molar"],
+      "pain_type": "dull ache",
+      "pain_level": 5,
+      "duration": "for 2 weeks",
+      "triggers": ["biting"],
+      "visual_signs": ["swelling"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Advanced Periodontitis with Tooth Mobility",
+      "differential": ["Trauma from Occlusion"],
+      "confidence": 88
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Periodontal Surgery Consultation",
+      "estimated_duration_minutes": 75
+    },
+    "category": "periodontal",
+    "complexity": "complex",
+    "patient_profile": {"age": 58, "gender": "M", "conditions": ["diabetic"]}
+  },
+  {
+    "scenario_id": "c1d2e3f4-a5b6-7890-cdef-123456789012",
+    "input_description": "I have a brown spot on my lower right premolar and it's sensitive to sweet things for 3 days.",
+    "extracted_symptoms": {
+      "pain_location": ["lower right premolar"],
+      "pain_type": "sensitive",
+      "pain_level": 3,
+      "duration": "for 3 days",
+      "triggers": ["sweet"],
+      "visual_signs": ["cavity"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Dental Caries (Cavity)",
+      "differential": ["Staining", "Initial Demineralization"],
+      "confidence": 85
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Restorative Filling",
+      "estimated_duration_minutes": 45
+    },
+    "category": "restorative",
+    "complexity": "simple",
+    "patient_profile": {"age": 32, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "d2e3f4a5-b6c7-8901-defa-234567890123",
+    "input_description": "My filling fell out of my upper left molar and now there's a hole. It's sensitive to cold.",
+    "extracted_symptoms": {
+      "pain_location": ["upper left molar"],
+      "pain_type": "sensitive",
+      "pain_level": 5,
+      "duration": "since this morning",
+      "triggers": ["cold", "hot"],
+      "visual_signs": ["cavity"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Lost Restoration with Possible Secondary Caries",
+      "differential": ["Fractured Cusp"],
+      "confidence": 90
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Replacement Filling",
+      "estimated_duration_minutes": 60
+    },
+    "category": "restorative",
+    "complexity": "moderate",
+    "patient_profile": {"age": 45, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "e3f4a5b6-c7d8-9012-efab-345678901234",
+    "input_description": "My lower right molar cracked when I bit down on something hard. Now it hurts when I chew 7/10.",
+    "extracted_symptoms": {
+      "pain_location": ["lower right molar"],
+      "pain_type": "sharp",
+      "pain_level": 7,
+      "duration": "a few hours",
+      "triggers": ["biting"],
+      "visual_signs": ["fracture"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Cracked Tooth Syndrome",
+      "differential": ["Split Tooth", "Cusp Fracture"],
+      "confidence": 82
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Crown or Onlay",
+      "estimated_duration_minutes": 90
+    },
+    "category": "restorative",
+    "complexity": "moderate",
+    "patient_profile": {"age": 38, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "f4a5b6c7-d8e9-0123-fabc-456789012345",
+    "input_description": "My teeth look shorter and are very sensitive, especially to cold. It's been over a month.",
+    "extracted_symptoms": {
+      "pain_location": ["whole mouth"],
+      "pain_type": "sensitive",
+      "pain_level": 4,
+      "duration": "over a month",
+      "triggers": ["cold"],
+      "visual_signs": ["none"],
+      "additional_symptoms": ["sensitivity"]
+    },
+    "diagnosis": {
+      "primary": "Dental Erosion",
+      "differential": ["Abrasion", "Attrition"],
+      "confidence": 78
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Restorative Consultation",
+      "estimated_duration_minutes": 45
+    },
+    "category": "restorative",
+    "complexity": "moderate",
+    "patient_profile": {"age": 29, "gender": "M", "conditions": ["GERD"]}
+  },
+  {
+    "scenario_id": "a5b6c7d8-e9f0-1234-abcd-567890123456",
+    "input_description": "Chipped front tooth from sports injury. Sharp edges cutting my lip. No pain.",
+    "extracted_symptoms": {
+      "pain_location": ["upper right incisor"],
+      "pain_type": "none",
+      "pain_level": 0,
+      "duration": "a few hours",
+      "triggers": ["none"],
+      "visual_signs": ["fracture"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Uncomplicated Crown Fracture",
+      "differential": ["Enamel Infraction"],
+      "confidence": 92
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Composite Restoration",
+      "estimated_duration_minutes": 60
+    },
+    "category": "restorative",
+    "complexity": "simple",
+    "patient_profile": {"age": 22, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "b6c7d8e9-f0a1-2345-bcde-678901234567",
+    "input_description": "Old silver filling in lower left molar is cracked. Sensitivity to pressure. For a week.",
+    "extracted_symptoms": {
+      "pain_location": ["lower left molar"],
+      "pain_type": "sensitive",
+      "pain_level": 4,
+      "duration": "about a week",
+      "triggers": ["biting"],
+      "visual_signs": ["fracture"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Fractured Restoration with Secondary Caries",
+      "differential": ["Cracked Tooth"],
+      "confidence": 84
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Replacement Filling",
+      "estimated_duration_minutes": 60
+    },
+    "category": "restorative",
+    "complexity": "moderate",
+    "patient_profile": {"age": 52, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "c7d8e9f0-a1b2-3456-cdef-789012345678",
+    "input_description": "White spot on upper left canine becoming brown. No pain but noticed for 2 weeks.",
+    "extracted_symptoms": {
+      "pain_location": ["upper left canine"],
+      "pain_type": "none",
+      "pain_level": 0,
+      "duration": "for 2 weeks",
+      "triggers": ["none"],
+      "visual_signs": ["dark_spot"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Active Dental Caries",
+      "differential": ["Fluorosis", "Hypomineralization"],
+      "confidence": 80
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Restorative Filling",
+      "estimated_duration_minutes": 45
+    },
+    "category": "restorative",
+    "complexity": "simple",
+    "patient_profile": {"age": 19, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "d8e9f0a1-b2c3-4567-defa-890123456789",
+    "input_description": "Multiple teeth with worn biting edges. Sensitivity to temperature changes. For months.",
+    "extracted_symptoms": {
+      "pain_location": ["whole mouth"],
+      "pain_type": "sensitive",
+      "pain_level": 3,
+      "duration": "over a month",
+      "triggers": ["cold", "hot"],
+      "visual_signs": ["none"],
+      "additional_symptoms": ["sensitivity"]
+    },
+    "diagnosis": {
+      "primary": "Severe Attrition with Dentin Exposure",
+      "differential": ["Erosion", "Bruxism Effects"],
+      "confidence": 85
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Full Mouth Rehabilitation Consultation",
+      "estimated_duration_minutes": 90
+    },
+    "category": "restorative",
+    "complexity": "complex",
+    "patient_profile": {"age": 65, "gender": "M", "conditions": ["bruxism"]}
+  },
+  {
+    "scenario_id": "e9f0a1b2-c3d4-5678-efab-901234567890",
+    "input_description": "My wisdom tooth in the lower right is hurting and I can feel pressure. It's been for 3 days.",
+    "extracted_symptoms": {
+      "pain_location": ["wisdom tooth"],
+      "pain_type": "dull ache",
+      "pain_level": 6,
+      "duration": "for 3 days",
+      "triggers": ["none"],
+      "visual_signs": ["swelling"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Impacted Third Molar",
+      "differential": ["Pericoronitis", "Root Resorption of Adjacent Tooth"],
+      "confidence": 85
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Surgical Extraction",
+      "estimated_duration_minutes": 90
+    },
+    "category": "oral_surgery",
+    "complexity": "moderate",
+    "patient_profile": {"age": 24, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "f0a1b2c3-d4e5-6789-fabc-012345678901",
+    "input_description": "I had a tooth pulled 4 days ago and now the pain is getting worse. I can see bone in the socket.",
+    "extracted_symptoms": {
+      "pain_location": ["jaw"],
+      "pain_type": "throbbing",
+      "pain_level": 9,
+      "duration": "3 days",
+      "triggers": ["none"],
+      "visual_signs": ["none"],
+      "additional_symptoms": ["bad_taste"]
+    },
+    "diagnosis": {
+      "primary": "Alveolar Osteitis (Dry Socket)",
+      "differential": ["Infection", "Fractured Socket"],
+      "confidence": 92
+    },
+    "recommended_action": {
+      "urgency": "immediate",
+      "service_type": "Emergency Socket Treatment",
+      "estimated_duration_minutes": 45
+    },
+    "category": "oral_surgery",
+    "complexity": "complex",
+    "patient_profile": {"age": 35, "gender": "F", "conditions": ["smoker"]}
+  },
+  {
+    "scenario_id": "a1b2c3d4-e5f6-7890-abcd-123456789012",
+    "input_description": "My jaw clicks when I open wide and I have pain near my ear. It's worse in the morning.",
+    "extracted_symptoms": {
+      "pain_location": ["jaw"],
+      "pain_type": "dull ache",
+      "pain_level": 5,
+      "duration": "about a week",
+      "triggers": ["none"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Temporomandibular Disorder (TMD)",
+      "differential": ["Bruxism", "Internal Derangement"],
+      "confidence": 75
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "TMJ Evaluation",
+      "estimated_duration_minutes": 60
+    },
+    "category": "oral_surgery",
+    "complexity": "moderate",
+    "patient_profile": {"age": 40, "gender": "F", "conditions": ["stress"]}
+  },
+  {
+    "scenario_id": "b2c3d4e5-f6a7-8901-bcde-234567890123",
+    "input_description": "Swelling under my tongue with pain when swallowing. Started yesterday. Fever 38°C.",
+    "extracted_symptoms": {
+      "pain_location": ["jaw", "throat"],
+      "pain_type": "sharp",
+      "pain_level": 8,
+      "duration": "since yesterday",
+      "triggers": ["none"],
+      "visual_signs": ["swelling"],
+      "additional_symptoms": ["fever", "difficulty_swallowing"]
+    },
+    "diagnosis": {
+      "primary": "Submandibular Space Infection",
+      "differential": ["Sialadenitis", "Ludwig's Angina"],
+      "confidence": 88
+    },
+    "recommended_action": {
+      "urgency": "immediate",
+      "service_type": "Emergency Hospital Referral",
+      "estimated_duration_minutes": 120
+    },
+    "category": "oral_surgery",
+    "complexity": "complex",
+    "patient_profile": {"age": 45, "gender": "M", "conditions": ["diabetic"]}
+  },
+  {
+    "scenario_id": "c3d4e5f6-a7b8-9012-cdef-345678901234",
+    "input_description": "Upper left wisdom tooth partially erupted with gum flap. Food gets trapped. Occasional pain.",
+    "extracted_symptoms": {
+      "pain_location": ["wisdom tooth"],
+      "pain_type": "tender",
+      "pain_level": 3,
+      "duration": "for 2 weeks",
+      "triggers": ["none"],
+      "visual_signs": ["swelling", "redness"],
+      "additional_symptoms": ["bad_taste"]
+    },
+    "diagnosis": {
+      "primary": "Pericoronitis",
+      "differential": ["Food Impaction"],
+      "confidence": 90
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Irrigation and Extraction Planning",
+      "estimated_duration_minutes": 45
+    },
+    "category": "oral_surgery",
+    "complexity": "simple",
+    "patient_profile": {"age": 21, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "d4e5f6a7-b8c9-0123-defa-456789012345",
+    "input_description": "I got braces last week and my teeth are very sore. I can barely chew.",
+    "extracted_symptoms": {
+      "pain_location": ["whole mouth"],
+      "pain_type": "tender",
+      "pain_level": 5,
+      "duration": "about a week",
+      "triggers": ["biting"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Orthodontic Adjustment Pain",
+      "differential": [],
+      "confidence": 95
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Orthodontic Check",
+      "estimated_duration_minutes": 30
+    },
+    "category": "orthodontic",
+    "complexity": "simple",
+    "patient_profile": {"age": 16, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "e5f6a7b8-c9d0-1234-efab-567890123456",
+    "input_description": "The wire from my braces is poking my cheek and it really hurts.",
+    "extracted_symptoms": {
+      "pain_location": ["gums"],
+      "pain_type": "sharp",
+      "pain_level": 6,
+      "duration": "a few hours",
+      "triggers": ["none"],
+      "visual_signs": ["redness"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Orthodontic Wire Irritation",
+      "differential": [],
+      "confidence": 98
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Orthodontic Adjustment",
+      "estimated_duration_minutes": 20
+    },
+    "category": "orthodontic",
+    "complexity": "simple",
+    "patient_profile": {"age": 14, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "f6a7b8c9-d0e1-2345-fabc-678901234567",
+    "input_description": "My retainer doesn't fit anymore and my teeth feel like they're shifting.",
+    "extracted_symptoms": {
+      "pain_location": ["whole mouth"],
+      "pain_type": "tender",
+      "pain_level": 2,
+      "duration": "over a month",
+      "triggers": ["none"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Relapse After Orthodontic Treatment",
+      "differential": ["Inadequate Retention"],
+      "confidence": 80
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Orthodontic Consultation",
+      "estimated_duration_minutes": 45
+    },
+    "category": "orthodontic",
+    "complexity": "simple",
+    "patient_profile": {"age": 22, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "a7b8c9d0-e1f2-3456-abcd-789012345678",
+    "input_description": "My wisdom teeth are coming in and pushing my other teeth. There's pressure pain.",
+    "extracted_symptoms": {
+      "pain_location": ["jaw"],
+      "pain_type": "pressure",
+      "pain_level": 4,
+      "duration": "for 2 weeks",
+      "triggers": ["none"],
+      "visual_signs": ["swelling"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Dental Crowding from Erupting Third Molars",
+      "differential": ["Impaction", "Pericoronitis"],
+      "confidence": 78
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Orthodontic Evaluation",
+      "estimated_duration_minutes": 60
+    },
+    "category": "orthodontic",
+    "complexity": "moderate",
+    "patient_profile": {"age": 19, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "b8c9d0e1-f2a3-4567-bcde-890123456789",
+    "input_description": "Broken bracket on upper right canine. Wire is loose.",
+    "extracted_symptoms": {
+      "pain_location": ["upper right canine"],
+      "pain_type": "none",
+      "pain_level": 0,
+      "duration": "a few hours",
+      "triggers": ["none"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Orthodontic Appliance Failure",
+      "differential": [],
+      "confidence": 96
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Bracket Reattachment",
+      "estimated_duration_minutes": 30
+    },
+    "category": "orthodontic",
+    "complexity": "simple",
+    "patient_profile": {"age": 15, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "c9d0e1f2-a3b4-5678-cdef-901234567890",
+    "input_description": "Space maintainer loose after 3 days. Child 6 years old.",
+    "extracted_symptoms": {
+      "pain_location": ["lower right molar"],
+      "pain_type": "tender",
+      "pain_level": 2,
+      "duration": "for 3 days",
+      "triggers": ["none"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Loose Space Maintainer",
+      "differential": ["Eruption of Permanent Tooth"],
+      "confidence": 88
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Pediatric Appliance Adjustment",
+      "estimated_duration_minutes": 30
+    },
+    "category": "orthodontic",
+    "complexity": "simple",
+    "patient_profile": {"age": 6, "gender": "M", "conditions": ["child"]}
+  },
+  {
+    "scenario_id": "d0e1f2a3-b4c5-6789-defa-012345678901",
+    "input_description": "My 8-month-old is drooling a lot, has red cheeks, and is very fussy. No fever.",
+    "extracted_symptoms": {
+      "pain_location": ["gums"],
+      "pain_type": "tender",
+      "pain_level": 3,
+      "duration": "a few days",
+      "triggers": ["none"],
+      "visual_signs": ["redness", "swelling"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Primary Tooth Eruption (Teething)",
+      "differential": ["Viral Illness"],
+      "confidence": 90
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Pediatric Consultation",
+      "estimated_duration_minutes": 30
+    },
+    "category": "pediatric",
+    "complexity": "simple",
+    "patient_profile": {"age": 0.5, "gender": "F", "conditions": ["child"]}
+  },
+  {
+    "scenario_id": "e1f2a3b4-c5d6-7890-efab-123456789012",
+    "input_description": "My 3-year-old has white spots on the front teeth and brown areas near the gums.",
+    "extracted_symptoms": {
+      "pain_location": ["upper incisor"],
+      "pain_type": "none",
+      "pain_level": 0,
+      "duration": "over a month",
+      "triggers": ["none"],
+      "visual_signs": ["dark_spot"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Early Childhood Caries (ECC)",
+      "differential": ["Fluorosis", "Hypomineralization"],
+      "confidence": 88
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Pediatric Restorative",
+      "estimated_duration_minutes": 60
+    },
+    "category": "pediatric",
+    "complexity": "moderate",
+    "patient_profile": {"age": 3, "gender": "M", "conditions": ["child"]}
+  },
+  {
+    "scenario_id": "f2a3b4c5-d6e7-8901-fabc-234567890123",
+    "input_description": "My 7-year-old fell and hit his front tooth. It's loose and bleeding from the gum.",
+    "extracted_symptoms": {
+      "pain_location": ["upper incisor"],
+      "pain_type": "sharp",
+      "pain_level": 7,
+      "duration": "a few hours",
+      "triggers": ["none"],
+      "visual_signs": ["fracture", "bleeding"],
+      "additional_symptoms": ["bleeding"]
+    },
+    "diagnosis": {
+      "primary": "Dental Trauma with Subluxation",
+      "differential": ["Root Fracture", "Luxation"],
+      "confidence": 82
+    },
+    "recommended_action": {
+      "urgency": "immediate",
+      "service_type": "Emergency Pediatric Dentistry",
+      "estimated_duration_minutes": 60
+    },
+    "category": "pediatric",
+    "complexity": "complex",
+    "patient_profile": {"age": 7, "gender": "M", "conditions": ["child"]}
+  },
+  {
+    "scenario_id": "a3b4c5d6-e7f8-9012-abcd-345678901234",
+    "input_description": "My 5-year-old's front teeth stick out and there's a gap. She still sucks her thumb.",
+    "extracted_symptoms": {
+      "pain_location": ["whole mouth"],
+      "pain_type": "none",
+      "pain_level": 0,
+      "duration": "over a month",
+      "triggers": ["none"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Habit-induced Malocclusion",
+      "differential": ["Skeletal Open Bite"],
+      "confidence": 85
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Pediatric Orthodontic Evaluation",
+      "estimated_duration_minutes": 45
+    },
+    "category": "pediatric",
+    "complexity": "simple",
+    "patient_profile": {"age": 5, "gender": "F", "conditions": ["child"]}
+  },
+  {
+    "scenario_id": "b4c5d6e7-f8a9-0123-bcde-456789012345",
+    "input_description": "10-year-old with gray permanent molar just erupted. Parent worried about color.",
+    "extracted_symptoms": {
+      "pain_location": ["lower left molar"],
+      "pain_type": "none",
+      "pain_level": 0,
+      "duration": "about a week",
+      "triggers": ["none"],
+      "visual_signs": ["dark_spot"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Molar Incisor Hypomineralization (MIH)",
+      "differential": ["Fluorosis"],
+      "confidence": 82
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Pediatric Evaluation",
+      "estimated_duration_minutes": 30
+    },
+    "category": "pediatric",
+    "complexity": "simple",
+    "patient_profile": {"age": 10, "gender": "M", "conditions": ["child"]}
+  },
+  {
+    "scenario_id": "c5d6e7f8-a9b0-1234-cdef-567890123456",
+    "input_description": "I fell and my front tooth came completely out. I have it in milk. This just happened 20 minutes ago.",
+    "extracted_symptoms": {
+      "pain_location": ["upper incisor"],
+      "pain_type": "sharp",
+      "pain_level": 8,
+      "duration": "a few hours",
+      "triggers": ["none"],
+      "visual_signs": ["bleeding"],
+      "additional_symptoms": ["bleeding"]
+    },
+    "diagnosis": {
+      "primary": "Avulsed Permanent Tooth",
+      "differential": ["Alveolar Fracture"],
+      "confidence": 98
+    },
+    "recommended_action": {
+      "urgency": "immediate",
+      "service_type": "Emergency Reimplantation",
+      "estimated_duration_minutes": 90
+    },
+    "category": "emergency",
+    "complexity": "complex",
+    "patient_profile": {"age": 18, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "d6e7f8a9-b0c1-2345-defa-678901234567",
+    "input_description": "My extraction site won't stop bleeding. It's been 4 hours and I've changed the gauze 5 times.",
+    "extracted_symptoms": {
+      "pain_location": ["jaw"],
+      "pain_type": "throbbing",
+      "pain_level": 6,
+      "duration": "4 hours",
+      "triggers": ["none"],
+      "visual_signs": ["bleeding"],
+      "additional_symptoms": ["bleeding"]
+    },
+    "diagnosis": {
+      "primary": "Post-extraction Hemorrhage",
+      "differential": ["Coagulopathy"],
+      "confidence": 95
+    },
+    "recommended_action": {
+      "urgency": "immediate",
+      "service_type": "Emergency Hemostasis",
+      "estimated_duration_minutes": 45
+    },
+    "category": "emergency",
+    "complexity": "complex",
+    "patient_profile": {"age": 55, "gender": "F", "conditions": ["anticoagulant"]}
+  },
+  {
+    "scenario_id": "e7f8a9b0-c1d2-3456-efab-789012345678",
+    "input_description": "My face is swollen up to my eye and I have a fever of 39°C. I can barely open my mouth.",
+    "extracted_symptoms": {
+      "pain_location": ["jaw", "face"],
+      "pain_type": "throbbing",
+      "pain_level": 10,
+      "duration": "2 days",
+      "triggers": ["none"],
+      "visual_signs": ["swelling", "redness"],
+      "additional_symptoms": ["fever", "difficulty_opening"]
+    },
+    "diagnosis": {
+      "primary": "Odontogenic Cellulitis with Trismus",
+      "differential": ["Abscess", "Parapharyngeal Infection"],
+      "confidence": 90
+    },
+    "recommended_action": {
+      "urgency": "immediate",
+      "service_type": "Emergency Hospital Referral",
+      "estimated_duration_minutes": 120
+    },
+    "category": "emergency",
+    "complexity": "complex",
+    "patient_profile": {"age": 40, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "f8a9b0c1-d2e3-4567-fabc-890123456789",
+    "input_description": "I was in a car accident and my jaw is crooked. I can't bite down properly and there's numbness.",
+    "extracted_symptoms": {
+      "pain_location": ["jaw"],
+      "pain_type": "sharp",
+      "pain_level": 9,
+      "duration": "a few hours",
+      "triggers": ["none"],
+      "visual_signs": ["fracture"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Mandibular Fracture",
+      "differential": ["TMJ Dislocation", "Alveolar Fracture"],
+      "confidence": 88
+    },
+    "recommended_action": {
+      "urgency": "immediate",
+      "service_type": "Emergency Oral Surgery",
+      "estimated_duration_minutes": 180
+    },
+    "category": "emergency",
+    "complexity": "complex",
+    "patient_profile": {"age": 35, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "a9b0c1d2-e3f4-5678-abcd-901234567890",
+    "input_description": "Multiple teeth are broken after a sports injury. There's blood and pieces of teeth in my mouth.",
+    "extracted_symptoms": {
+      "pain_location": ["whole mouth"],
+      "pain_type": "sharp",
+      "pain_level": 10,
+      "duration": "a few hours",
+      "triggers": ["none"],
+      "visual_signs": ["fracture", "bleeding"],
+      "additional_symptoms": ["bleeding"]
+    },
+    "diagnosis": {
+      "primary": "Multiple Dental Traumas",
+      "differential": ["Jaw Fracture", "Soft Tissue Laceration"],
+      "confidence": 95
+    },
+    "recommended_action": {
+      "urgency": "immediate",
+      "service_type": "Emergency Trauma Management",
+      "estimated_duration_minutes": 150
+    },
+    "category": "emergency",
+    "complexity": "complex",
+    "patient_profile": {"age": 25, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "b0c1d2e3-f4a5-6789-bcde-012345678901",
+    "input_description": "Constant dull ache in upper left second premolar. Pain 4/10, no swelling, 2 weeks duration.",
+    "extracted_symptoms": {
+      "pain_location": ["upper left premolar"],
+      "pain_type": "constant",
+      "pain_level": 4,
+      "duration": "for 2 weeks",
+      "triggers": ["none"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Chronic Apical Periodontitis",
+      "differential": ["Cracked Tooth"],
+      "confidence": 78
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Endodontic Evaluation",
+      "estimated_duration_minutes": 60
+    },
+    "category": "endodontic",
+    "complexity": "moderate",
+    "patient_profile": {"age": 48, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "c1d2e3f4-a5b6-7890-cdef-123456789012",
+    "input_description": "Intermittent sharp pain in lower right canine when drinking cold water. Started yesterday.",
+    "extracted_symptoms": {
+      "pain_location": ["lower right canine"],
+      "pain_type": "intermittent",
+      "pain_level": 5,
+      "duration": "since yesterday",
+      "triggers": ["cold"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Reversible Pulpitis",
+      "differential": ["Dentin Hypersensitivity"],
+      "confidence": 82
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Restorative Treatment",
+      "estimated_duration_minutes": 45
+    },
+    "category": "endodontic",
+    "complexity": "simple",
+    "patient_profile": {"age": 33, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "d2e3f4a5-b6c7-8901-defa-234567890123",
+    "input_description": "Pain radiating to ear from lower left molar. Worse when lying down. Pain 7/10.",
+    "extracted_symptoms": {
+      "pain_location": ["lower left molar", "ear"],
+      "pain_type": "throbbing",
+      "pain_level": 7,
+      "duration": "for 3 days",
+      "triggers": ["none"],
+      "visual_signs": ["none"],
+      "additional_symptoms": ["ear_pain"]
+    },
+    "diagnosis": {
+      "primary": "Irreversible Pulpitis with Referred Pain",
+      "differential": ["TMJ Disorder"],
+      "confidence": 84
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Root Canal Treatment",
+      "estimated_duration_minutes": 90
+    },
+    "category": "endodontic",
+    "complexity": "moderate",
+    "patient_profile": {"age": 41, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "e3f4a5b6-c7d8-9012-efab-345678901234",
+    "input_description": "Gum recession with exposed root on upper right canine. Sensitivity to touch.",
+    "extracted_symptoms": {
+      "pain_location": ["upper right canine"],
+      "pain_type": "sensitive",
+      "pain_level": 3,
+      "duration": "over a month",
+      "triggers": ["none"],
+      "visual_signs": ["redness"],
+      "additional_symptoms": ["sensitivity"]
+    },
+    "diagnosis": {
+      "primary": "Gingival Recession with Root Exposure",
+      "differential": ["Periodontitis"],
+      "confidence": 86
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Periodontal/Gingival Graft Evaluation",
+      "estimated_duration_minutes": 60
+    },
+    "category": "periodontal",
+    "complexity": "moderate",
+    "patient_profile": {"age": 37, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "f4a5b6c7-d8e9-0123-fabc-456789012345",
+    "input_description": "Localised gum swelling between lower molars with pus. Pain 6/10 for 2 days.",
+    "extracted_symptoms": {
+      "pain_location": ["gums"],
+      "pain_type": "throbbing",
+      "pain_level": 6,
+      "duration": "for 2 days",
+      "triggers": ["none"],
+      "visual_signs": ["swelling", "pus"],
+      "additional_symptoms": ["bad_taste"]
+    },
+    "diagnosis": {
+      "primary": "Periodontal Abscess",
+      "differential": ["Gingival Abscess"],
+      "confidence": 89
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Periodontal Treatment",
+      "estimated_duration_minutes": 60
+    },
+    "category": "periodontal",
+    "complexity": "moderate",
+    "patient_profile": {"age": 50, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "a5b6c7d8-e9f0-1234-abcd-567890123456",
+    "input_description": "Deep cavity visible on lower left first molar. Pain when eating sweets. 4/10.",
+    "extracted_symptoms": {
+      "pain_location": ["lower left molar"],
+      "pain_type": "sensitive",
+      "pain_level": 4,
+      "duration": "for 2 weeks",
+      "triggers": ["sweet"],
+      "visual_signs": ["cavity"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Moderate Dental Caries",
+      "differential": ["Staining"],
+      "confidence": 88
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Restorative Filling",
+      "estimated_duration_minutes": 45
+    },
+    "category": "restorative",
+    "complexity": "simple",
+    "patient_profile": {"age": 28, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "b6c7d8e9-f0a1-2345-bcde-678901234567",
+    "input_description": "Broken cusp on upper right molar. Sharp pain on biting. Started this morning.",
+    "extracted_symptoms": {
+      "pain_location": ["upper right molar"],
+      "pain_type": "sharp",
+      "pain_level": 6,
+      "duration": "since this morning",
+      "triggers": ["biting"],
+      "visual_signs": ["fracture"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Fractured Cusp",
+      "differential": ["Cracked Tooth"],
+      "confidence": 85
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Onlay or Crown",
+      "estimated_duration_minutes": 75
+    },
+    "category": "restorative",
+    "complexity": "moderate",
+    "patient_profile": {"age": 46, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "c7d8e9f0-a1b2-3456-cdef-789012345678",
+    "input_description": "Wisdom tooth pain with limited mouth opening. Swollen cheek. 3 days.",
+    "extracted_symptoms": {
+      "pain_location": ["wisdom tooth"],
+      "pain_type": "dull ache",
+      "pain_level": 7,
+      "duration": "for 3 days",
+      "triggers": ["none"],
+      "visual_signs": ["swelling"],
+      "additional_symptoms": ["difficulty_opening"]
+    },
+    "diagnosis": {
+      "primary": "Pericoronitis with Trismus",
+      "differential": ["Abscess"],
+      "confidence": 87
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Surgical Extraction",
+      "estimated_duration_minutes": 90
+    },
+    "category": "oral_surgery",
+    "complexity": "complex",
+    "patient_profile": {"age": 27, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "d8e9f0a1-b2c3-4567-defa-890123456789",
+    "input_description": "Painful ulcer under tongue making swallowing difficult. Started 2 days ago.",
+    "extracted_symptoms": {
+      "pain_location": ["tongue"],
+      "pain_type": "sharp",
+      "pain_level": 6,
+      "duration": "for 2 days",
+      "triggers": ["none"],
+      "visual_signs": ["redness"],
+      "additional_symptoms": ["difficulty_swallowing"]
+    },
+    "diagnosis": {
+      "primary": "Aphthous Ulcer (Minor)",
+      "differential": ["Viral Infection"],
+      "confidence": 80
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Oral Medicine Evaluation",
+      "estimated_duration_minutes": 30
+    },
+    "category": "oral_surgery",
+    "complexity": "simple",
+    "patient_profile": {"age": 32, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "e9f0a1b2-c3d4-5678-efab-901234567890",
+    "input_description": "Loose bracket on braces causing lip irritation. Teenager needs adjustment.",
+    "extracted_symptoms": {
+      "pain_location": ["whole mouth"],
+      "pain_type": "tender",
+      "pain_level": 3,
+      "duration": "for 3 days",
+      "triggers": ["none"],
+      "visual_signs": ["redness"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Orthodontic Appliance Irritation",
+      "differential": [],
+      "confidence": 95
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Orthodontic Adjustment",
+      "estimated_duration_minutes": 20
+    },
+    "category": "orthodontic",
+    "complexity": "simple",
+    "patient_profile": {"age": 15, "gender": "F", "conditions": ["child"]}
+  },
+  {
+    "scenario_id": "f0a1b2c3-d4e5-6789-fabc-012345678901",
+    "input_description": "Overbite correction plate not fitting after 2 weeks. Teen patient.",
+    "extracted_symptoms": {
+      "pain_location": ["whole mouth"],
+      "pain_type": "pressure",
+      "pain_level": 2,
+      "duration": "for 2 weeks",
+      "triggers": ["none"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Ill-fitting Removable Appliance",
+      "differential": ["Tooth Movement"],
+      "confidence": 88
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Orthodontic Adjustment",
+      "estimated_duration_minutes": 30
+    },
+    "category": "orthodontic",
+    "complexity": "simple",
+    "patient_profile": {"age": 13, "gender": "M", "conditions": ["child"]}
+  },
+  {
+    "scenario_id": "a1b2c3d4-e5f6-7890-abcd-123456789012",
+    "input_description": "9-month-old with excessive drooling and finger chewing. No fever.",
+    "extracted_symptoms": {
+      "pain_location": ["gums"],
+      "pain_type": "tender",
+      "pain_level": 2,
+      "duration": "a few days",
+      "triggers": ["none"],
+      "visual_signs": ["redness", "swelling"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Primary Tooth Eruption",
+      "differential": ["Viral Illness"],
+      "confidence": 91
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Pediatric Consultation",
+      "estimated_duration_minutes": 20
+    },
+    "category": "pediatric",
+    "complexity": "simple",
+    "patient_profile": {"age": 0.75, "gender": "F", "conditions": ["child"]}
+  },
+  {
+    "scenario_id": "b2c3d4e5-f6a7-8901-bcde-234567890123",
+    "input_description": "11-year-old hit upper front teeth. Both loose and tender. Bleeding stopped.",
+    "extracted_symptoms": {
+      "pain_location": ["upper incisor"],
+      "pain_type": "tender",
+      "pain_level": 5,
+      "duration": "a few hours",
+      "triggers": ["none"],
+      "visual_signs": ["bleeding"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Dental Trauma with Subluxation",
+      "differential": ["Root Fracture"],
+      "confidence": 84
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Pediatric Trauma Evaluation",
+      "estimated_duration_minutes": 45
+    },
+    "category": "pediatric",
+    "complexity": "moderate",
+    "patient_profile": {"age": 11, "gender": "M", "conditions": ["child"]}
+  },
+  {
+    "scenario_id": "c3d4e5f6-a7b8-9012-cdef-345678901234",
+    "input_description": "Severe facial swelling after dental extraction. Fever 38.5°C. Patient diabetic.",
+    "extracted_symptoms": {
+      "pain_location": ["jaw", "face"],
+      "pain_type": "throbbing",
+      "pain_level": 9,
+      "duration": "1 day",
+      "triggers": ["none"],
+      "visual_signs": ["swelling", "redness"],
+      "additional_symptoms": ["fever"]
+    },
+    "diagnosis": {
+      "primary": "Post-extraction Infection with Cellulitis",
+      "differential": ["Osteomyelitis"],
+      "confidence": 92
+    },
+    "recommended_action": {
+      "urgency": "immediate",
+      "service_type": "Emergency Hospital Admission",
+      "estimated_duration_minutes": 120
+    },
+    "category": "emergency",
+    "complexity": "complex",
+    "patient_profile": {"age": 60, "gender": "F", "conditions": ["diabetic"]}
+  },
+  {
+    "scenario_id": "d4e5f6a7-b8c9-0123-defa-456789012345",
+    "input_description": "Knocked-out tooth from bicycle accident. Patient has tooth in hand. 30 minutes ago.",
+    "extracted_symptoms": {
+      "pain_location": ["upper incisor"],
+      "pain_type": "sharp",
+      "pain_level": 7,
+      "duration": "a few hours",
+      "triggers": ["none"],
+      "visual_signs": ["bleeding"],
+      "additional_symptoms": ["bleeding"]
+    },
+    "diagnosis": {
+      "primary": "Avulsed Permanent Tooth",
+      "differential": ["Alveolar Fracture"],
+      "confidence": 97
+    },
+    "recommended_action": {
+      "urgency": "immediate",
+      "service_type": "Emergency Reimplantation",
+      "estimated_duration_minutes": 90
+    },
+    "category": "emergency",
+    "complexity": "complex",
+    "patient_profile": {"age": 20, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "e5f6a7b8-c9d0-1234-efab-567890123456",
+    "input_description": "Burning tongue sensation after eating spicy food. 1 day duration. No visible lesions.",
+    "extracted_symptoms": {
+      "pain_location": ["tongue"],
+      "pain_type": "burning",
+      "pain_level": 4,
+      "duration": "1 day",
+      "triggers": ["none"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Transient Lingual Papillitis",
+      "differential": ["Allergic Reaction"],
+      "confidence": 75
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Oral Medicine Evaluation",
+      "estimated_duration_minutes": 30
+    },
+    "category": "oral_surgery",
+    "complexity": "simple",
+    "patient_profile": {"age": 34, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "f6a7b8c9-d0e1-2345-fabc-678901234567",
+    "input_description": "White line inside cheek from biting. Recurrent. No pain.",
+    "extracted_symptoms": {
+      "pain_location": ["cheek"],
+      "pain_type": "none",
+      "pain_level": 0,
+      "duration": "over a month",
+      "triggers": ["none"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Linea Alba (Frictional Keratosis)",
+      "differential": ["Oral Lichen Planus"],
+      "confidence": 90
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Oral Examination",
+      "estimated_duration_minutes": 20
+    },
+    "category": "oral_surgery",
+    "complexity": "simple",
+    "patient_profile": {"age": 29, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "a7b8c9d0-e1f2-3456-abcd-789012345678",
+    "input_description": "Metallic taste after dental filling placed yesterday. Slight sensitivity.",
+    "extracted_symptoms": {
+      "pain_location": ["lower molar"],
+      "pain_type": "sensitive",
+      "pain_level": 2,
+      "duration": "1 day",
+      "triggers": ["none"],
+      "visual_signs": ["none"],
+      "additional_symptoms": ["bad_taste"]
+    },
+    "diagnosis": {
+      "primary": "Galvanic Reaction to Restoration",
+      "differential": ["High Filling"],
+      "confidence": 78
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Restoration Adjustment",
+      "estimated_duration_minutes": 30
+    },
+    "category": "restorative",
+    "complexity": "simple",
+    "patient_profile": {"age": 45, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "b8c9d0e1-f2a3-4567-bcde-890123456789",
+    "input_description": "Food impaction between upper molars causing gum pain. Flossing helps temporarily.",
+    "extracted_symptoms": {
+      "pain_location": ["gums"],
+      "pain_type": "tender",
+      "pain_level": 4,
+      "duration": "for 3 days",
+      "triggers": ["none"],
+      "visual_signs": ["redness"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Food Impaction with Localized Gingivitis",
+      "differential": ["Open Contact"],
+      "confidence": 88
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Restorative/Periodontal Evaluation",
+      "estimated_duration_minutes": 45
+    },
+    "category": "periodontal",
+    "complexity": "simple",
+    "patient_profile": {"age": 40, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "c9d0e1f2-a3b4-5678-cdef-901234567890",
+    "input_description": "Pain from dental implant site 1 week after placement. Mild swelling.",
+    "extracted_symptoms": {
+      "pain_location": ["jaw"],
+      "pain_type": "dull ache",
+      "pain_level": 5,
+      "duration": "1 week",
+      "triggers": ["none"],
+      "visual_signs": ["swelling"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Normal Post-implant Healing",
+      "differential": ["Early Implant Failure"],
+      "confidence": 82
+    },
+    "recommended_action": {
+      "urgency": "routine",
+      "service_type": "Implant Follow-up",
+      "estimated_duration_minutes": 30
+    },
+    "category": "oral_surgery",
+    "complexity": "moderate",
+    "patient_profile": {"age": 55, "gender": "F", "conditions": []}
+  },
+  {
+    "scenario_id": "d0e1f2a3-b4c5-6789-defa-012345678901",
+    "input_description": "Bad taste and smell from dental bridge margin. 2 weeks.",
+    "extracted_symptoms": {
+      "pain_location": ["bridge area"],
+      "pain_type": "none",
+      "pain_level": 1,
+      "duration": "for 2 weeks",
+      "triggers": ["none"],
+      "visual_signs": ["none"],
+      "additional_symptoms": ["bad_taste", "bad_breath"]
+    },
+    "diagnosis": {
+      "primary": "Caries under Bridge Margin",
+      "differential": ["Open Margin"],
+      "confidence": 85
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Bridge Evaluation and Repair",
+      "estimated_duration_minutes": 60
+    },
+    "category": "restorative",
+    "complexity": "moderate",
+    "patient_profile": {"age": 62, "gender": "M", "conditions": []}
+  },
+  {
+    "scenario_id": "e1f2a3b4-c5d6-7890-efab-123456789012",
+    "input_description": "Pain from temporary crown that fell off. Tooth sensitive to air.",
+    "extracted_symptoms": {
+      "pain_location": ["upper premolar"],
+      "pain_type": "sensitive",
+      "pain_level": 6,
+      "duration": "a few hours",
+      "triggers": ["cold"],
+      "visual_signs": ["none"],
+      "additional_symptoms": []
+    },
+    "diagnosis": {
+      "primary": "Exposed Prepared Tooth (Post-temp crown loss)",
+      "differential": [],
+      "confidence": 94
+    },
+    "recommended_action": {
+      "urgency": "24-48h",
+      "service_type": "Temporary Crown Replacement",
+      "estimated_duration_minutes": 45
+    },
+    "category": "restorative",
+    "complexity": "simple",
+    "patient_profile": {"age": 38, "gender": "F", "conditions": []}
+  }
+]
