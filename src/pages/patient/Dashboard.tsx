@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Calendar, 
@@ -10,7 +10,8 @@ import {
   XCircle,
   RefreshCw,
   Download,
-  AlertCircle
+  AlertCircle,
+  History
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -426,6 +427,55 @@ END:VCALENDAR`;
                               <XCircle className="h-4 w-4 mr-1" />
                               {cancelling === apt.id ? t("dashboard.loading") : cancellationData.isBlocked ? t("dashboard.accountBlocked") : t("dashboard.cancel")}
                             </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Past Appointments */}
+            <Card id="past-appointments">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  {t("dashboard.pastAppointments")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {pastAppointments.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <Clock className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>{t("dashboard.noPastAppointments")}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {pastAppointments.map((apt) => (
+                      <div key={apt.id} className="border rounded-lg p-4 bg-gray-50">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="flex items-start gap-4">
+                            <div className="bg-gray-200 rounded-lg p-3 text-center min-w-[70px]">
+                              <div className="text-xs text-gray-600 uppercase">
+                                {new Date(apt.appointment_date).toLocaleDateString(t("lang.ro") === "Română" ? 'ro-RO' : 'en-US', { month: 'short' })}
+                              </div>
+                              <div className="text-xl font-bold text-gray-700">
+                                {new Date(apt.appointment_date).getDate()}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-gray-400" />
+                                <span className="font-semibold text-gray-600">
+                                  {apt.appointment_time?.substring(0, 5)}
+                                </span>
+                                <Badge className="bg-gray-200 text-gray-700">
+                                  {t("dashboard.status.completed")}
+                                </Badge>
+                              </div>
+                              <p className="font-medium mt-1 text-gray-700">{apt.service}</p>
+                            </div>
                           </div>
                         </div>
                       </div>
