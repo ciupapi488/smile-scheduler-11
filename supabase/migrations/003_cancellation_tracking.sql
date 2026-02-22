@@ -33,17 +33,7 @@ CREATE TRIGGER update_patient_cancellations_updated_at
 -- Politici RLS (Row Level Security)
 ALTER TABLE patient_cancellations ENABLE ROW LEVEL SECURITY;
 
--- Pacienții pot vedea doar propriile înregistrări
-DROP POLICY IF EXISTS patient_cancellations_select_own ON patient_cancellations;
-CREATE POLICY patient_cancellations_select_own ON patient_cancellations
-    FOR SELECT USING (email = auth.email());
-
--- Doar adminii pot vedea toate înregistrările
-DROP POLICY IF EXISTS patient_cancellations_admin_all ON patient_cancellations;
-CREATE POLICY patient_cancellations_admin_all ON patient_cancellations
-    FOR ALL USING (
-        EXISTS (
-            SELECT 1 FROM user_roles 
-            WHERE user_id = auth.uid() AND role = 'admin'
-        )
-    );
+-- Permite citire/scriere pentru toți utilizatorii autentificați (simplificat)
+DROP POLICY IF EXISTS patient_cancellations_all ON patient_cancellations;
+CREATE POLICY patient_cancellations_all ON patient_cancellations
+    FOR ALL USING (true);

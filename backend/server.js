@@ -102,41 +102,72 @@ app.post('/api/appointments', async (req, res) => {
       return res.status(409).json({ error: 'Already have an appointment this day', code: 'DOUBLE_BOOKING' });
     }
     
-    // Create slot - ONLY include fields that exist in the table
-    const slotData = {
-      slot_date: date,
-      slot_time: time,
-      status: 'booked',
-      patient_name: name,
-      patient_phone: phone,
-      booked_by: email
-    };
-    // Note: dentist_id is only in appointments table, not in appointment_slots
-    
-    console.log('Creating slot:', slotData);
-    
-    const { data: newSlot, error: slotError } = await supabase
+    // Check if slot already exists (might be from a previous cancellation)
+    const { data: existingSlot } = await supabase
       .from('appointment_slots')
-      .insert(slotData)
-      .select()
-      .single();
+      .select('id, status')
+      .eq('slot_date', date)
+      .eq('slot_time', time)
+      .maybeSingle();
     
-    if (slotError) {
-      console.error('Slot creation error details:', JSON.stringify(slotError, null, 2));
-      // If slot already exists, return error
-      if (slotError.code === '23505') { // Unique violation
+    let slotId;
+    
+    if (existingSlot) {
+      if (existingSlot.status === 'booked') {
         return res.status(409).json({ error: 'This time slot is already booked', code: 'SLOT_TAKEN' });
       }
-      // Return the actual error for debugging
-      return res.status(500).json({ error: slotError.message || 'Slot creation failed', details: slotError });
+      // Slot exists and is available - update it
+      const { error: updateError } = await supabase
+        .from('appointment_slots')
+        .update({
+          status: 'booked',
+          patient_name: name,
+          patient_phone: phone,
+          booked_by: email
+        })
+        .eq('id', existingSlot.id);
+      
+      if (updateError) {
+        console.error('Slot update error:', updateError);
+        return res.status(500).json({ error: 'Failed to book slot' });
+      }
+      slotId = existingSlot.id;
+      console.log('Existing slot updated:', slotId);
+    } else {
+      // Create new slot
+      const slotData = {
+        slot_date: date,
+        slot_time: time,
+        status: 'booked',
+        patient_name: name,
+        patient_phone: phone,
+        booked_by: email
+      };
+      
+      console.log('Creating new slot:', slotData);
+      
+      const { data: newSlot, error: slotError } = await supabase
+        .from('appointment_slots')
+        .insert(slotData)
+        .select()
+        .single();
+      
+      if (slotError) {
+        console.error('Slot creation error:', slotError);
+        if (slotError.code === '23505') {
+          return res.status(409).json({ error: 'This time slot is already booked', code: 'SLOT_TAKEN' });
+        }
+        return res.status(500).json({ error: slotError.message || 'Slot creation failed' });
+      }
+      
+      slotId = newSlot.id;
+      console.log('New slot created:', slotId);
     }
-    
-    console.log('Slot created:', newSlot);
     
     // Create appointment - only include fields that exist in schema
     // Schema: id, slot_id, name, email, phone, service, appointment_date, appointment_time, created_at, updated_at
     const apptData = {
-      slot_id: newSlot.id,
+      slot_id: slotId,
       name,
       email,
       phone,
