@@ -173,20 +173,38 @@ export const updateWorkingDay = async (
   return response.ok;
 };
 
-// AI Symptom Checker
+// AI Symptom Checker - Wizard Interface
 export interface SymptomCheckResult {
   urgency: string;
+  urgencyLabel: string;
   possibleCause: string;
   recommendedService: string;
   confidence: number;
+  score: number;
   color: 'red' | 'orange' | 'blue';
+  toothDescription: string | null;
 }
 
-export const checkSymptoms = async (symptoms: string, language: string = 'ro'): Promise<SymptomCheckResult> => {
+export interface SymptomAnswers {
+  mainSymptom?: string;
+  painType?: string;
+  painLevel?: number;
+  duration?: string;
+  swellingLocation?: string;
+  hasPus?: boolean;
+  bleedingType?: string;
+  sensitivityType?: string;
+  brokenType?: string;
+  discolorationType?: string;
+  toothNumber?: number;
+  modifiers?: string[];
+}
+
+export const checkSymptoms = async (answers: SymptomAnswers, language: string = 'ro'): Promise<SymptomCheckResult> => {
   const response = await fetch(`${API_URL}/api/ai/symptom-check`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ symptoms, language }),
+    body: JSON.stringify({ answers, language }),
   });
   
   const data = await response.json();

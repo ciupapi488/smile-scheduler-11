@@ -56,7 +56,24 @@ const translations = {
 
     // AI Symptom Checker
     "ai.title": "Asistent AI Dentar",
-    "ai.subtitle": "Descrieți simptomele și primiți îndrumare instant",
+    "ai.subtitle": "Evaluare pas cu pas a simptomelor",
+    "ai.step1": "Ce simptom aveți?",
+    "ai.step2": "Detalii simptom",
+    "ai.step3": "Durată și factori",
+    "ai.step4": "Localizare",
+    "ai.painType": "Ce tip de durere?",
+    "ai.painLevel": "Intensitate durere (1-10)",
+    "ai.duration": "De cât timp aveți simptomele?",
+    "ai.toothMap": "Selectați dintele afectat",
+    "ai.getResults": "Vezi Rezultatul",
+    "ai.analyzing": "Se analizează...",
+    "ai.complete": "Analiză Completă",
+    "ai.confidence": "Încredere",
+    "ai.possibleCause": "Posibilă cauză",
+    "ai.recommendedService": "Serviciu recomandat",
+    "ai.affectedTooth": "Dinte afectat",
+    "ai.startOver": "Reia",
+    "ai.bookNow": "Programează-te",
 
     // Location
     "location.title": "Unde ne găsești?",
