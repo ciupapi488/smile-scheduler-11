@@ -180,11 +180,17 @@ export default function BookingFormNew() {
 
       if (response.ok && result.success) {
         setSuccess(true);
+      } else if (result.code === 'ACCOUNT_BLOCKED') {
+        setError(t('booking.accountBlocked') || 'Contul dumneavoastră este blocat din cauza anulărilor excesive. Contactați clinica.');
+      } else if (result.code === 'DOUBLE_BOOKING') {
+        setError(t('booking.doubleBooking') || 'Aveți deja o programare în această zi.');
+      } else if (result.code === 'SLOT_TAKEN') {
+        setError(t('booking.slotTaken') || 'Acest interval orar este deja rezervat. Selectați altul.');
       } else {
-        setError(result.error || 'Eroare la programare');
+        setError(result.error || t('booking.error') || 'Eroare la programare');
       }
     } catch (err: any) {
-      setError('Eroare de conexiune');
+      setError(t('booking.connectionError') || 'Eroare de conexiune');
     } finally {
       setLoading(false);
     }

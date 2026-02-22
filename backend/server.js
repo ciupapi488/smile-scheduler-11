@@ -89,8 +89,25 @@ app.post('/api/appointments', async (req, res) => {
     return res.status(400).json({ error: 'All fields required' });
   }
   
+  const normalizedEmail = email.toLowerCase().trim();
+  
   try {
-    // Check existing appointment same day (can't filter by status as column doesn't exist)
+    // Check if user is blocked due to excessive cancellations
+    const { data: cancelData } = await supabase
+      .from('patient_cancellations')
+      .select('count')
+      .eq('email', normalizedEmail)
+      .maybeSingle();
+    
+    if (cancelData && cancelData.count >= 3) {
+      return res.status(403).json({ 
+        error: 'Your account is blocked due to excessive cancellations. Please contact the clinic.',
+        code: 'ACCOUNT_BLOCKED',
+        count: cancelData.count
+      });
+    }
+    
+    // Check existing appointment same day
     const { data: existing } = await supabase
       .from('appointments')
       .select('id')
