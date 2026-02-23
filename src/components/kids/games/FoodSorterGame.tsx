@@ -1,12 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, PanInfo } from 'framer-motion';
-import { ArrowLeft, Clock, Trophy, Star, RotateCcw, Sparkles, CheckCircle, XCircle } from 'lucide-react';
-import { useGameProgress } from '@/hooks/useBrushingProgress';
-import { ToothFairyAvatar } from '../ToothFairyAvatar';
-
-interface FoodSorterGameProps {
-  onBack: () => void;
-}
+import { motion, AnimatePresence, useAnimation, PanInfo } from 'framer-motion';
+import { ArrowLeft, Trophy, Star, RotateCcw, Sparkles, CheckCircle, XCircle, Timer } from 'lucide-react';
+import { useGameProgress } from '@/hooks/useGameProgress';
 
 interface FoodItem {
   id: string;
@@ -16,37 +11,50 @@ interface FoodItem {
   isTrap: boolean;
   explanation: string;
   color: string;
+  faceExpression: 'happy' | 'neutral' | 'evil';
 }
 
 const FOODS: FoodItem[] = [
   // Healthy foods
-  { id: '1', name: 'Măr', emoji: '🍎', isHealthy: true, isTrap: false, explanation: 'Merele curăță dinții natural!', color: '#FF6B6B' },
-  { id: '2', name: 'Morcov', emoji: '🥕', isHealthy: true, isTrap: false, explanation: 'Morcovii sunt buni pentru gingii!', color: '#FF8C42' },
-  { id: '3', name: 'Brânză', emoji: '🧀', isHealthy: true, isTrap: false, explanation: 'Brânza are calciu pentru dinți puternici!', color: '#FFD93D' },
-  { id: '4', name: 'Iaurt', emoji: '🥛', isHealthy: true, isTrap: false, explanation: 'Iaurtul are probiotice sănătoase!', color: '#F8F9FA' },
-  { id: '5', name: 'Apă', emoji: '💧', isHealthy: true, isTrap: false, explanation: 'Apa spală bacteriile!', color: '#74C0FC' },
-  { id: '6', name: 'Nuci', emoji: '🥜', isHealthy: true, isTrap: false, explanation: 'Nucile au proteine și minerale!', color: '#8B5A2B' },
-  { id: '7', name: 'Pâine integrală', emoji: '🍞', isHealthy: true, isTrap: false, explanation: 'Pâinea integrală are fibre!', color: '#D4A373' },
-  { id: '8', name: 'Ou', emoji: '🥚', isHealthy: true, isTrap: false, explanation: 'Ouăle au vitamina D!', color: '#FFF3E0' },
-  { id: '9', name: 'Pește', emoji: '🐟', isHealthy: true, isTrap: false, explanation: 'Peștele are fosfor pentru dinți!', color: '#90CAF9' },
-  { id: '10', name: 'Varză', emoji: '🥬', isHealthy: true, isTrap: false, explanation: 'Varza are vitamina C!', color: '#66BB6A' },
+  { id: '1', name: 'Măr', emoji: '🍎', isHealthy: true, isTrap: false, explanation: 'Merele curăță dinții natural!', color: '#FF4444', faceExpression: 'happy' },
+  { id: '2', name: 'Morcov', emoji: '🥕', isHealthy: true, isTrap: false, explanation: 'Morcovii sunt buni pentru gingii!', color: '#FF8C00', faceExpression: 'happy' },
+  { id: '3', name: 'Brânză', emoji: '🧀', isHealthy: true, isTrap: false, explanation: 'Calciu pentru dinți puternici!', color: '#FFD700', faceExpression: 'happy' },
+  { id: '4', name: 'Iaurt', emoji: '🥛', isHealthy: true, isTrap: false, explanation: 'Probiotice sănătoase!', color: '#F0F0F0', faceExpression: 'happy' },
+  { id: '5', name: 'Apă', emoji: '💧', isHealthy: true, isTrap: false, explanation: 'Apa spală bacteriile!', color: '#00BFFF', faceExpression: 'happy' },
+  { id: '6', name: 'Nuci', emoji: '🥜', isHealthy: true, isTrap: false, explanation: 'Proteine și minerale!', color: '#8B4513', faceExpression: 'happy' },
+  { id: '7', name: 'Pâine', emoji: '🍞', isHealthy: true, isTrap: false, explanation: 'Fibre pentru sănătate!', color: '#D2691E', faceExpression: 'happy' },
+  { id: '8', name: 'Ou', emoji: '🥚', isHealthy: true, isTrap: false, explanation: 'Vitamina D pentru dinți!', color: '#FFF8DC', faceExpression: 'happy' },
+  { id: '9', name: 'Pește', emoji: '🐟', isHealthy: true, isTrap: false, explanation: 'Fosfor pentru dinți!', color: '#4682B4', faceExpression: 'happy' },
+  { id: '10', name: 'Varză', emoji: '🥬', isHealthy: true, isTrap: false, explanation: 'Vitamina C!', color: '#32CD32', faceExpression: 'happy' },
   // Harmful foods
-  { id: '11', name: 'Bomboane', emoji: '🍬', isHealthy: false, isTrap: false, explanation: 'Bomboanele fac carii!', color: '#FF69B4' },
-  { id: '12', name: 'Suc acidulat', emoji: '🥤', isHealthy: false, isTrap: false, explanation: 'Sucul distruge smalțul!', color: '#E53935' },
-  { id: '13', name: 'Ciocolată', emoji: '🍫', isHealthy: false, isTrap: false, explanation: 'Ciocolata se lipește de dinți!', color: '#5D4037' },
-  { id: '14', name: 'Chipsuri', emoji: '🥔', isHealthy: false, isTrap: false, explanation: 'Chipsurile sunt acide!', color: '#FFAB40' },
-  { id: '15', name: 'Înghețată', emoji: '🍦', isHealthy: false, isTrap: false, explanation: 'Înghețata are mult zahăr!', color: '#FFF8E1' },
-  { id: '16', name: 'Băutură acidă', emoji: '🧃', isHealthy: false, isTrap: false, explanation: 'Acidul atacă dinții!', color: '#FF5722' },
-  { id: '17', name: 'Caramel', emoji: '🍮', isHealthy: false, isTrap: false, explanation: 'Caramelul se lipeste tare!', color: '#D7CCC8' },
-  { id: '18', name: 'Tort', emoji: '🎂', isHealthy: false, isTrap: false, explanation: 'Tortul are mult zahăr!', color: '#F48FB1' },
-  // Trap foods
-  { id: '19', name: 'Gumă fără zahăr', emoji: '🍬', isHealthy: true, isTrap: true, explanation: 'Surpriză! Guma fără zahăr e OK!', color: '#81C784' },
-  { id: '20', name: 'Lămâie', emoji: '🍋', isHealthy: false, isTrap: true, explanation: 'Capcană! Lămâia e acidă!', color: '#FFF176' },
+  { id: '11', name: 'Bomboane', emoji: '🍬', isHealthy: false, isTrap: false, explanation: 'Bomboanele fac carii!', color: '#FF1493', faceExpression: 'evil' },
+  { id: '12', name: 'Suc', emoji: '🥤', isHealthy: false, isTrap: false, explanation: 'Distruge smalțul!', color: '#DC143C', faceExpression: 'evil' },
+  { id: '13', name: 'Ciocolată', emoji: '🍫', isHealthy: false, isTrap: false, explanation: 'Se lipește de dinți!', color: '#4A2C2A', faceExpression: 'evil' },
+  { id: '14', name: 'Chipsuri', emoji: '🥔', isHealthy: false, isTrap: false, explanation: 'Acide pentru dinți!', color: '#FF6347', faceExpression: 'evil' },
+  { id: '15', name: 'Înghețată', emoji: '🍦', isHealthy: false, isTrap: false, explanation: 'Mult zahăr!', color: '#FFFACD', faceExpression: 'evil' },
+  { id: '16', name: 'Băutură acidă', emoji: '🧃', isHealthy: false, isTrap: false, explanation: 'Acid atacă dinții!', color: '#FF4500', faceExpression: 'evil' },
+  { id: '17', name: 'Caramel', emoji: '🍮', isHealthy: false, isTrap: false, explanation: 'Se lipeste tare!', color: '#8B7355', faceExpression: 'evil' },
+  { id: '18', name: 'Tort', emoji: '🎂', isHealthy: false, isTrap: false, explanation: 'Mult zahăr!', color: '#FF69B4', faceExpression: 'evil' },
+  // Traps
+  { id: '19', name: 'Gumă', emoji: '🍬', isHealthy: true, isTrap: true, explanation: 'Surpriză! E OK fără zahăr!', color: '#90EE90', faceExpression: 'happy' },
+  { id: '20', name: 'Lămâie', emoji: '🍋', isHealthy: false, isTrap: true, explanation: 'Capcană! E acidă!', color: '#FFFF00', faceExpression: 'neutral' },
 ];
 
-export function FoodSorterGame({ onBack }: FoodSorterGameProps) {
-  const { earnSticker } = useBrushingProgress();
-  
+// Particle system
+interface Particle {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  color: string;
+  size: number;
+  life: number;
+  type: 'sparkle' | 'confetti' | 'bubble';
+}
+
+export function FoodSorterGame({ onBack }: { onBack: () => void }) {
+  const { saveGameSession } = useGameProgress();
   const [gameState, setGameState] = useState<'intro' | 'playing' | 'result'>('intro');
   const [foodsQueue, setFoodsQueue] = useState<FoodItem[]>([]);
   const [currentFood, setCurrentFood] = useState<FoodItem | null>(null);
@@ -54,17 +62,19 @@ export function FoodSorterGame({ onBack }: FoodSorterGameProps) {
   const [timeLeft, setTimeLeft] = useState(60);
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
-  const [feedback, setFeedback] = useState<{ message: string; correct: boolean; emoji: string } | null>(null);
-  const [fairyComment, setFairyComment] = useState('');
+  const [feedback, setFeedback] = useState<{ message: string; correct: boolean } | null>(null);
+  const [particles, setParticles] = useState<Particle[]>([]);
   const [isDragging, setIsDragging] = useState(false);
-  const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
-  const [dropZone, setDropZone] = useState<'left' | 'right' | null>(null);
-  const [foodsInBasket, setFoodsInBasket] = useState<{food: FoodItem; zone: 'healthy' | 'unhealthy'}[]>([]);
+  const [dragDirection, setDragDirection] = useState<'left' | 'right' | null>(null);
+  const [streakCount, setStreakCount] = useState(0);
+  const [showFairy, setShowFairy] = useState(false);
+  const [fairyMessage, setFairyMessage] = useState('');
   
-  const gameAreaRef = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<NodeJS.Timeout>();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const particleIdRef = useRef(0);
+  const controls = useAnimation();
 
-  // Initialize game
+  // Shuffle and start game
   const startGame = useCallback(() => {
     const shuffled = [...FOODS].sort(() => Math.random() - 0.5);
     setFoodsQueue(shuffled);
@@ -74,92 +84,110 @@ export function FoodSorterGame({ onBack }: FoodSorterGameProps) {
     setTimeLeft(60);
     setCorrectCount(0);
     setWrongCount(0);
-    setFeedback(null);
-    setFairyComment('Trage alimentele în coșul corect!');
-    setFoodsInBasket([]);
+    setStreakCount(0);
+    setParticles([]);
+    setFairyMessage('Trage alimentele în coșul corect! Hai să învățăm!');
+    setShowFairy(true);
+    setTimeout(() => setShowFairy(false), 3000);
   }, []);
 
   // Timer
   useEffect(() => {
     if (gameState === 'playing' && timeLeft > 0) {
-      timerRef.current = setTimeout(() => setTimeLeft(t => t - 1), 1000);
-      return () => clearTimeout(timerRef.current);
+      const timer = setTimeout(() => setTimeLeft(t => t - 1), 1000);
+      return () => clearTimeout(timer);
     } else if (timeLeft === 0 && gameState === 'playing') {
       endGame();
     }
   }, [gameState, timeLeft]);
 
-  // Fairy comments
+  // Create particles
+  const createParticles = useCallback((x: number, y: number, color: string, count: number = 15) => {
+    const newParticles: Particle[] = [];
+    for (let i = 0; i < count; i++) {
+      newParticles.push({
+        id: particleIdRef.current++,
+        x,
+        y,
+        vx: (Math.random() - 0.5) * 15,
+        vy: (Math.random() - 0.5) * 15 - 5,
+        color: ['#FFD700', '#FF69B4', '#00CED1', '#7FFF00', color][Math.floor(Math.random() * 5)],
+        size: Math.random() * 8 + 4,
+        life: 1,
+        type: Math.random() > 0.5 ? 'sparkle' : 'confetti',
+      });
+    }
+    setParticles(prev => [...prev, ...newParticles]);
+  }, []);
+
+  // Update particles
   useEffect(() => {
-    if (gameState !== 'playing') return;
-    
-    const comments = [
-      'Gândește-te ce e bun pentru dinții tăi!',
-      'Bacteriile adoră zahărul!',
-      'Calciul = dinți puternici!',
-      'Atentie la capcane!',
-      'Apa e cel mai bun prieten!',
-    ];
+    if (particles.length === 0) return;
     
     const interval = setInterval(() => {
-      if (!feedback) {
-        setFairyComment(comments[Math.floor(Math.random() * comments.length)]);
-      }
-    }, 4000);
+      setParticles(prev => prev
+        .map(p => ({
+          ...p,
+          x: p.x + p.vx,
+          y: p.y + p.vy,
+          vy: p.vy + 0.5,
+          life: p.life - 0.02,
+        }))
+        .filter(p => p.life > 0)
+      );
+    }, 16);
     
     return () => clearInterval(interval);
-  }, [gameState, feedback]);
+  }, [particles.length]);
 
-  const handleSort = (isHealthyZone: boolean) => {
+  // Handle sort
+  const handleSort = async (isHealthyZone: boolean) => {
     if (!currentFood || feedback) return;
     
     const isCorrect = currentFood.isHealthy === isHealthyZone;
+    const points = isCorrect ? (currentFood.isTrap ? 20 : 10) : -5;
     
     if (isCorrect) {
-      const points = currentFood.isTrap ? 20 : 10;
       setScore(s => s + points);
       setCorrectCount(c => c + 1);
-      setFeedback({ 
-        message: currentFood.explanation, 
-        correct: true, 
-        emoji: currentFood.isTrap ? '🎯' : '✅' 
-      });
+      setStreakCount(s => s + 1);
+      setFeedback({ message: currentFood.explanation, correct: true });
       
-      // Add to basket visualization
-      setFoodsInBasket(prev => [...prev, { 
-        food: currentFood, 
-        zone: isHealthyZone ? 'healthy' : 'unhealthy' 
-      }]);
+      // Vibrate
+      if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
       
-      if (currentFood.isTrap) {
-        setFairyComment('Bravo! Ai prins capcana! +20');
-        if (navigator.vibrate) navigator.vibrate([50, 50, 100]);
-      } else {
-        setFairyComment(`Corect! ${currentFood.name} ${isHealthyZone ? 'e sănătos!' : 'nu e bun!'}`);
-        if (navigator.vibrate) navigator.vibrate(50);
+      // Particles at drop position
+      createParticles(isHealthyZone ? 25 : 75, 70, '#00FF00');
+      
+      // Fairy comment every 5 correct
+      if ((correctCount + 1) % 5 === 0) {
+        setFairyMessage('🎉 Uau! Bravo! Continuă așa!');
+        setShowFairy(true);
+        setTimeout(() => setShowFairy(false), 2000);
       }
     } else {
-      setScore(s => Math.max(0, s - 5));
+      setScore(s => Math.max(0, s + points));
       setWrongCount(w => w + 1);
-      setFeedback({ 
-        message: currentFood.explanation, 
-        correct: false, 
-        emoji: '❌' 
-      });
-      setFairyComment('Ups! ' + currentFood.explanation);
-      if (navigator.vibrate) navigator.vibrate([100, 50]);
+      setStreakCount(0);
+      setFeedback({ message: currentFood.explanation, correct: false });
+      
+      if (navigator.vibrate) navigator.vibrate(200);
+      createParticles(isHealthyZone ? 25 : 75, 70, '#FF0000', 8);
     }
 
-    // Move to next food after delay
+    // Next food
     setTimeout(() => {
       setFeedback(null);
       const nextIndex = foodsQueue.findIndex(f => f.id === currentFood.id) + 1;
       
       if (nextIndex < foodsQueue.length) {
         setCurrentFood(foodsQueue[nextIndex]);
-        // Warning for traps (last 5)
+        
+        // Warning for traps
         if (nextIndex >= 15) {
-          setFairyComment('⚠️ ATENȚIE! Capcane!');
+          setFairyMessage('⚠️ ATENȚIE! Capcane înainte!');
+          setShowFairy(true);
+          setTimeout(() => setShowFairy(false), 2500);
         }
       } else {
         endGame();
@@ -169,144 +197,198 @@ export function FoodSorterGame({ onBack }: FoodSorterGameProps) {
 
   const endGame = () => {
     setGameState('result');
-    
-    // Time bonus
-    let finalScore = score;
-    if (timeLeft > 0) {
-      finalScore += 50;
-    }
-    
-    // Award sticker if score is good
-    if (finalScore >= 150) {
-      earnSticker('detective');
-    }
+    const timeBonus = timeLeft > 0 ? 50 : 0;
+    saveGameSession({
+      gameId: 'sorter',
+      score: score + timeBonus,
+      duration: 60 - timeLeft,
+    });
   };
 
   // Drag handlers
-  const handleDragStart = () => {
-    setIsDragging(true);
-    setFairyComment('Trage în stânga sau dreapta!');
-  };
-
-  const handleDrag = (_: unknown, info: PanInfo) => {
-    setDragPosition({ x: info.offset.x, y: info.offset.y });
-    
-    // Determine drop zone based on drag position
-    if (info.offset.x < -80) {
-      setDropZone('left');
-    } else if (info.offset.x > 80) {
-      setDropZone('right');
+  const handleDrag = (_: any, info: PanInfo) => {
+    const threshold = 80;
+    if (info.offset.x < -threshold) {
+      setDragDirection('left');
+    } else if (info.offset.x > threshold) {
+      setDragDirection('right');
     } else {
-      setDropZone(null);
+      setDragDirection(null);
     }
   };
 
-  const handleDragEnd = (_: unknown, info: PanInfo) => {
-    setIsDragging(false);
-    setDragPosition({ x: 0, y: 0 });
-    
+  const handleDragEnd = (_: any, info: PanInfo) => {
     if (info.offset.x < -100) {
-      handleSort(true); // Left = Healthy
+      handleSort(true);
     } else if (info.offset.x > 100) {
-      handleSort(false); // Right = Unhealthy
+      handleSort(false);
     }
-    
-    setDropZone(null);
+    setDragDirection(null);
+    setIsDragging(false);
   };
 
   const currentIndex = currentFood ? foodsQueue.findIndex(f => f.id === currentFood.id) : 0;
-  const isTrapPhase = currentIndex >= 15;
 
+  // Intro screen
   if (gameState === 'intro') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-green-50 via-emerald-50 to-green-100 p-4">
-        <div className="max-w-2xl mx-auto pt-4">
-          <button 
-            onClick={onBack} 
-            className="text-gray-600 hover:text-gray-800 mb-4 flex items-center gap-2 transition-colors"
+      <div className="min-h-screen bg-gradient-to-br from-green-400 via-emerald-400 to-teal-400 overflow-hidden">
+        {/* Animated background */}
+        <div className="absolute inset-0 overflow-hidden">
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute text-4xl opacity-20"
+              initial={{ y: '100vh', x: Math.random() * 100 + 'vw' }}
+              animate={{ y: '-20vh' }}
+              transition={{ 
+                duration: 8 + Math.random() * 10, 
+                repeat: Infinity, 
+                delay: Math.random() * 5 
+              }}
+            >
+              {['🍎', '🥕', '🍬', '🧀', '🥤', '🥬'][i % 6]}
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="relative z-10 max-w-2xl mx-auto p-6 pt-12">
+          <motion.button 
+            onClick={onBack}
+            className="mb-6 flex items-center gap-2 text-white font-bold bg-white/20 backdrop-blur px-4 py-2 rounded-full"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             <ArrowLeft className="w-5 h-5" /> Înapoi
-          </button>
+          </motion.button>
           
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
             className="text-center"
           >
-            <div className="text-6xl mb-4">🍎⚡🍬</div>
-            <h1 className="text-4xl md:text-5xl font-bold text-green-600 mb-2">Sortează Sănătos</h1>
-            <p className="text-lg text-gray-600 mb-6">Trage alimentele în coșul corect!</p>
+            {/* Bouncing food emojis */}
+            <div className="flex justify-center gap-4 mb-6">
+              {['🍎', '⚡', '🍬'].map((emoji, i) => (
+                <motion.span
+                  key={i}
+                  className="text-7xl"
+                  animate={{ y: [0, -20, 0], rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
+                >
+                  {emoji}
+                </motion.span>
+              ))}
+            </div>
+
+            <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-4 drop-shadow-lg">
+              Sortează Sănătos
+            </h1>
+            <p className="text-xl text-white/90 mb-8 font-medium">
+              Trage alimentele în coșul corect și învață ce e bun pentru dinții tăi!
+            </p>
             
-            {/* Game preview */}
-            <div className="bg-white rounded-3xl p-6 mb-6 shadow-xl">
-              <div className="grid grid-cols-2 gap-4">
+            {/* Baskets preview */}
+            <div className="grid grid-cols-2 gap-6 mb-8">
+              <motion.div 
+                className="bg-gradient-to-br from-green-500 to-green-600 rounded-3xl p-6 shadow-2xl border-4 border-white/30"
+                whileHover={{ scale: 1.05, rotate: -2 }}
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
                 <motion.div 
-                  whileHover={{ scale: 1.05 }}
-                  className="bg-gradient-to-br from-green-400 to-green-500 rounded-2xl p-4 text-white shadow-lg"
+                  className="text-6xl mb-2"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1, repeat: Infinity }}
                 >
-                  <span className="text-5xl">😊</span>
-                  <p className="font-bold text-lg mt-2">Prieteni</p>
-                  <p className="text-sm opacity-90">Alimente sănătoase</p>
-                  <div className="mt-2 text-2xl">🍎🥕🧀</div>
+                  😊
                 </motion.div>
+                <p className="font-bold text-white text-xl">PRIETENI</p>
+                <p className="text-green-100 text-sm">Alimente sănătoase</p>
+                <div className="mt-3 flex justify-center gap-1 text-2xl">
+                  {['🍎', '🥕', '🧀', '🥛', '💧'].map((e, i) => (
+                    <motion.span 
+                      key={i}
+                      animate={{ y: [0, -5, 0] }}
+                      transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
+                    >
+                      {e}
+                    </motion.span>
+                  ))}
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                className="bg-gradient-to-br from-red-500 to-red-600 rounded-3xl p-6 shadow-2xl border-4 border-white/30"
+                whileHover={{ scale: 1.05, rotate: 2 }}
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+              >
                 <motion.div 
-                  whileHover={{ scale: 1.05 }}
-                  className="bg-gradient-to-br from-red-400 to-red-500 rounded-2xl p-4 text-white shadow-lg"
+                  className="text-6xl mb-2"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1, repeat: Infinity, delay: 0.5 }}
                 >
-                  <span className="text-5xl">😈</span>
-                  <p className="font-bold text-lg mt-2">Dușmani</p>
-                  <p className="text-sm opacity-90">Alimente dăunătoare</p>
-                  <div className="mt-2 text-2xl">🍬🥤🍫</div>
+                  😈
                 </motion.div>
-              </div>
+                <p className="font-bold text-white text-xl">DUȘMANI</p>
+                <p className="text-red-100 text-sm">Alimente dăunătoare</p>
+                <div className="mt-3 flex justify-center gap-1 text-2xl">
+                  {['🍬', '🥤', '🍫', '🥔', '🍦'].map((e, i) => (
+                    <motion.span 
+                      key={i}
+                      animate={{ y: [0, -5, 0] }}
+                      transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 + 0.5 }}
+                    >
+                      {e}
+                    </motion.span>
+                  ))}
+                </div>
+              </motion.div>
             </div>
             
-            {/* Rules */}
+            {/* Rules card */}
             <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              className="bg-white/95 backdrop-blur rounded-3xl p-6 mb-8 shadow-xl"
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-5 mb-6 text-left"
             >
-              <h3 className="font-bold text-yellow-800 mb-3 flex items-center gap-2">
-                <Sparkles className="w-5 h-5" />
-                Cum se joacă:
+              <h3 className="font-bold text-gray-800 mb-4 flex items-center justify-center gap-2 text-lg">
+                <Sparkles className="w-5 h-5 text-yellow-500" />
+                Cum se joacă
               </h3>
-              <ul className="space-y-2 text-yellow-700 text-sm">
-                <li className="flex items-center gap-2">
-                  <span className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold text-xs">1</span>
-                  Sortează 20 de alimente în 60 de secunde
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold text-xs">2</span>
-                  Trage alimentul în stânga (sănătos) sau dreapta (nesănătos)
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold text-xs">3</span>
-                  +10 puncte pentru răspuns corect, +20 pentru capcane!
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold text-xs">4</span>
-                  -5 puncte pentru greșeală
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold text-xs">5</span>
-                  +50 puncte bonus dacă termini repede!
-                </li>
-                <li className="flex items-center gap-2 text-red-600 font-semibold">
-                  <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center text-red-600 font-bold text-xs">!</span>
-                  ⚠️ Ultimele 5 alimente sunt CAPCANE!
-                </li>
-              </ul>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="flex items-center gap-2 bg-green-50 p-3 rounded-xl">
+                  <span className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold">1</span>
+                  <span className="text-gray-700">Sortează 20 alimente</span>
+                </div>
+                <div className="flex items-center gap-2 bg-blue-50 p-3 rounded-xl">
+                  <span className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">2</span>
+                  <span className="text-gray-700">Trage stânga/dreapta</span>
+                </div>
+                <div className="flex items-center gap-2 bg-purple-50 p-3 rounded-xl">
+                  <span className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">3</span>
+                  <span className="text-gray-700">+10 puncte/corect</span>
+                </div>
+                <div className="flex items-center gap-2 bg-orange-50 p-3 rounded-xl">
+                  <span className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold">4</span>
+                  <span className="text-gray-700">+50 bonus timp</span>
+                </div>
+              </div>
+              <div className="mt-4 p-3 bg-red-50 rounded-xl flex items-center gap-2 text-red-700 font-semibold">
+                <span className="text-xl">⚠️</span>
+                <span>Ultimele 5 sunt CAPCANE!</span>
+              </div>
             </motion.div>
             
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.1, rotate: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={startGame}
-              className="bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xl font-bold px-12 py-4 rounded-full shadow-xl hover:shadow-2xl transition-all"
+              className="bg-white text-green-600 text-2xl font-extrabold px-16 py-5 rounded-full shadow-2xl hover:shadow-green-400/50 transition-shadow"
             >
-              🎮 Începe Jocul!
+              🎮 JOACĂ ACUM! 🎮
             </motion.button>
           </motion.div>
         </div>
@@ -314,270 +396,448 @@ export function FoodSorterGame({ onBack }: FoodSorterGameProps) {
     );
   }
 
+  // Result screen
   if (gameState === 'result') {
     const timeBonus = timeLeft > 0 ? 50 : 0;
     const finalScore = score + timeBonus;
-    const isPerfect = wrongCount === 0 && correctCount === 20;
     const accuracy = Math.round((correctCount / (correctCount + wrongCount)) * 100) || 0;
+    const isPerfect = wrongCount === 0;
     
     return (
-      <div className="min-h-screen bg-gradient-to-b from-green-50 to-green-100 p-4">
-        <div className="max-w-2xl mx-auto pt-8 text-center">
+      <div className="min-h-screen bg-gradient-to-br from-green-400 via-emerald-400 to-teal-400 p-4">
+        {/* Confetti */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(30)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute text-4xl"
+              initial={{ y: -50, x: Math.random() * window.innerWidth }}
+              animate={{ y: window.innerHeight + 50, rotate: Math.random() * 360 }}
+              transition={{ 
+                duration: 3 + Math.random() * 2, 
+                repeat: Infinity, 
+                delay: Math.random() * 2 
+              }}
+            >
+              {['🎉', '🎊', '⭐', '🏆', '🎈'][i % 5]}
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="max-w-2xl mx-auto pt-8 text-center relative z-10">
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring' }}
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', stiffness: 200 }}
+            className="text-8xl mb-4"
           >
-            <div className="text-7xl mb-4">
-              {isPerfect ? '🏆' : finalScore >= 180 ? '🥇' : finalScore >= 150 ? '🥈' : finalScore >= 100 ? '🥉' : '🎮'}
+            {isPerfect ? '👑' : finalScore >= 150 ? '🏆' : finalScore >= 100 ? '🥇' : '🎮'}
+          </motion.div>
+          
+          <motion.h1 
+            className="text-5xl font-extrabold text-white mb-2 drop-shadow-lg"
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+          >
+            {isPerfect ? 'PERFECT!' : 'BRAVO!'}
+          </motion.h1>
+          
+          <motion.div 
+            className="bg-white rounded-3xl p-8 shadow-2xl mt-6"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <motion.p 
+              className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-600 mb-2"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.4, type: 'spring' }}
+            >
+              {finalScore}
+            </motion.p>
+            <p className="text-gray-500 font-medium">puncte totale</p>
+            
+            <div className="grid grid-cols-3 gap-4 mt-6">
+              <motion.div 
+                className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-4 border-2 border-green-200"
+                whileHover={{ scale: 1.05 }}
+              >
+                <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-2" />
+                <p className="text-3xl font-bold text-green-600">{correctCount}</p>
+                <p className="text-xs text-green-700 font-medium">Corecte</p>
+              </motion.div>
+              <motion.div 
+                className="bg-gradient-to-br from-red-50 to-red-100 rounded-2xl p-4 border-2 border-red-200"
+                whileHover={{ scale: 1.05 }}
+              >
+                <XCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
+                <p className="text-3xl font-bold text-red-600">{wrongCount}</p>
+                <p className="text-xs text-red-700 font-medium">Greșite</p>
+              </motion.div>
+              <motion.div 
+                className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl p-4 border-2 border-yellow-200"
+                whileHover={{ scale: 1.05 }}
+              >
+                <Timer className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
+                <p className="text-3xl font-bold text-yellow-600">{timeBonus}</p>
+                <p className="text-xs text-yellow-700 font-medium">Bonus</p>
+              </motion.div>
             </div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">
-              {isPerfect ? 'PERFECT!' : 'Bravo!'}
-            </h1>
+            
+            <motion.div 
+              className="mt-6 p-4 bg-gray-50 rounded-xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+            >
+              <p className="text-gray-600 font-medium">
+                Acuratețe: <span className={`text-2xl font-bold ${accuracy >= 80 ? 'text-green-500' : accuracy >= 50 ? 'text-yellow-500' : 'text-red-500'}`}>{accuracy}%</span>
+              </p>
+              <div className="w-full h-4 bg-gray-200 rounded-full mt-2 overflow-hidden">
+                <motion.div 
+                  className={`h-full rounded-full ${accuracy >= 80 ? 'bg-green-500' : accuracy >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${accuracy}%` }}
+                  transition={{ delay: 0.8, duration: 0.5 }}
+                />
+              </div>
+            </motion.div>
           </motion.div>
           
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-3xl p-8 shadow-xl mb-6"
+            className="flex gap-4 justify-center mt-8"
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.8 }}
           >
-            <p className="text-6xl font-bold text-green-600 mb-2">{finalScore}</p>
-            <p className="text-gray-500 mb-6">puncte totale</p>
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-green-50 rounded-2xl p-4 border-2 border-green-100">
-                <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-2" />
-                <p className="text-3xl font-bold text-green-600">{correctCount}</p>
-                <p className="text-xs text-green-700">Corecte</p>
-              </div>
-              <div className="bg-red-50 rounded-2xl p-4 border-2 border-red-100">
-                <XCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
-                <p className="text-3xl font-bold text-red-600">{wrongCount}</p>
-                <p className="text-xs text-red-700">Greșite</p>
-              </div>
-              <div className="bg-yellow-50 rounded-2xl p-4 border-2 border-yellow-100">
-                <Clock className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
-                <p className="text-3xl font-bold text-yellow-600">{timeBonus}</p>
-                <p className="text-xs text-yellow-700">Bonus timp</p>
-              </div>
-            </div>
-            
-            <div className="mt-6 p-4 bg-gray-50 rounded-xl">
-              <p className="text-gray-600">
-                Acuratețe: <span className="font-bold text-lg" style={{ color: accuracy >= 80 ? '#22C55E' : accuracy >= 50 ? '#EAB308' : '#EF4444' }}>{accuracy}%</span>
-              </p>
-              <div className="w-full h-3 bg-gray-200 rounded-full mt-2 overflow-hidden">
-                <div 
-                  className="h-full rounded-full transition-all duration-1000"
-                  style={{ 
-                    width: `${accuracy}%`,
-                    backgroundColor: accuracy >= 80 ? '#22C55E' : accuracy >= 50 ? '#EAB308' : '#EF4444'
-                  }}
-                />
-              </div>
-            </div>
-          </motion.div>
-          
-          <div className="flex gap-4 justify-center">
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, rotate: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={startGame}
-              className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full font-bold shadow-lg"
+              className="bg-white text-green-600 px-8 py-4 rounded-full font-bold text-lg shadow-xl flex items-center gap-2"
             >
               <RotateCcw className="w-5 h-5" />
               Joacă Din Nou
             </motion.button>
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, rotate: 2 }}
               whileTap={{ scale: 0.95 }}
               onClick={onBack}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-8 py-3 rounded-full font-bold"
+              className="bg-green-700 text-white px-8 py-4 rounded-full font-bold text-lg shadow-xl"
             >
               Înapoi
             </motion.button>
-          </div>
+          </motion.div>
         </div>
       </div>
     );
   }
 
+  // Game screen
   return (
-    <div ref={gameAreaRef} className="min-h-screen bg-gradient-to-b from-green-50 to-green-100 overflow-hidden">
+    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-green-300 via-emerald-200 to-teal-300 overflow-hidden relative">
+      {/* Particles */}
+      {particles.map(p => (
+        <motion.div
+          key={p.id}
+          className="absolute pointer-events-none"
+          style={{
+            left: p.x + '%',
+            top: p.y + '%',
+            width: p.size,
+            height: p.size,
+          }}
+          initial={{ scale: 1, opacity: 1 }}
+          animate={{ scale: 0, opacity: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div 
+            className={`w-full h-full rounded-full ${p.type === 'sparkle' ? 'animate-pulse' : ''}`}
+            style={{ 
+              backgroundColor: p.color,
+              boxShadow: `0 0 ${p.size}px ${p.color}`,
+            }}
+          />
+        </motion.div>
+      ))}
+
+      {/* Fairy */}
+      <AnimatePresence>
+        {showFairy && (
+          <motion.div
+            initial={{ x: -200, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -200, opacity: 0 }}
+            className="fixed top-20 left-4 z-50"
+          >
+            <div className="bg-white rounded-2xl p-4 shadow-2xl max-w-xs border-4 border-pink-200">
+              <div className="flex items-center gap-3">
+                <motion.div 
+                  animate={{ y: [0, -5, 0] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                  className="text-4xl"
+                >
+                  🧚‍♀️
+                </motion.div>
+                <p className="text-gray-700 font-medium">{fairyMessage}</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
-      <div className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md p-3 shadow-sm z-30">
+      <div className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md p-3 shadow-lg z-40">
         <div className="flex items-center justify-between max-w-lg mx-auto">
-          <button onClick={onBack} className="text-gray-600 hover:text-gray-800 p-2">
-            <ArrowLeft className="w-6 h-6" />
-          </button>
+          <motion.button 
+            onClick={onBack} 
+            className="p-2 hover:bg-gray-100 rounded-full"
+            whileTap={{ scale: 0.9 }}
+          >
+            <ArrowLeft className="w-6 h-6 text-gray-600" />
+          </motion.button>
           
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-yellow-100 px-3 py-1.5 rounded-full">
-              <Trophy className="w-4 h-4 text-yellow-600" />
-              <span className="font-bold text-yellow-800">{score}</span>
-            </div>
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${timeLeft < 10 ? 'bg-red-100 text-red-700 animate-pulse' : 'bg-blue-100 text-blue-700'}`}>
-              <Clock className="w-4 h-4" />
-              <span className="font-bold">{timeLeft}s</span>
-            </div>
+          <div className="flex items-center gap-3">
+            <motion.div 
+              className="flex items-center gap-2 bg-yellow-100 px-4 py-2 rounded-full"
+              whileHover={{ scale: 1.05 }}
+            >
+              <Trophy className="w-5 h-5 text-yellow-600" />
+              <motion.span 
+                key={score}
+                initial={{ scale: 1.5, color: '#FFD700' }}
+                animate={{ scale: 1, color: '#000' }}
+                className="font-bold"
+              >
+                {score}
+              </motion.span>
+            </motion.div>
+            
+            <motion.div 
+              className={`flex items-center gap-2 px-4 py-2 rounded-full ${timeLeft < 10 ? 'bg-red-100 animate-pulse' : 'bg-blue-100'}`}
+            >
+              <Timer className={`w-5 h-5 ${timeLeft < 10 ? 'text-red-600' : 'text-blue-600'}`} />
+              <span className={`font-bold ${timeLeft < 10 ? 'text-red-600' : 'text-blue-600'}`}>{timeLeft}s</span>
+            </motion.div>
           </div>
         </div>
         
-        {/* Progress */}
+        {/* Progress bar */}
         <div className="max-w-lg mx-auto mt-2">
-          <div className="flex justify-between text-xs text-gray-500 mb-1">
+          <div className="flex justify-between text-xs text-gray-600 mb-1 font-medium">
             <span>Progres</span>
             <span>{currentIndex + 1} / 20</span>
           </div>
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
             <motion.div 
-              className="h-full bg-gradient-to-r from-green-400 to-green-500"
+              className="h-full bg-gradient-to-r from-green-500 to-emerald-500"
               initial={{ width: 0 }}
               animate={{ width: `${((currentIndex + 1) / 20) * 100}%` }}
-              transition={{ duration: 0.3 }}
+              transition={{ type: 'spring', stiffness: 100 }}
             />
           </div>
         </div>
       </div>
 
-      {/* Fairy Comment */}
-      <AnimatePresence>
-        {fairyComment && !feedback && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="fixed top-24 left-0 right-0 flex justify-center z-20 px-4"
-          >
-            <div className="flex items-center gap-3 bg-white rounded-full px-5 py-3 shadow-xl border border-green-100">
-              <ToothFairyAvatar size="sm" />
-              <span className="text-gray-700 font-medium">{fairyComment}</span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Trap Warning */}
-      <AnimatePresence>
-        {isTrapPhase && !feedback && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="fixed top-36 left-0 right-0 flex justify-center z-20 px-4"
-          >
-            <div className="bg-red-500 text-white px-6 py-3 rounded-full font-bold shadow-lg animate-pulse flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5" />
-              ATENȚIE! CAPCANE!
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Drop Zones */}
-      <div className="fixed inset-0 pt-32 flex">
-        {/* Left Zone - Healthy */}
-        <motion.div 
-          className={`flex-1 flex flex-col items-center justify-end pb-32 transition-all ${
-            dropZone === 'left' ? 'bg-green-200/50' : 'bg-green-100/20'
-          }`}
-          animate={{ 
-            scale: dropZone === 'left' ? 1.02 : 1,
-          }}
+      {/* Streak counter */}
+      {streakCount > 2 && (
+        <motion.div
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          className="fixed top-28 left-1/2 transform -translate-x-1/2 z-30"
         >
-          <div className={`text-center p-6 rounded-3xl transition-all ${
-            dropZone === 'left' 
-              ? 'bg-green-500 shadow-2xl scale-110' 
-              : 'bg-gradient-to-br from-green-400 to-green-500 shadow-xl'
-          }`}>
-            <span className="text-5xl">😊</span>
-            <p className="text-white font-bold text-lg mt-2">PRIETENI</p>
-            <p className="text-white/80 text-sm">Sănătos</p>
-            
-            {/* Mini basket contents */}
-            <div className="mt-3 flex flex-wrap justify-center gap-1 max-w-[100px]">
-              {foodsInBasket.filter(f => f.zone === 'healthy').slice(-6).map((f, i) => (
-                <span key={i} className="text-lg">{f.food.emoji}</span>
-              ))}
-            </div>
+          <div className="bg-gradient-to-r from-orange-400 to-red-500 text-white px-6 py-2 rounded-full font-bold text-lg shadow-xl flex items-center gap-2">
+            <span className="text-2xl">🔥</span>
+            <span>x{streakCount} STREAK!</span>
           </div>
         </motion.div>
+      )}
 
-        {/* Right Zone - Unhealthy */}
+      {/* Drop zones */}
+      <div className="fixed inset-0 pt-32 flex">
+        {/* Left zone - Healthy */}
         <motion.div 
           className={`flex-1 flex flex-col items-center justify-end pb-32 transition-all ${
-            dropZone === 'right' ? 'bg-red-200/50' : 'bg-red-100/20'
+            dragDirection === 'left' ? 'bg-green-400/50' : 'bg-green-400/20'
           }`}
           animate={{ 
-            scale: dropZone === 'right' ? 1.02 : 1,
+            scale: dragDirection === 'left' ? 1.02 : 1,
           }}
         >
-          <div className={`text-center p-6 rounded-3xl transition-all ${
-            dropZone === 'right' 
-              ? 'bg-red-500 shadow-2xl scale-110' 
-              : 'bg-gradient-to-br from-red-400 to-red-500 shadow-xl'
-          }`}>
-            <span className="text-5xl">😈</span>
-            <p className="text-white font-bold text-lg mt-2">DUȘMANI</p>
-            <p className="text-white/80 text-sm">Nesănătos</p>
-            
-            {/* Mini basket contents */}
-            <div className="mt-3 flex flex-wrap justify-center gap-1 max-w-[100px]">
-              {foodsInBasket.filter(f => f.zone === 'unhealthy').slice(-6).map((f, i) => (
-                <span key={i} className="text-lg">{f.food.emoji}</span>
-              ))}
-            </div>
-          </div>
+          <motion.div 
+            className={`text-center p-8 rounded-3xl shadow-2xl border-4 ${
+              dragDirection === 'left' 
+                ? 'bg-green-500 border-yellow-300 scale-110' 
+                : 'bg-gradient-to-br from-green-500 to-green-600 border-white/50'
+            }`}
+            animate={{
+              boxShadow: dragDirection === 'left' 
+                ? '0 0 50px rgba(34, 197, 94, 0.8)' 
+                : '0 10px 40px rgba(0,0,0,0.2)'
+            }}
+          >
+            <motion.div 
+              className="text-7xl mb-2"
+              animate={{ 
+                scale: [1, 1.2, 1],
+                rotate: [0, -10, 10, 0]
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              😊
+            </motion.div>
+            <p className="font-black text-white text-2xl">PRIETENI</p>
+            <p className="text-green-100 font-medium">Sănătos</p>
+          </motion.div>
+        </motion.div>
+
+        {/* Right zone - Unhealthy */}
+        <motion.div 
+          className={`flex-1 flex flex-col items-center justify-end pb-32 transition-all ${
+            dragDirection === 'right' ? 'bg-red-400/50' : 'bg-red-400/20'
+          }`}
+          animate={{ 
+            scale: dragDirection === 'right' ? 1.02 : 1,
+          }}
+        >
+          <motion.div 
+            className={`text-center p-8 rounded-3xl shadow-2xl border-4 ${
+              dragDirection === 'right' 
+                ? 'bg-red-500 border-yellow-300 scale-110' 
+                : 'bg-gradient-to-br from-red-500 to-red-600 border-white/50'
+            }`}
+            animate={{
+              boxShadow: dragDirection === 'right' 
+                ? '0 0 50px rgba(239, 68, 68, 0.8)' 
+                : '0 10px 40px rgba(0,0,0,0.2)'
+            }}
+          >
+            <motion.div 
+              className="text-7xl mb-2"
+              animate={{ 
+                scale: [1, 1.2, 1],
+                rotate: [0, 10, -10, 0]
+              }}
+              transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+            >
+              😈
+            </motion.div>
+            <p className="font-black text-white text-2xl">DUȘMANI</p>
+            <p className="text-red-100 font-medium">Nesănătos</p>
+          </motion.div>
         </motion.div>
       </div>
 
-      {/* Current Food - Draggable */}
+      {/* Draggable food */}
       <AnimatePresence mode="wait">
         {currentFood && !feedback && (
           <motion.div
             key={currentFood.id}
-            initial={{ y: -100, opacity: 0, rotate: -10 }}
+            initial={{ y: -200, opacity: 0, scale: 0.5, rotate: -20 }}
             animate={{ 
-              y: isDragging ? dragPosition.y : 0, 
-              x: isDragging ? dragPosition.x : 0,
-              opacity: 1,
-              rotate: isDragging ? dragPosition.x * 0.1 : 0,
-              scale: isDragging ? 1.1 : 1,
+              y: 0, 
+              opacity: 1, 
+              scale: 1,
+              rotate: 0,
             }}
             exit={{ 
-              y: dropZone === 'left' ? 200 : dropZone === 'right' ? 200 : -100,
-              x: dropZone === 'left' ? -150 : dropZone === 'right' ? 150 : 0,
+              scale: 0,
               opacity: 0,
-              scale: 0.5,
+              rotate: dragDirection === 'left' ? -45 : 45,
+              x: dragDirection === 'left' ? -200 : 200,
             }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             drag
-            dragConstraints={{ left: -150, right: 150, top: -50, bottom: 100 }}
-            dragElastic={0.2}
-            onDragStart={handleDragStart}
+            dragConstraints={{ left: -150, right: 150, top: -100, bottom: 100 }}
+            dragElastic={0.3}
+            onDragStart={() => setIsDragging(true)}
             onDrag={handleDrag}
             onDragEnd={handleDragEnd}
-            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 cursor-grab active:cursor-grabbing"
+            whileDrag={{ 
+              scale: 1.2, 
+              cursor: 'grabbing',
+              zIndex: 100,
+            }}
+            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 cursor-grab"
           >
-            <div 
-              className="w-32 h-32 rounded-3xl shadow-2xl flex flex-col items-center justify-center border-4 border-white"
-              style={{ backgroundColor: currentFood.color }}
-            >
-              <span className="text-6xl filter drop-shadow-lg">{currentFood.emoji}</span>
-            </div>
-            <p className="text-center font-bold text-gray-700 mt-3 text-lg bg-white/80 px-4 py-1 rounded-full shadow">
-              {currentFood.name}
-            </p>
+            {/* Trail effect */}
+            {isDragging && (
+              <motion.div
+                className="absolute inset-0 rounded-3xl"
+                style={{ backgroundColor: currentFood.color }}
+                animate={{ 
+                  scale: [1, 1.5, 1],
+                  opacity: [0.5, 0, 0.5],
+                }}
+                transition={{ duration: 0.5, repeat: Infinity }}
+              />
+            )}
             
+            <motion.div 
+              className="relative w-36 h-36 rounded-3xl shadow-2xl flex flex-col items-center justify-center border-4 border-white"
+              style={{ backgroundColor: currentFood.color }}
+              animate={{
+                boxShadow: isDragging 
+                  ? `0 20px 60px ${currentFood.color}80` 
+                  : '0 10px 30px rgba(0,0,0,0.3)'
+              }}
+            >
+              {/* Food emoji with face */}
+              <motion.span 
+                className="text-7xl filter drop-shadow-lg"
+                animate={{
+                  y: [0, -5, 0],
+                  rotate: currentFood.faceExpression === 'happy' ? [0, 5, -5, 0] : 0,
+                }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                {currentFood.emoji}
+              </motion.span>
+              
+              {/* Face expression overlay */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                {currentFood.faceExpression === 'happy' && (
+                  <motion.div 
+                    className="text-3xl mt-4"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                  >
+                    😊
+                  </motion.div>
+                )}
+                {currentFood.faceExpression === 'evil' && (
+                  <motion.div 
+                    className="text-3xl mt-4"
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 0.5, repeat: Infinity }}
+                  >
+                    😈
+                  </motion.div>
+                )}
+              </div>
+            </motion.div>
+            
+            {/* Food name */}
+            <motion.p 
+              className="text-center font-bold text-gray-800 mt-4 text-lg bg-white/90 px-4 py-2 rounded-full shadow-lg"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              {currentFood.name}
+            </motion.p>
+
             {/* Drag hint */}
             {!isDragging && (
               <motion.div 
+                className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 whitespace-nowrap"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 whitespace-nowrap"
+                transition={{ delay: 1 }}
               >
-                <span className="text-gray-500 text-sm bg-white/80 px-3 py-1 rounded-full">
-                  ← Trage stânga sau dreapta →
+                <span className="text-gray-600 font-medium bg-white/80 px-3 py-1 rounded-full text-sm">
+                  ← Trage →
                 </span>
               </motion.div>
             )}
@@ -585,36 +845,115 @@ export function FoodSorterGame({ onBack }: FoodSorterGameProps) {
         )}
       </AnimatePresence>
 
-      {/* Feedback Overlay */}
+      {/* Feedback overlay */}
       <AnimatePresence>
         {feedback && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5 }}
-            className="fixed inset-0 flex items-center justify-center z-40 pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
           >
-            <div className={`text-center p-8 rounded-3xl shadow-2xl ${
-              feedback.correct ? 'bg-green-100 border-4 border-green-400' : 'bg-red-100 border-4 border-red-400'
-            }`}>
-              <div className="text-7xl mb-4">{feedback.emoji}</div>
-              <p className={`text-2xl font-bold ${feedback.correct ? 'text-green-700' : 'text-red-700'}`}>
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              exit={{ scale: 0, rotate: 180 }}
+              transition={{ type: 'spring', stiffness: 200 }}
+              className={`text-center p-10 rounded-3xl shadow-2xl border-4 ${
+                feedback.correct 
+                  ? 'bg-gradient-to-br from-green-400 to-green-500 border-yellow-300' 
+                  : 'bg-gradient-to-br from-red-400 to-red-500 border-gray-300'
+              }`}
+            >
+              <motion.div 
+                className="text-8xl mb-4"
+                animate={{ 
+                  scale: [1, 1.3, 1],
+                  rotate: feedback.correct ? [0, 10, -10, 0] : [0, -10, 10, 0]
+                }}
+                transition={{ duration: 0.5, repeat: 2 }}
+              >
+                {feedback.correct ? '🎉' : '😅'}
+              </motion.div>
+              <motion.p 
+                className="text-3xl font-black text-white mb-2"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
                 {feedback.correct ? 'CORECT!' : 'GREȘIT!'}
-              </p>
-              <p className="text-gray-600 mt-2 max-w-xs">{feedback.message}</p>
-            </div>
+              </motion.p>
+              <motion.p 
+                className="text-white/90 font-medium max-w-xs"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                {feedback.message}
+              </motion.p>
+              
+              {feedback.correct && (
+                <motion.div
+                  className="mt-4 flex justify-center gap-1"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  {[...Array(5)].map((_, i) => (
+                    <motion.span
+                      key={i}
+                      className="text-3xl"
+                      initial={{ y: 0 }}
+                      animate={{ y: [-20, 0] }}
+                      transition={{ delay: 0.5 + i * 0.1, duration: 0.3 }}
+                    >
+                      ⭐
+                    </motion.span>
+                  ))}
+                </motion.div>
+              )}
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Stats Bar */}
+      {/* Trap warning */}
+      <AnimatePresence>
+        {currentIndex >= 15 && !feedback && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="fixed top-36 left-0 right-0 flex justify-center z-30"
+          >
+            <motion.div 
+              className="bg-red-500 text-white px-6 py-3 rounded-full font-black text-lg shadow-xl flex items-center gap-2"
+              animate={{ 
+                scale: [1, 1.1, 1],
+                boxShadow: [
+                  '0 0 0 0 rgba(239, 68, 68, 0.4)',
+                  '0 0 0 20px rgba(239, 68, 68, 0)',
+                ]
+              }}
+              transition={{ duration: 1, repeat: Infinity }}
+            >
+              <span className="text-2xl">⚠️</span>
+              CAPCANE ÎNAINTE!
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Stats bar */}
       <div className="fixed bottom-4 left-4 right-4 flex justify-center gap-4 z-30">
-        <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-full shadow-lg flex items-center gap-2">
-          <Star className="w-5 h-5 text-yellow-500" />
-          <span className="font-bold text-green-600">{correctCount}</span>
+        <motion.div 
+          className="bg-white/95 backdrop-blur px-6 py-3 rounded-full shadow-xl flex items-center gap-3"
+          whileHover={{ scale: 1.05 }}
+        >
+          <Star className="w-6 h-6 text-yellow-500" />
+          <span className="font-bold text-green-600 text-xl">{correctCount}</span>
           <span className="text-gray-400">/</span>
-          <span className="font-bold text-red-600">{wrongCount}</span>
-        </div>
+          <span className="font-bold text-red-600 text-xl">{wrongCount}</span>
+        </motion.div>
       </div>
     </div>
   );

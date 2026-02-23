@@ -1,12 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Trophy, Heart, Zap, Clock } from 'lucide-react';
+import { ArrowLeft, Heart, Zap, Trophy, RotateCcw } from 'lucide-react';
 import { useGameProgress } from '@/hooks/useGameProgress';
-import { ToothFairyAvatar } from '../ToothFairyAvatar';
-
-interface FluorAdventureProps {
-  onBack: () => void;
-}
 
 interface Player {
   x: number;
@@ -14,97 +9,107 @@ interface Player {
   vy: number;
   isJumping: boolean;
   invincible: boolean;
+  scaleY: number;
+  rotation: number;
 }
 
 interface Obstacle {
   id: string;
   x: number;
   y: number;
-  type: 'candy' | 'pit' | 'bacteria';
+  type: 'candy' | 'bacteria' | 'pit' | 'flying-candy';
   width: number;
   height: number;
-}
-
-interface Platform {
-  id: string;
-  x: number;
-  y: number;
-  width: number;
+  rotation: number;
 }
 
 interface Collectible {
   id: string;
   x: number;
   y: number;
-  type: 'toothbrush' | 'paste';
+  type: 'toothbrush' | 'paste' | 'coin';
+  collected: boolean;
+  floatOffset: number;
+}
+
+interface Particle {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  color: string;
+  size: number;
+  life: number;
 }
 
 const GRAVITY = 0.6;
-const JUMP_FORCE = -12;
-const GROUND_Y = 70;
-const GAME_SPEED = 3;
+const JUMP_FORCE = -13;
+const GROUND_Y = 75;
 
-export function FluorAdventure({ onBack }: FluorAdventureProps) {
-  const { saveGameSession, newBadges } = useGameProgress();
+export function FluorAdventure({ onBack }: { onBack: () => void }) {
+  const { saveGameSession } = useGameProgress();
   
   const [gameState, setGameState] = useState<'intro' | 'playing' | 'paused' | 'gameOver' | 'victory'>('intro');
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [level, setLevel] = useState(1);
   const [distance, setDistance] = useState(0);
+  const [gameTime, setGameTime] = useState(0);
   const [invincibleTime, setInvincibleTime] = useState(0);
   
-  const [player, setPlayer] = useState<Player>({ x: 10, y: GROUND_Y, vy: 0, isJumping: false, invincible: false });
+  const [player, setPlayer] = useState<Player>({ 
+    x: 15, 
+    y: GROUND_Y, 
+    vy: 0, 
+    isJumping: false, 
+    invincible: false,
+    scaleY: 1,
+    rotation: 0,
+  });
+  
   const [obstacles, setObstacles] = useState<Obstacle[]>([]);
-  const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [collectibles, setCollectibles] = useState<Collectible[]>([]);
-  const [fairyComment, setFairyComment] = useState('');
+  const [particles, setParticles] = useState<Particle[]>([]);
+  const [backgroundOffset, setBackgroundOffset] = useState(0);
+  const [showFairy, setShowFairy] = useState(true);
+  const [fairyMessage, setFairyMessage] = useState('Ajuțilă pe Fluor să salveze Orașul Dinților!');
+  const [screenShake, setScreenShake] = useState(0);
   
   const gameLoopRef = useRef<number>();
-  const lastObstacleTime = useRef(0);
-  const startTime = useRef(0);
+  const lastSpawnRef = useRef(0);
+  const particleIdRef = useRef(0);
+  const startTimeRef = useRef(0);
 
-  // Generate obstacles
-  const generateObstacle = useCallback(() => {
-    const types: Obstacle['type'][] = ['candy', 'candy', 'bacteria'];
-    if (Math.random() > 0.7) types.push('pit');
-    
-    const type = types[Math.floor(Math.random() * types.length)];
-    const id = Math.random().toString(36).substr(2, 9);
-    
-    if (type === 'pit') {
-      return { id, x: 100, y: GROUND_Y + 10, type, width: 15, height: 20 };
+  // Create particles
+  const createParticles = useCallback((x: number, y: number, color: string, count: number = 10) => {
+    const newParticles: Particle[] = [];
+    for (let i = 0; i < count; i++) {
+      newParticles.push({
+        id: particleIdRef.current++,
+        x,
+        y,
+        vx: (Math.random() - 0.5) * 12,
+        vy: (Math.random() - 0.5) * 12 - 5,
+        color,
+        size: Math.random() * 8 + 4,
+        life: 1,
+      });
     }
-    return { 
-      id, 
-      x: 100, 
-      y: GROUND_Y - (type === 'candy' ? 5 : 10), 
-      type, 
-      width: type === 'bacteria' ? 8 : 5, 
-      height: type === 'bacteria' ? 8 : 5 
-    };
+    setParticles(prev => [...prev, ...newParticles]);
   }, []);
 
-  // Generate platform
-  const generatePlatform = useCallback(() => {
-    return {
-      id: Math.random().toString(36).substr(2, 9),
-      x: 100,
-      y: GROUND_Y - 20 - Math.random() * 15,
-      width: 20 + Math.random() * 15,
-    };
-  }, []);
-
-  // Generate collectible
-  const generateCollectible = useCallback(() => {
-    const isPaste = Math.random() > 0.8;
-    return {
-      id: Math.random().toString(36).substr(2, 9),
-      x: 100,
-      y: GROUND_Y - 15 - Math.random() * 20,
-      type: isPaste ? 'paste' as const : 'toothbrush' as const,
-    };
-  }, []);
+  // Update particles
+  useEffect(() => {
+    if (particles.length === 0) return;
+    const interval = setInterval(() => {
+      setParticles(prev => prev
+        .map(p => ({ ...p, x: p.x + p.vx, y: p.y + p.vy, vy: p.vy + 0.4, life: p.life - 0.025 }))
+        .filter(p => p.life > 0)
+      );
+    }, 16);
+    return () => clearInterval(interval);
+  }, [particles.length]);
 
   // Start game
   const startGame = () => {
@@ -113,30 +118,30 @@ export function FluorAdventure({ onBack }: FluorAdventureProps) {
     setLives(3);
     setLevel(1);
     setDistance(0);
-    setPlayer({ x: 10, y: GROUND_Y, vy: 0, isJumping: false, invincible: false });
+    setGameTime(0);
+    setPlayer({ x: 15, y: GROUND_Y, vy: 0, isJumping: false, invincible: false, scaleY: 1, rotation: 0 });
     setObstacles([]);
-    setPlatforms([]);
     setCollectibles([]);
-    startTime.current = Date.now();
-    lastObstacleTime.current = 0;
-    setFairyComment('Sari peste dulciuri și bacterii!');
+    setParticles([]);
+    setBackgroundOffset(0);
+    startTimeRef.current = Date.now();
+    setFairyMessage('Apasă SPACE sau atinge pentru săritură!');
+    setShowFairy(true);
+    setTimeout(() => setShowFairy(false), 3000);
   };
 
   // Jump
   const jump = useCallback(() => {
     if (!player.isJumping && gameState === 'playing') {
-      setPlayer(p => ({ ...p, vy: JUMP_FORCE, isJumping: true }));
-      if (navigator.vibrate) navigator.vibrate(30);
+      setPlayer(p => ({ ...p, vy: JUMP_FORCE, isJumping: true, scaleY: 1.3 }));
+      createParticles(player.x, player.y + 5, '#4FC3F7', 8);
+      if (navigator.vibrate) navigator.vibrate(40);
+    } else if (player.isJumping && player.vy > -3 && gameState === 'playing') {
+      // Double jump
+      setPlayer(p => ({ ...p, vy: JUMP_FORCE * 0.8, scaleY: 1.2 }));
+      createParticles(player.x, player.y + 5, '#81D4FA', 6);
     }
-  }, [player.isJumping, gameState]);
-
-  // Double jump
-  const doubleJump = useCallback(() => {
-    if (player.isJumping && player.vy > -5 && gameState === 'playing') {
-      setPlayer(p => ({ ...p, vy: JUMP_FORCE * 0.8 }));
-      if (navigator.vibrate) navigator.vibrate(30);
-    }
-  }, [player.isJumping, player.vy, gameState]);
+  }, [player.isJumping, player.vy, player.x, player.y, gameState, createParticles]);
 
   // Game loop
   useEffect(() => {
@@ -144,124 +149,170 @@ export function FluorAdventure({ onBack }: FluorAdventureProps) {
 
     const gameLoop = () => {
       const now = Date.now();
-      const elapsed = (now - startTime.current) / 1000;
-      
-      // Update distance
-      setDistance(d => d + GAME_SPEED * 0.1);
+      const elapsed = (now - startTimeRef.current) / 1000;
+      setGameTime(elapsed);
       
       // Level progression
       if (elapsed > 30 && level === 1) {
         setLevel(2);
-        setFairyComment('Nivel 2! Mai rapid acum!');
+        setFairyMessage('Nivelul 2! Viteza crește!');
+        setShowFairy(true);
+        setTimeout(() => setShowFairy(false), 2500);
       } else if (elapsed > 60 && level === 2) {
         setLevel(3);
-        setFairyComment('Nivel 3! Finalul!');
+        setFairyMessage('Nivelul 3! Finalul!');
+        setShowFairy(true);
+        setTimeout(() => setShowFairy(false), 2500);
       } else if (elapsed > 90) {
         setGameState('victory');
-        saveGameSession({
-          gameId: 'fluor',
-          score: score + lives * 100,
-          duration: elapsed,
-          level: 3,
-        });
+        saveGameSession({ gameId: 'fluor', score: score + lives * 100, duration: elapsed, level: 3 });
         return;
       }
 
       // Spawn obstacles
-      if (now - lastObstacleTime.current > (2000 - level * 300)) {
-        lastObstacleTime.current = now;
-        setObstacles(prev => [...prev.slice(-5), generateObstacle()]);
+      const spawnRate = Math.max(1500, 2500 - level * 400);
+      if (now - lastSpawnRef.current > spawnRate) {
+        lastSpawnRef.current = now;
+        const types: Obstacle['type'][] = ['candy', 'bacteria', 'candy', 'flying-candy'];
+        if (level >= 2) types.push('pit');
         
-        if (Math.random() > 0.5) {
-          setPlatforms(prev => [...prev.slice(-3), generatePlatform()]);
-        }
+        const type = types[Math.floor(Math.random() * types.length)];
+        const newObstacle: Obstacle = {
+          id: Math.random().toString(36).substr(2, 9),
+          x: 110,
+          y: type === 'flying-candy' ? 40 : type === 'pit' ? GROUND_Y + 5 : GROUND_Y - 5,
+          type,
+          width: type === 'pit' ? 15 : 6,
+          height: type === 'pit' ? 15 : 6,
+          rotation: 0,
+        };
+        setObstacles(prev => [...prev.slice(-6), newObstacle]);
         
-        if (Math.random() > 0.3) {
-          setCollectibles(prev => [...prev.slice(-4), generateCollectible()]);
+        // Spawn collectible
+        if (Math.random() > 0.4) {
+          const types: Collectible['type'][] = ['coin', 'coin', 'toothbrush', 'paste'];
+          const type = types[Math.floor(Math.random() * types.length)];
+          setCollectibles(prev => [...prev.slice(-5), {
+            id: Math.random().toString(36).substr(2, 9),
+            x: 110,
+            y: GROUND_Y - 15 - Math.random() * 25,
+            type,
+            collected: false,
+            floatOffset: Math.random() * Math.PI * 2,
+          }]);
         }
       }
 
-      // Update player physics
+      const speed = 2.5 + level * 0.8;
+      setDistance(d => d + speed * 0.05);
+      setBackgroundOffset(o => (o + speed * 0.02) % 100);
+
+      // Player physics
       setPlayer(p => {
         let newY = p.y + p.vy;
         let newVy = p.vy + GRAVITY;
         let isJumping = true;
+        let scaleY = p.scaleY;
+        let rotation = p.rotation;
 
-        // Ground collision
         if (newY >= GROUND_Y) {
           newY = GROUND_Y;
           newVy = 0;
           isJumping = false;
+          scaleY = 1;
+          rotation = 0;
+        } else {
+          scaleY = Math.max(0.8, 1 - Math.abs(newVy) * 0.02);
+          rotation = newVy * 2;
         }
 
-        // Platform collision
-        platforms.forEach(plat => {
-          if (Math.abs(plat.x - p.x) < plat.width / 2 && 
-              newY >= plat.y - 5 && newY <= plat.y + 5 && 
-              p.vy >= 0) {
-            newY = plat.y;
-            newVy = 0;
-            isJumping = false;
-          }
-        });
-
-        return { ...p, y: newY, vy: newVy, isJumping };
+        return { ...p, y: newY, vy: newVy, isJumping, scaleY, rotation };
       });
 
       // Move obstacles
-      setObstacles(prev => prev.map(o => ({ ...o, x: o.x - GAME_SPEED * (1 + level * 0.2) })).filter(o => o.x > -10));
-      setPlatforms(prev => prev.map(p => ({ ...p, x: p.x - GAME_SPEED * (1 + level * 0.2) })).filter(p => p.x > -20));
-      setCollectibles(prev => prev.map(c => ({ ...c, x: c.x - GAME_SPEED * (1 + level * 0.2) })).filter(c => c.x > -5));
+      setObstacles(prev => prev.map(o => ({
+        ...o,
+        x: o.x - speed,
+        rotation: o.rotation + 2,
+        y: o.type === 'flying-candy' ? o.y + Math.sin(now / 300) * 0.5 : o.y,
+      })).filter(o => o.x > -15));
 
-      // Check collisions
+      // Move collectibles
+      setCollectibles(prev => prev.map(c => ({
+        ...c,
+        x: c.x - speed,
+      })).filter(c => c.x > -10 && !c.collected));
+
+      // Collision detection
       obstacles.forEach(obs => {
-        if (Math.abs(obs.x - player.x) < 8 && Math.abs(obs.y - player.y) < 10 && !player.invincible) {
+        const dx = obs.x - player.x;
+        const dy = obs.y - player.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist < 10 && !player.invincible) {
           setLives(l => {
             const newLives = l - 1;
+            setPlayer(p => ({ ...p, invincible: true, scaleY: 0.8 }));
+            setInvincibleTime(3);
+            setScreenShake(10);
+            createParticles(player.x, player.y, '#EF5350', 20);
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+            
             if (newLives <= 0) {
               setGameState('gameOver');
-              saveGameSession({
-                gameId: 'fluor',
-                score,
-                duration: elapsed,
-                level,
-              });
+              saveGameSession({ gameId: 'fluor', score, duration: elapsed, level });
             } else {
-              setPlayer(p => ({ ...p, invincible: true }));
-              setInvincibleTime(3);
-              setFairyComment('Ai! Ai pierdut o viață!');
-              if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+              setFairyMessage(`Ai! Mai ai ${newLives} vieți!`);
+              setShowFairy(true);
+              setTimeout(() => setShowFairy(false), 2000);
             }
             return newLives;
           });
         }
       });
 
-      // Check collectible collisions
+      // Collectible collision
       collectibles.forEach(col => {
-        if (Math.abs(col.x - player.x) < 8 && Math.abs(col.y - player.y) < 10) {
-          if (col.type === 'toothbrush') {
-            setScore(s => s + 50);
-            setFairyComment('+50 Periuță!');
-          } else {
-            setPlayer(p => ({ ...p, invincible: true }));
-            setInvincibleTime(5);
-            setFairyComment('Paste invincibilitate!');
+        if (!col.collected) {
+          const dx = col.x - player.x;
+          const dy = col.y - player.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist < 12) {
+            setCollectibles(prev => prev.map(c => c.id === col.id ? { ...c, collected: true } : c));
+            
+            if (col.type === 'coin') {
+              setScore(s => s + 10);
+              createParticles(col.x, col.y, '#FFD700', 8);
+            } else if (col.type === 'toothbrush') {
+              setScore(s => s + 50);
+              createParticles(col.x, col.y, '#4FC3F7', 15);
+              setFairyMessage('+50 Periuță!');
+              setShowFairy(true);
+              setTimeout(() => setShowFairy(false), 1500);
+            } else if (col.type === 'paste') {
+              setPlayer(p => ({ ...p, invincible: true }));
+              setInvincibleTime(5);
+              createParticles(col.x, col.y, '#FFFFFF', 20);
+              setFairyMessage('⭐ Invincibilitate! ⭐');
+              setShowFairy(true);
+              setTimeout(() => setShowFairy(false), 2000);
+            }
           }
-          setCollectibles(prev => prev.filter(c => c.id !== col.id));
         }
       });
 
-      // Update invincibility
+      // Screen shake decay
+      setScreenShake(s => Math.max(0, s - 1));
+
+      // Invincibility
       if (invincibleTime > 0) {
         setInvincibleTime(t => t - 0.016);
       } else if (player.invincible) {
         setPlayer(p => ({ ...p, invincible: false }));
       }
 
-      // Update score
       setScore(s => s + 1);
-
       gameLoopRef.current = requestAnimationFrame(gameLoop);
     };
 
@@ -269,61 +320,69 @@ export function FluorAdventure({ onBack }: FluorAdventureProps) {
     return () => {
       if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
     };
-  }, [gameState, level, player.x, player.y, player.invincible, obstacles, platforms, collectibles, score]);
+  }, [gameState, level, player.invincible, obstacles, collectibles, score, lives, createParticles, saveGameSession]);
 
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space' || e.code === 'ArrowUp') {
         e.preventDefault();
-        if (player.isJumping) {
-          doubleJump();
-        } else {
-          jump();
-        }
+        jump();
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [jump, doubleJump, player.isJumping]);
+  }, [jump]);
 
   if (gameState === 'intro') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-900 to-purple-700 p-4">
-        <div className="max-w-2xl mx-auto pt-8">
-          <button onClick={onBack} className="text-white/80 hover:text-white mb-6 flex items-center gap-2">
+      <div className="min-h-screen bg-gradient-to-b from-blue-900 via-blue-800 to-indigo-900 overflow-hidden">
+        <div className="max-w-2xl mx-auto p-6 pt-8">
+          <motion.button 
+            onClick={onBack}
+            className="mb-6 flex items-center gap-2 text-white/80 font-medium"
+            whileHover={{ scale: 1.05 }}
+          >
             <ArrowLeft className="w-5 h-5" /> Înapoi
-          </button>
+          </motion.button>
           
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">💧 Aventura lui Fluor</h1>
-            <p className="text-xl text-purple-200 mb-8">Ajuțilă pe Fluor să salveze Orașul Dinților!</p>
-            
-            <div className="bg-white/10 backdrop-blur rounded-3xl p-6 mb-8">
-              <div className="text-6xl mb-4">🏃</div>
-              <p className="text-white">Fluor aleargă prin oraș!</p>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur rounded-2xl p-4 mb-8 text-left text-white">
-              <h3 className="font-bold mb-2">📖 Cum se joacă:</h3>
-              <ul className="space-y-1 text-purple-200 text-sm">
-                <li>• Apasă SPACE sau atinge ecranul pentru săritură</li>
-                <li>• Apasă din nou în aer pentru dublă săritură</li>
-                <li>• Evită dulciurile și bacteriile!</li>
-                <li>• Colectează periuțe pentru puncte</li>
-                <li>• Pasta te face invincibil 5 secunde</li>
-                <li>• Supraviețuiește 90 de secunde pentru victorie!</li>
-              </ul>
-            </div>
-            
-            <button
-              onClick={startGame}
-              className="bg-gradient-to-r from-purple-400 to-pink-500 text-white text-xl font-bold px-12 py-4 rounded-full shadow-lg hover:scale-105 transition-transform"
+          <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center">
+            <motion.div 
+              className="text-8xl mb-6"
+              animate={{ y: [0, -20, 0], rotate: [0, 5, -5, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
             >
-              🎮 Joacă Acum!
-            </button>
-          </div>
+              💧
+            </motion.div>
+            <h1 className="text-5xl font-black text-white mb-4">Aventura lui Fluor</h1>
+            <p className="text-blue-200 mb-8">Ajuțilă pe Fluor să salveze Orașul Dinților!</p>
+            
+            <motion.div className="bg-white/10 backdrop-blur rounded-3xl p-6 mb-8">
+              <div className="grid grid-cols-3 gap-4 text-center text-white">
+                <div>
+                  <div className="text-4xl mb-2">🍬</div>
+                  <p className="text-sm">Evită dulciurile</p>
+                </div>
+                <div>
+                  <div className="text-4xl mb-2">🦠</div>
+                  <p className="text-sm">Ferește-te de bacterii</p>
+                </div>
+                <div>
+                  <div className="text-4xl mb-2">🪥</div>
+                  <p className="text-sm">Colectează periuțe</p>
+                </div>
+              </div>
+            </motion.div>
+            
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={startGame}
+              className="bg-gradient-to-r from-blue-400 to-cyan-400 text-white text-2xl font-black px-16 py-5 rounded-full shadow-2xl"
+            >
+              🎮 ÎNCEPE AVENTURA!
+            </motion.button>
+          </motion.div>
         </div>
       </div>
     );
@@ -331,218 +390,287 @@ export function FluorAdventure({ onBack }: FluorAdventureProps) {
 
   if (gameState === 'gameOver') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-900 to-purple-700 p-4">
-        <div className="max-w-2xl mx-auto pt-8 text-center">
-          <h1 className="text-4xl font-bold text-white mb-4">💔 Game Over</h1>
-          <p className="text-xl text-purple-200 mb-6">Fluor a obosit...</p>
-          
-          <div className="bg-white/10 backdrop-blur rounded-3xl p-8 mb-6">
-            <p className="text-5xl font-bold text-white mb-2">{score}</p>
-            <p className="text-purple-200">puncte</p>
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex items-center justify-center p-4">
+        <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="text-center">
+          <motion.div className="text-8xl mb-6" animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 0.5, repeat: Infinity }}>
+            💧😵
+          </motion.div>
+          <h1 className="text-4xl font-black text-white mb-4">Joc Terminat!</h1>
+          <div className="bg-white/10 rounded-3xl p-8 mb-6">
+            <p className="text-6xl font-black text-cyan-400 mb-2">{score}</p>
+            <p className="text-gray-400">puncte</p>
           </div>
-          
-          {newBadges.length > 0 && (
-            <div className="bg-yellow-400/20 rounded-2xl p-4 mb-6">
-              <p className="text-yellow-300 font-bold mb-2">🏅 Insigne Noi!</p>
-              {newBadges.map((badge, i) => (
-                <span key={i} className="inline-block bg-yellow-400 text-purple-900 px-3 py-1 rounded-full text-sm m-1">
-                  {badge}
-                </span>
-              ))}
-            </div>
-          )}
-          
-          <div className="flex gap-4 justify-center">
-            <button onClick={startGame} className="bg-purple-500 text-white px-8 py-3 rounded-full font-bold">
-              Încearcă Din Nou
-            </button>
-            <button onClick={onBack} className="bg-white/20 text-white px-8 py-3 rounded-full font-bold">
-              Înapoi
-            </button>
-          </div>
-        </div>
+          <motion.button whileHover={{ scale: 1.05 }} onClick={startGame} className="bg-cyan-500 text-white px-8 py-3 rounded-full font-bold">
+            <RotateCcw className="w-5 h-5 inline mr-2" /> Încearcă Din Nou
+          </motion.button>
+        </motion.div>
       </div>
     );
   }
 
   if (gameState === 'victory') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-yellow-400 to-orange-500 p-4">
-        <div className="max-w-2xl mx-auto pt-8 text-center">
-          <h1 className="text-4xl font-bold text-white mb-4">🏆 VICTORIE!</h1>
-          <p className="text-xl text-white/80 mb-6">Ai salvat Orașul Dinților!</p>
-          
-          <div className="text-8xl mb-6">🎉</div>
-          
-          <div className="bg-white rounded-3xl p-8 mb-6">
-            <p className="text-5xl font-bold text-purple-600 mb-2">{score + lives * 100}</p>
-            <p className="text-gray-500">puncte finale</p>
-          </div>
-          
-          {newBadges.length > 0 && (
-            <div className="bg-white/20 rounded-2xl p-4 mb-6">
-              <p className="text-white font-bold mb-2">🏅 Insigne Noi!</p>
-              {newBadges.map((badge, i) => (
-                <span key={i} className="inline-block bg-white text-orange-600 px-3 py-1 rounded-full text-sm m-1">
-                  {badge}
-                </span>
-              ))}
+      <div className="min-h-screen bg-gradient-to-b from-yellow-400 to-orange-500 overflow-hidden">
+        {[...Array(30)].map((_, i) => (
+          <motion.div key={i} className="absolute text-4xl" initial={{ y: -50, x: Math.random() * window.innerWidth }} animate={{ y: window.innerHeight + 50 }} transition={{ duration: 3 + Math.random() * 2, repeat: Infinity, delay: Math.random() * 2 }}>
+            {['🎉', '🎊', '⭐', '🏆'][i % 4]}
+          </motion.div>
+        ))}
+        <div className="min-h-screen flex items-center justify-center p-4 relative z-10">
+          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-center">
+            <motion.div className="text-9xl mb-6" animate={{ rotate: [0, 360] }} transition={{ duration: 2, repeat: Infinity }}>
+              👑
+            </motion.div>
+            <h1 className="text-5xl font-black text-white mb-4">VICTORIE!</h1>
+            <div className="bg-white rounded-3xl p-8">
+              <p className="text-6xl font-black text-orange-500">{score + lives * 100}</p>
+              <p className="text-gray-500">puncte finale</p>
             </div>
-          )}
-          
-          <button onClick={startGame} className="bg-white text-orange-600 px-8 py-3 rounded-full font-bold">
-            Joacă Din Nou
-          </button>
+          </motion.div>
         </div>
       </div>
     );
   }
 
   return (
-    <div 
-      className="min-h-screen bg-gradient-to-b from-purple-800 to-purple-600 overflow-hidden"
-      onClick={() => player.isJumping ? doubleJump() : jump()}
+    <motion.div 
+      className="min-h-screen bg-gradient-to-b from-blue-300 via-blue-200 to-white overflow-hidden relative"
+      style={{ transform: `translate(${screenShake * (Math.random() - 0.5)}px, ${screenShake * (Math.random() - 0.5)}px)` }}
+      onClick={jump}
     >
-      {/* HUD */}
-      <div className="fixed top-0 left-0 right-0 p-4 flex justify-between items-center z-20 bg-black/20">
-        <button onClick={(e) => { e.stopPropagation(); onBack(); }} className="text-white/80 hover:text-white">
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        
-        <div className="flex items-center gap-4 text-white">
-          <div className="bg-white/10 px-3 py-1 rounded-full flex items-center gap-1">
-            <Trophy className="w-4 h-4 text-yellow-400" />
-            <span className="font-bold">{score}</span>
-          </div>
-          <div className="bg-white/10 px-3 py-1 rounded-full flex items-center gap-1">
-            <Heart className="w-4 h-4 text-red-400" />
-            <span className="font-bold">{lives}</span>
-          </div>
-          <div className="bg-white/10 px-3 py-1 rounded-full flex items-center gap-1">
-            <Clock className="w-4 h-4 text-blue-400" />
-            <span className="font-bold">N{level}</span>
-          </div>
+      {/* Parallax Background */}
+      <div className="absolute inset-0">
+        {/* Far layer - teeth */}
+        <div className="absolute inset-0 flex" style={{ transform: `translateX(-${backgroundOffset * 0.3}%)` }}>
+          {[...Array(10)].map((_, i) => (
+            <div key={i} className="text-[200px] opacity-10 select-none" style={{ marginLeft: i === 0 ? '-10%' : '-5%' }}>
+              🦷
+            </div>
+          ))}
         </div>
         
-        {invincibleTime > 0 && (
-          <div className="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full font-bold animate-pulse flex items-center gap-1">
-            <Zap className="w-4 h-4" />
-            {Math.ceil(invincibleTime)}s
-          </div>
-        )}
+        {/* Mid layer - gums */}
+        <div className="absolute top-20 left-0 right-0 h-32 bg-gradient-to-b from-pink-200/50 to-transparent" 
+          style={{ transform: `translateX(-${backgroundOffset * 0.5}%)` }}
+        />
       </div>
 
-      {/* Fairy Comment */}
+      {/* HUD */}
+      <div className="fixed top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/50 to-transparent z-40">
+        <div className="flex justify-between items-center max-w-lg mx-auto">
+          <button onClick={(e) => { e.stopPropagation(); onBack(); }} className="text-white p-2 hover:bg-white/20 rounded-full">
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          
+          <div className="flex items-center gap-4">
+            <motion.div className="flex items-center gap-2 bg-yellow-400/90 px-4 py-2 rounded-full" whileHover={{ scale: 1.05 }}>
+              <Trophy className="w-5 h-5 text-yellow-800" />
+              <span className="font-black text-yellow-900">{score}</span>
+            </motion.div>
+            
+            <div className="flex items-center gap-1 bg-red-500/90 px-4 py-2 rounded-full">
+              {[...Array(3)].map((_, i) => (
+                <motion.div key={i} animate={{ scale: i < lives ? 1 : 0.5, opacity: i < lives ? 1 : 0.3 }}>
+                  <Heart className="w-5 h-5 text-white fill-white" />
+                </motion.div>
+              ))}
+            </div>
+            
+            {invincibleTime > 0 && (
+              <motion.div className="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full font-black animate-pulse flex items-center gap-1">
+                <Zap className="w-4 h-4" />
+                {Math.ceil(invincibleTime)}
+              </motion.div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Fairy */}
       <AnimatePresence>
-        {fairyComment && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="fixed top-20 left-1/2 transform -translate-x-1/2 z-10"
-          >
-            <div className="flex items-center gap-2 bg-white rounded-full px-4 py-2 shadow">
-              <ToothFairyAvatar size="sm" />
-              <span className="text-sm">{fairyComment}</span>
+        {showFairy && (
+          <motion.div initial={{ x: -200 }} animate={{ x: 0 }} exit={{ x: -200 }} className="fixed top-24 left-4 z-30">
+            <div className="bg-white rounded-2xl p-4 shadow-2xl border-4 border-blue-300">
+              <div className="flex items-center gap-3">
+                <span className="text-4xl">🧚‍♀️</span>
+                <p className="text-gray-700 font-bold">{fairyMessage}</p>
+              </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Game Area */}
-      <div className="relative w-full h-screen">
-        {/* Background elements */}
-        <div className="absolute inset-0">
-          {/* Tooth buildings */}
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute bottom-20 text-6xl opacity-30"
-              style={{ left: `${i * 25 - (distance * 0.1) % 25}%` }}
-            >
-              🦷
-            </div>
+      {/* Level indicator */}
+      <div className="fixed top-20 right-4 z-30">
+        <motion.div 
+          className="bg-blue-600 text-white px-4 py-2 rounded-full font-black shadow-lg"
+          key={level}
+          initial={{ scale: 1.5 }}
+          animate={{ scale: 1 }}
+        >
+          Nivel {level}
+        </motion.div>
+      </div>
+
+      {/* Particles */}
+      {particles.map(p => (
+        <motion.div
+          key={p.id}
+          className="absolute pointer-events-none z-20"
+          style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.size, height: p.size }}
+          initial={{ scale: 1, opacity: p.life }}
+          animate={{ scale: 0, opacity: 0 }}
+        >
+          <div className="w-full h-full rounded-full" style={{ backgroundColor: p.color, boxShadow: `0 0 ${p.size}px ${p.color}` }} />
+        </motion.div>
+      ))}
+
+      {/* Ground */}
+      <div className="absolute bottom-0 left-0 right-0 h-[25%]">
+        <div className="absolute inset-0 bg-gradient-to-t from-green-500 to-green-400" />
+        {/* Ground texture */}
+        <div className="absolute top-0 left-0 right-0 h-4 bg-green-300" style={{ transform: `translateX(-${backgroundOffset}%)` }}>
+          {[...Array(20)].map((_, i) => (
+            <div key={i} className="absolute top-0 w-8 h-4 bg-green-200 rounded-b-full" style={{ left: `${i * 10}%` }} />
           ))}
         </div>
+      </div>
 
-        {/* Ground */}
-        <div className="absolute bottom-0 left-0 right-0 h-[30%] bg-gradient-to-t from-green-600 to-green-400">
-          <div className="absolute top-0 left-0 right-0 h-4 bg-green-300" />
-        </div>
-
-        {/* Platforms */}
-        {platforms.map(plat => (
-          <div
-            key={plat.id}
-            className="absolute bg-amber-600 rounded"
-            style={{
-              left: `${plat.x}%`,
-              top: `${plat.y}%`,
-              width: `${plat.width}%`,
-              height: '8px',
-            }}
-          />
-        ))}
-
-        {/* Player - Fluor */}
-        <motion.div
-          className={`absolute w-12 h-12 transform -translate-x-1/2 -translate-y-1/2 ${player.invincible ? 'animate-pulse' : ''}`}
-          style={{
-            left: `${player.x}%`,
-            top: `${player.y}%`,
-          }}
-          animate={{
-            rotate: player.isJumping ? -15 : 0,
-            scale: player.invincible ? [1, 1.1, 1] : 1,
-          }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="text-5xl filter drop-shadow-lg">
-            {player.invincible ? '✨💧✨' : '💧'}
-          </div>
-        </motion.div>
-
-        {/* Obstacles */}
+      {/* Obstacles */}
+      <AnimatePresence>
         {obstacles.map(obs => (
-          <div
-            key={obs.id}
-            className="absolute transform -translate-x-1/2 -translate-y-1/2"
-            style={{
-              left: `${obs.x}%`,
-              top: `${obs.y}%`,
-            }}
-          >
-            <div className="text-4xl">
-              {obs.type === 'candy' && '🍬'}
-              {obs.type === 'bacteria' && '🦠'}
-              {obs.type === 'pit' && '🕳️'}
-            </div>
-          </div>
-        ))}
-
-        {/* Collectibles */}
-        {collectibles.map(col => (
           <motion.div
-            key={col.id}
-            className="absolute transform -translate-x-1/2 -translate-y-1/2"
-            style={{
-              left: `${col.x}%`,
-              top: `${col.y}%`,
-            }}
-            animate={{ y: [0, -5, 0] }}
-            transition={{ repeat: Infinity, duration: 1 }}
+            key={obs.id}
+            initial={{ x: '110vw' }}
+            animate={{ x: `${obs.x}vw` }}
+            exit={{ opacity: 0 }}
+            className="absolute z-10"
+            style={{ top: `${obs.y}%`, transform: `rotate(${obs.rotation}deg)` }}
           >
-            <div className="text-3xl">
-              {col.type === 'toothbrush' ? '🪥' : '🧴'}
-            </div>
+            {obs.type === 'candy' && (
+              <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}>
+                <span className="text-6xl filter drop-shadow-lg">🍬</span>
+              </motion.div>
+            )}
+            {obs.type === 'flying-candy' && (
+              <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 1, repeat: Infinity }}>
+                <span className="text-5xl">🍭</span>
+              </motion.div>
+            )}
+            {obs.type === 'bacteria' && (
+              <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 0.5, repeat: Infinity }}>
+                <span className="text-5xl">🦠</span>
+              </motion.div>
+            )}
+            {obs.type === 'pit' && (
+              <div className="w-16 h-16 bg-gray-900 rounded-full shadow-inner border-4 border-gray-700">
+                <div className="absolute inset-2 bg-black rounded-full" />
+              </div>
+            )}
           </motion.div>
         ))}
+      </AnimatePresence>
 
-        {/* Instructions */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white/60 text-sm">
-          Apasă pentru săritură, apasă din nou pentru dublă!
+      {/* Collectibles */}
+      {collectibles.filter(c => !c.collected).map(col => (
+        <motion.div
+          key={col.id}
+          className="absolute z-10"
+          style={{ left: `${col.x}%`, top: `${col.y}%` }}
+          animate={{ y: [0, -8, 0], rotate: [0, 10, -10, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <span className="text-4xl filter drop-shadow-lg">
+            {col.type === 'coin' && '🪙'}
+            {col.type === 'toothbrush' && '🪥'}
+            {col.type === 'paste' && '🧴'}
+          </span>
+          <motion.div 
+            className="absolute -inset-2 rounded-full"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
+            transition={{ duration: 1, repeat: Infinity }}
+            style={{ backgroundColor: col.type === 'paste' ? '#FFD700' : 'transparent' }}
+          />
+        </motion.div>
+      ))}
+
+      {/* Player - Fluor */}
+      <motion.div
+        className="absolute z-20"
+        style={{ left: `${player.x}%`, top: `${player.y}%`, transform: `translate(-50%, -50%)` }}
+        animate={{ 
+          scaleY: player.scaleY,
+          rotate: player.rotation,
+          opacity: player.invincible ? [1, 0.5, 1] : 1,
+        }}
+        transition={{ type: 'spring', stiffness: 300 }}
+      >
+        <div className="relative">
+          {/* Glow when invincible */}
+          {player.invincible && (
+            <motion.div 
+              className="absolute -inset-8 bg-yellow-400/30 rounded-full blur-xl"
+              animate={{ scale: [1, 1.3, 1] }}
+              transition={{ duration: 0.5, repeat: Infinity }}
+            />
+          )}
+          
+          {/* Fluor body */}
+          <motion.div 
+            className="w-16 h-20 relative"
+            style={{
+              background: 'radial-gradient(circle at 30% 30%, #81D4FA, #29B6F6, #0288D1)',
+              borderRadius: '50% 50% 45% 45%',
+              boxShadow: 'inset -5px -5px 15px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.3)',
+            }}
+          >
+            {/* Face */}
+            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+              <div className="w-3 h-3 bg-white rounded-full">
+                <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-1 right-0.5" />
+              </div>
+              <div className="w-3 h-3 bg-white rounded-full">
+                <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-1 right-0.5" />
+              </div>
+            </div>
+            <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-4 h-2 bg-white rounded-full" />
+            
+            {/* Shine effect */}
+            <div className="absolute top-2 left-3 w-4 h-3 bg-white/40 rounded-full" />
+          </motion.div>
+          
+          {/* Arms */}
+          <motion.div 
+            className="absolute top-6 -left-3 w-4 h-8 bg-blue-400 rounded-full origin-top"
+            animate={{ rotate: player.isJumping ? -30 : [0, 10, -10, 0] }}
+            transition={{ duration: 0.5, repeat: !player.isJumping ? Infinity : 0 }}
+          />
+          <motion.div 
+            className="absolute top-6 -right-3 w-4 h-8 bg-blue-400 rounded-full origin-top"
+            animate={{ rotate: player.isJumping ? 30 : [0, -10, 10, 0] }}
+            transition={{ duration: 0.5, repeat: !player.isJumping ? Infinity : 0 }}
+          />
+          
+          {/* Legs */}
+          <motion.div 
+            className="absolute -bottom-4 left-2 w-4 h-6 bg-blue-400 rounded-full origin-top"
+            animate={{ rotate: player.isJumping ? -20 : [0, 20, 0] }}
+            transition={{ duration: 0.3, repeat: Infinity }}
+          />
+          <motion.div 
+            className="absolute -bottom-4 right-2 w-4 h-6 bg-blue-400 rounded-full origin-top"
+            animate={{ rotate: player.isJumping ? 20 : [0, -20, 0] }}
+            transition={{ duration: 0.3, repeat: Infinity, delay: 0.15 }}
+          />
         </div>
+      </motion.div>
+
+      {/* Instructions */}
+      <div className="fixed bottom-4 left-0 right-0 text-center z-30 pointer-events-none">
+        <p className="text-gray-600 font-bold bg-white/80 inline-block px-6 py-2 rounded-full shadow-lg">
+          Apasă sau atinge pentru săritură!
+        </p>
       </div>
-    </div>
+    </motion.div>
   );
 }
