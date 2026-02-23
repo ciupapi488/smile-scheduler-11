@@ -79,6 +79,60 @@ export default function Index() {
           </div>
         </section>
 
+        {/* Kids Section - Tooth Fairy */}
+        <section className="py-16 bg-gradient-to-b from-pink-50 via-purple-50 to-blue-50">
+          <div className="container">
+            <div className="mx-auto max-w-4xl">
+              <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl border-4 border-pink-200">
+                <div className="flex flex-col md:flex-row items-center gap-8">
+                  <div className="flex-shrink-0">
+                    <div className="w-32 h-32 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center text-6xl shadow-lg animate-pulse">
+                      ✨
+                    </div>
+                  </div>
+                  <div className="text-center md:text-left flex-1">
+                    <h2 className="text-3xl md:text-4xl font-bold text-pink-600 mb-3">
+                      {t("kids.title")}
+                    </h2>
+                    <p className="text-lg text-gray-600 mb-2">
+                      {language === 'ro' 
+                        ? "Povești interactive pentru cei mici"
+                        : "Interactive stories for kids"}
+                    </p>
+                    <p className="text-gray-500 mb-6">
+                      {language === 'ro'
+                        ? "Ajută-ți copilul să învețe despre igiena dentară prin aventuri distractive cu Zâna Măseluță! Colectează autocolante, citește povești și pregătește-te pentru vizita la dentist fără teamă."
+                        : "Help your child learn about dental hygiene through fun adventures with the Tooth Fairy! Collect stickers, read stories, and prepare for dentist visits without fear."}
+                    </p>
+                    <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                      <span className="inline-flex items-center gap-1 px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm">
+                        📚 5+ {language === 'ro' ? 'povești' : 'stories'}
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm">
+                        🎨 {language === 'ro' ? 'Autocolante' : 'Stickers'}
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
+                        🛡️ {language === 'ro' ? 'Sigur pentru copii' : 'Safe for kids'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <Button
+                      asChild
+                      size="lg"
+                      className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white rounded-full px-8 shadow-lg"
+                    >
+                      <Link to="/zana-maseluta">
+                        {language === 'ro' ? 'Descoperă ✨' : 'Discover ✨'}
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* AI Symptom Checker Section */}
         <section className="py-16 bg-gradient-to-b from-blue-50 to-white">
           <div className="container">

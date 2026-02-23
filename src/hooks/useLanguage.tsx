@@ -20,7 +20,6 @@ const translations = {
     "nav.doctorPortal": "Portal Doctor",
     "nav.gallery": "Lucrări",
     "nav.services": "Servicii",
-    "nav.home": "Acasă",
     "nav.book": "Programează-te",
 
     // Hero
@@ -288,6 +287,31 @@ const translations = {
     "dentist.save": "Salvează și finalizează",
     "dentist.cancel": "Anulează",
 
+    // Tooth Fairy (Kids)
+    "kids.title": "Zâna Măseluță",
+    "kids.subtitle": "Prietena ta pentru dinți sănătoși",
+    "kids.description": "Povești interactive pentru cei mici",
+    "kids.stories": "Povești",
+    "kids.stickers": "Autocolante",
+    "kids.safe": "Sigur pentru copii",
+    "kids.offline": "Funcționează offline",
+    "kids.storiesCount": "povești",
+    "kids.book": "Cartea de Stickere",
+    "kids.newSticker": "Autocolant Nou!",
+    "kids.storyComplete": "Poveste Terminată!",
+    "kids.moral": "Morală",
+    "kids.activity": "Activitate",
+    "kids.breathing": "Respiră adânc",
+    "kids.count": "Numără împreună",
+    "kids.close": "Închide",
+    "kids.back": "Înapoi",
+    "kids.next": "Continuă",
+    "kids.finish": "Terminat!",
+    "kids.discover": "Descoperă",
+    "kids.completeCollection": "Felicitări! Ai colecția completă!",
+    "kids.moreStickers": "Mai ai {count} autocolante de descoperit!",
+    "kids.readStories": "Citește povești pentru a câștiga autocolante!",
+
     // Language
     "lang.ro": "Română",
     "lang.en": "English",
@@ -303,7 +327,6 @@ const translations = {
     "nav.doctorPortal": "Doctor Portal",
     "nav.gallery": "Gallery",
     "nav.services": "Services",
-    "nav.home": "Home",
     "nav.book": "Book Now",
 
     // Hero
@@ -549,6 +572,31 @@ const translations = {
     "dentist.cost": "Treatment Cost (RON)",
     "dentist.save": "Save and Complete",
     "dentist.cancel": "Cancel",
+
+    // Tooth Fairy (Kids)
+    "kids.title": "Tooth Fairy",
+    "kids.subtitle": "Your friend for healthy teeth",
+    "kids.description": "Interactive stories for kids",
+    "kids.stories": "Stories",
+    "kids.stickers": "Stickers",
+    "kids.safe": "Safe for kids",
+    "kids.offline": "Works offline",
+    "kids.storiesCount": "stories",
+    "kids.book": "Sticker Book",
+    "kids.newSticker": "New Sticker!",
+    "kids.storyComplete": "Story Complete!",
+    "kids.moral": "Moral",
+    "kids.activity": "Activity",
+    "kids.breathing": "Breathe deep",
+    "kids.count": "Count together",
+    "kids.close": "Close",
+    "kids.back": "Back",
+    "kids.next": "Continue",
+    "kids.finish": "Finished!",
+    "kids.discover": "Discover",
+    "kids.completeCollection": "Congratulations! Collection complete!",
+    "kids.moreStickers": "{count} more stickers to discover!",
+    "kids.readStories": "Read stories to earn stickers!",
 
     // Language
     "lang.ro": "Română",

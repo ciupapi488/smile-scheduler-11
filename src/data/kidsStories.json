@@ -1,0 +1,180 @@
+[
+  {
+    "id": "dino-tooth",
+    "title": "Dinozaurul care si-a pierdut dintele",
+    "emoji": "🦕",
+    "description": "O poveste despre curaj si vizita la dentist",
+    "intro": "A fost odata un dinozaur mic si prietenos pe nume Dino. Intr-o zi, in timp ce manca o salata delicioasa, a simtit ceva ciudat...",
+    "pages": [
+      {
+        "text": "Dino a descoperit ca un dinte il durea. A inceput sa planga. Ce fac acum? se gandea el.",
+        "illustration": "dino-sad",
+        "choice": {
+          "question": "Ce crezi ca ar trebui sa faca Dino?",
+          "options": [
+            { "text": "Sa mearga la dentist", "correct": true, "feedback": "Bravo! Dino e curajos!" },
+            { "text": "Sa se ascunda", "correct": false, "feedback": "Hm, dar durerea nu trece asa. Hai sa incercam altceva!" }
+          ]
+        }
+      },
+      {
+        "text": "Dino a ajuns la cabinetul dentistului. A vazut un scaun mare si niste instrumente stralucitoare. Inima ii batea tare!",
+        "illustration": "dino-dentist",
+        "activity": { "type": "breathing", "instruction": "Respira adanc cu Dino: inspira pe nas, expira pe gura. Gata! Esti pregatit!" }
+      },
+      {
+        "text": "Dr. Zana Maseluta l-a primit cu zambetul pe buze. Nu-ti fie frica, Dino! Sunt aici sa te ajut. O sa-ti fac o palariie magica de supererou!",
+        "illustration": "fairy-with-dino",
+        "choice": { "question": "Ce culoare sa aiba palariia magica?", "options": [
+          { "text": "Rosie ca focul", "color": "#EF4444" },
+          { "text": "Albastra ca cerul", "color": "#3B82F6" },
+          { "text": "Galbena ca soarele", "color": "#EAB308" }
+        ]}
+      },
+      {
+        "text": "Cu palariia magica pe cap, Dino s-a simtit plin de curaj! Dr. Zana i-a spus povesti amuzante in timp ce lucra. Simti ceva? a intrebat ea. Nu! a raspuns Dino mandru.",
+        "illustration": "dino-happy",
+        "activity": { "type": "count", "instruction": "Hai sa numaram impreuna pana la 5: 1, 2, 3, 4, 5! Asa de repede a trecut!" }
+      },
+      {
+        "text": "Dino a primit un autocolant Curajosul si un dinte nou, stralucitor! A plecat acasa sarind de bucurie!",
+        "illustration": "dino-celebrating",
+        "ending": true,
+        "sticker": "brave",
+        "moral": "Curajul nu inseamna sa nu-ti fie frica, ci sa mergi mai departe chiar si cand ti-e frica!"
+      }
+    ]
+  },
+  {
+    "id": "bacteria-war",
+    "title": "Razboiul impotriva bacteriilor",
+    "emoji": "⚔️",
+    "description": "O aventura epica pentru dinti sanatosi",
+    "intro": "In imparatia gurii tale traiesc mici cavaleri (dintii) si armate de bacterii care vor sa faca gauri!",
+    "pages": [
+      {
+        "text": "Capitanul Fluor, un cavaler stralucitor, pazeste dintii. Dar intr-o noapte, armata bacteriilor a atacat! Ajutor! au strigat dintii.",
+        "illustration": "castle-teeth",
+        "choice": { "question": "Cum ii ajutam pe cavaleri sa se apere?", "options": [
+          { "text": "Periem dintii", "correct": true, "feedback": "Exact! Periajul e sabia magica!" },
+          { "text": "Mancam bomboane", "correct": false, "feedback": "Oh nu! Bomboanele sunt hrana bacteriilor!" }
+        ]}
+      },
+      {
+        "text": "Capitanul Fluor a strigat: La arme! Luati periutele! Toti cavalerii s-au aliniat si au inceput sa se perieze zgomotos.",
+        "illustration": "brushing-battle",
+        "activity": { "type": "brush-along", "instruction": "Misca-ti periuta in aer! Sus-jos, sus-jos, timp de 2 minute!" }
+      },
+      {
+        "text": "Dar unele bacterii s-au ascuns intre dinti, acolo unde periuta nu ajunge. Avem nevoie de ajutor! a strigat Capitanul.",
+        "illustration": "hidden-bacteria",
+        "choice": { "question": "Ce mai putem folosi?", "options": [
+          { "text": "Ata dentara", "correct": true, "feedback": "Perfect! Ata prinde tot!" },
+          { "text": "Apa de gura", "correct": true, "feedback": "Excelent! Apa de gura le spala!" }
+        ]}
+      },
+      {
+        "text": "Cu ata dentara si apa de gura, cavalerii au castigat batalia! Imparatia gurii era din nou in siguranta!",
+        "illustration": "victory-celebration",
+        "ending": true,
+        "sticker": "captain",
+        "moral": "Periajul zilnic si vizitele la dentist te protejeaza de bacterii!"
+      }
+    ]
+  },
+  {
+    "id": "first-visit",
+    "title": "Prima vizita la dentist",
+    "emoji": "🦷",
+    "description": "Pentru cei care merg prima data",
+    "intro": "Sofia are 4 ani si niciodata nu a fost la dentist. Hai sa descoperim impreuna cum e!",
+    "pages": [
+      {
+        "text": "Mama i-a spus Sofiei: Azi mergem sa o cunoastem pe Zana Maseluta! Sofia a strans din buze. Ce o sa faca acolo?",
+        "illustration": "sofia-worried",
+        "choice": { "question": "Ce crezi ca simte Sofia?", "options": [
+          { "text": "E putin speriata", "response": "Normal! E prima data!" },
+          { "text": "E curioasa", "response": "Da, si asta!" }
+        ]}
+      },
+      {
+        "text": "La cabinet, Sofia a vazut un scaun care merge sus si jos! Wooo! a exclamat ea. E ca la distractii!",
+        "illustration": "magic-chair",
+        "activity": { "type": "chair-ride", "instruction": "Fa ca si cum zbori! Weee!" }
+      },
+      {
+        "text": "Dr. Zana i-a aratat instrumentele. Asta numeste-o oglinda magica. Cu ea pot vedea toti dintii tai!",
+        "illustration": "dentist-tools",
+        "choice": { "question": "Ce instrument vrei sa vezi?", "options": [
+          { "text": "Oglinda magica", "fun-fact": "Oglinda ii ajuta pe dentisti sa vada in toate colturile!" },
+          { "text": "Periuta electrica", "fun-fact": "Face 30.000 de miscari pe minut!" }
+        ]}
+      },
+      {
+        "text": "Dr. Zana a numarat dintii Sofiei: Unu, doi, trei... uau, ai 20 de dinti de lapte perfecti! Sofia a zambit mandra.",
+        "illustration": "counting-teeth",
+        "ending": true,
+        "sticker": "explorer",
+        "moral": "Prima vizita la dentist poate fi distractiva!"
+      }
+    ]
+  },
+  {
+    "id": "wobbly-tooth",
+    "title": "Dintele care se clatina",
+    "emoji": "🦷",
+    "description": "Pentru cei care au dinti de lapte care cad",
+    "intro": "Luca avea un dinte care se clatina. Era gata sa cada si sa faca loc unui dinte mare!",
+    "pages": [
+      {
+        "text": "Luca simtea ceva ciudat cu limba. Un dinte se misca! Mami! Dintele meu danseaza! a strigat el.",
+        "illustration": "wobbly-tooth",
+        "choice": { "question": "Ce sa faca Luca?", "options": [
+          { "text": "Sa-l scuture usor", "correct": true, "feedback": "Da, dar cu grija!" },
+          { "text": "Sa astepte", "correct": true, "feedback": "Rabdarea e cheia!" }
+        ]}
+      },
+      {
+        "text": "Dintele de lapte a cazut in timpul cinei! Poc! Luca l-a gasit in farfurie. Am pierdut un dinte!",
+        "illustration": "lost-tooth",
+        "activity": { "type": "tooth-fairy-prep", "instruction": "Pune mana sub perna! Asa punem dintele pentru Zana Maseluta!" }
+      },
+      {
+        "text": "Noaptea, Zana Maseluta a venit! A luat dintele si a lasat in schimb un mic cadou si un mesaj: Felicitari! Cresti mare!",
+        "illustration": "fairy-night-visit",
+        "ending": true,
+        "sticker": "star",
+        "moral": "Pierderea dintilor de lapte e normala si inseamna ca crestem!"
+      }
+    ]
+  },
+  {
+    "id": "night-guardian",
+    "title": "Gardianul Noptii si Bacteriile Visatoare",
+    "emoji": "🌙",
+    "description": "Importanta periajului de seara",
+    "intro": "Cand Maria adoarme, in gura ei incepe o batalie intre Gardianul Noptii si bacterii!",
+    "pages": [
+      {
+        "text": "Maria era obosita. Sa ma culc fara sa ma periez... doar o seara... Dar bacteriile au sarbatorit: Yaaay! Noptile sunt ale noastre!",
+        "illustration": "sleepy-maria",
+        "choice": { "question": "Ce sa faca Maria?", "options": [
+          { "text": "Sa mearga sa se perieze", "correct": true, "feedback": "Gardianul Noptii o va proteja!" },
+          { "text": "Sa doarma", "correct": false, "feedback": "Bacteriile se vor inmulti!" }
+        ]}
+      },
+      {
+        "text": "Gardianul Noptii (un calut fermecat) a aparut! Nu te teme, Maria! Periuta magica e sabia mea!",
+        "illustration": "night-guardian",
+        "activity": { "type": "brush-battle", "instruction": "Fa zgomote de sabie cu periuta! Shing! Shing!" }
+      },
+      {
+        "text": "Gardianul si Maria au luptat impreuna. Spala, spala, curata tot! Nu lasa nicio bacterie!",
+        "illustration": "brushing-battle",
+        "ending": true,
+        "sticker": "guardian",
+        "moral": "Periajul de seara e crucial - protejeaza dintii toata noaptea!"
+      }
+    ]
+  }
+]
