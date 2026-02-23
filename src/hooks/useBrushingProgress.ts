@@ -25,6 +25,7 @@ const BADGES = {
   BACTERIA_HUNTER: { id: 'bacteria_hunter', name: '🎯 Vânător de Bacterii', condition: (p: BrushingProgress) => p.totalBacteriaKilled >= 100 },
   PERFECT_WEEK: { id: 'perfect_week', name: '⭐ Săptămâna Perfectă', condition: (p: BrushingProgress) => p.currentStreak >= 7 && p.sessions.slice(-7).every(s => s.completed) },
   MASTER_BRUSHER: { id: 'master_brusher', name: '👑 Maestru al Periajului', condition: (p: BrushingProgress) => p.totalSessions >= 30 },
+  DETECTIVE: { id: 'detective', name: '🕵️ Detectivul Alimentar', condition: (p: BrushingProgress) => p.badges.includes('🕵️ Detectivul Alimentar') },
 };
 
 function getInitialProgress(): BrushingProgress {
@@ -165,6 +166,25 @@ export function useBrushingProgress() {
     localStorage.removeItem(STORAGE_KEY);
   }, []);
 
+  const earnSticker = useCallback((stickerId: string) => {
+    setProgress((prev) => {
+      const stickerBadges: Record<string, string> = {
+        'detective': '🕵️ Detectivul Alimentar',
+        'brave': '🦁 Curajosul',
+        'champion': '🏆 Campionul',
+      };
+      
+      const badgeName = stickerBadges[stickerId];
+      if (badgeName && !prev.badges.includes(badgeName)) {
+        return {
+          ...prev,
+          badges: [...prev.badges, badgeName],
+        };
+      }
+      return prev;
+    });
+  }, []);
+
   return {
     progress,
     newBadges,
@@ -174,6 +194,7 @@ export function useBrushingProgress() {
     canBrushToday,
     getTodayBrushingCount,
     resetProgress,
+    earnSticker,
     BADGES,
   };
 }

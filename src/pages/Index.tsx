@@ -147,6 +147,39 @@ export default function Index() {
                   </div>
                 </div>
               </div>
+
+              {/* Games Hub Card */}
+              <div className="bg-white rounded-3xl p-8 shadow-xl border-4 border-purple-200 hover:shadow-2xl transition-shadow md:col-span-2">
+                <div className="flex items-center gap-6">
+                  <div className="w-24 h-24 bg-gradient-to-br from-indigo-400 to-purple-600 rounded-full flex items-center justify-center text-5xl shadow-lg">
+                    🎮
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-purple-600 mb-2">
+                      {language === 'ro' ? 'Jocurile Zânei' : 'Fairy Games'}
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-4">
+                      {language === 'ro' 
+                        ? "4 jocuri educative: Sortează, Fotbal, Aventură și Războiul Bacteriilor!"
+                        : "4 educational games: Sorting, Football, Adventure & Bacteria Wars!"}
+                    </p>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs">🍎 Sortare</span>
+                      <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">⚽ Fotbal</span>
+                      <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">🏃 Aventură</span>
+                      <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs">⚔️ Strategie</span>
+                    </div>
+                    <Button
+                      asChild
+                      className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-full px-6"
+                    >
+                      <Link to="/jocuri">
+                        {language === 'ro' ? 'Joacă acum 🎮' : 'Play now 🎮'}
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>

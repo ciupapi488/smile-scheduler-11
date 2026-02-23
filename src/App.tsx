@@ -14,6 +14,7 @@ import BookingFormNew from './components/BookingFormNew';
 import AdminLayout from './pages/admin';
 import { ToothFairyKids } from './components/kids/ToothFairyKids';
 import { DinoToothbrushTrainer } from './components/kids/DinoToothbrushTrainer';
+import { GameHub } from './components/kids/games/GameHub';
 
 function App() {
   return (
@@ -36,9 +37,10 @@ function App() {
         <Route path="/dentist/login" element={<DentistLogin />} />
         <Route path="/dentist/dashboard" element={<DentistDashboard />} />
         
-        {/* Kids - Tooth Fairy */}
+        {/* Kids - Tooth Fairy & Games */}
         <Route path="/zana-maseluta" element={<ToothFairyKids />} />
         <Route path="/dino-periuta" element={<DinoToothbrushTrainer />} />
+        <Route path="/jocuri" element={<GameHub />} />
         
         {/* Admin */}
         <Route path="/admin/*" element={<AdminLayout />} />
