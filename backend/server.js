@@ -25,6 +25,12 @@ const aiRoutes = require('./routes/ai');
 app.use('/api/ai', aiRoutes);
 
 // ============================================
+// KIDS ROUTES (Dino Toothbrush Trainer)
+// ============================================
+const kidsRoutes = require('./routes/kids');
+app.use('/api/kids', kidsRoutes);
+
+// ============================================
 // PUBLIC ROUTES
 // ============================================
 

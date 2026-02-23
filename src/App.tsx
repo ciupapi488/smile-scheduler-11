@@ -13,6 +13,7 @@ import ServicesPage from './pages/Services';
 import BookingFormNew from './components/BookingFormNew';
 import AdminLayout from './pages/admin';
 import { ToothFairyKids } from './components/kids/ToothFairyKids';
+import { DinoToothbrushTrainer } from './components/kids/DinoToothbrushTrainer';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
         
         {/* Kids - Tooth Fairy */}
         <Route path="/zana-maseluta" element={<ToothFairyKids />} />
+        <Route path="/dino-periuta" element={<DinoToothbrushTrainer />} />
         
         {/* Admin */}
         <Route path="/admin/*" element={<AdminLayout />} />
