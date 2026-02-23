@@ -7,7 +7,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import SymptomChecker from "@/components/ai/SymptomChecker";
 
 export default function Index() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const features = [
     {
