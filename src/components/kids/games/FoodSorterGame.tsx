@@ -40,6 +40,77 @@ const FOODS: FoodItem[] = [
   { id: '20', name: 'Lămâie', emoji: '🍋', isHealthy: false, isTrap: true, explanation: 'Capcană! E acidă!', color: '#FFFF00', faceExpression: 'neutral' },
 ];
 
+// Face expression icons
+const FaceExpression = ({ type, size = 'large' }: { type: 'happy' | 'neutral' | 'evil'; size?: 'small' | 'large' }) => {
+  const sizeClass = size === 'large' ? 'w-16 h-16' : 'w-8 h-8';
+  const iconSize = size === 'large' ? 32 : 16;
+  
+  if (type === 'happy') {
+    return (
+      <motion.div 
+        className={`${sizeClass} rounded-full bg-white flex items-center justify-center shadow-lg`}
+        animate={{ scale: [1, 1.1, 1] }}
+        transition={{ duration: 1, repeat: Infinity }}
+      >
+        <div className="relative">
+          {/* Eyes */}
+          <div className="flex gap-2 mb-1">
+            <div className="w-3 h-3 bg-gray-800 rounded-full" />
+            <div className="w-3 h-3 bg-gray-800 rounded-full" />
+          </div>
+          {/* Smile */}
+          <div className="w-6 h-3 border-b-4 border-gray-800 rounded-full" />
+        </div>
+      </motion.div>
+    );
+  }
+  
+  if (type === 'neutral') {
+    return (
+      <motion.div 
+        className={`${sizeClass} rounded-full bg-yellow-100 flex items-center justify-center shadow-lg`}
+        animate={{ rotate: [0, 5, -5, 0] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      >
+        <div className="relative">
+          {/* Eyes */}
+          <div className="flex gap-2 mb-1">
+            <div className="w-3 h-3 bg-gray-800 rounded-full" />
+            <div className="w-3 h-3 bg-gray-800 rounded-full" />
+          </div>
+          {/* Neutral mouth */}
+          <div className="w-6 h-1 bg-gray-800 rounded-full mx-auto" />
+        </div>
+      </motion.div>
+    );
+  }
+  
+  // Evil
+  return (
+    <motion.div 
+      className={`${sizeClass} rounded-full bg-red-100 flex items-center justify-center shadow-lg`}
+      animate={{ rotate: [0, 10, -10, 0] }}
+      transition={{ duration: 0.5, repeat: Infinity }}
+    >
+      <div className="relative">
+        {/* Angry eyes */}
+        <div className="flex gap-2 mb-1">
+          <div className="relative">
+            <div className="w-3 h-3 bg-gray-800 rounded-full" />
+            <div className="absolute -top-1 left-0 w-3 h-1 bg-gray-800 rounded-full transform -rotate-12" />
+          </div>
+          <div className="relative">
+            <div className="w-3 h-3 bg-gray-800 rounded-full" />
+            <div className="absolute -top-1 left-0 w-3 h-1 bg-gray-800 rounded-full transform rotate-12" />
+          </div>
+        </div>
+        {/* Frown */}
+        <div className="w-6 h-3 border-t-4 border-gray-800 rounded-full" />
+      </div>
+    </motion.div>
+  );
+};
+
 // Particle system
 interface Particle {
   id: number;
@@ -161,7 +232,7 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
       
       // Fairy comment every 5 correct
       if ((correctCount + 1) % 5 === 0) {
-        setFairyMessage('🎉 Uau! Bravo! Continuă așa!');
+        setFairyMessage('Uau! Bravo! Continuă așa!');
         setShowFairy(true);
         setTimeout(() => setShowFairy(false), 2000);
       }
@@ -185,7 +256,7 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
         
         // Warning for traps
         if (nextIndex >= 15) {
-          setFairyMessage('⚠️ ATENȚIE! Capcane înainte!');
+          setFairyMessage('ATENȚIE! Capcane înainte!');
           setShowFairy(true);
           setTimeout(() => setShowFairy(false), 2500);
         }
@@ -247,7 +318,7 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
                 delay: Math.random() * 5 
               }}
             >
-              {['🍎', '🥕', '🍬', '🧀', '🥤', '🥬'][i % 6]}
+              {['A', 'B', 'C', 'D', 'E', 'F'][i % 6]}
             </motion.div>
           ))}
         </div>
@@ -267,18 +338,29 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
             animate={{ scale: 1, opacity: 1 }}
             className="text-center"
           >
-            {/* Bouncing food emojis */}
+            {/* Face expressions preview */}
             <div className="flex justify-center gap-4 mb-6">
-              {['🍎', '⚡', '🍬'].map((emoji, i) => (
-                <motion.span
-                  key={i}
-                  className="text-7xl"
-                  animate={{ y: [0, -20, 0], rotate: [0, 10, -10, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
-                >
-                  {emoji}
-                </motion.span>
-              ))}
+              <motion.div
+                className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center shadow-lg"
+                animate={{ y: [0, -10, 0], rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                <FaceExpression type="happy" size="small" />
+              </motion.div>
+              <motion.div
+                className="w-20 h-20 rounded-full bg-yellow-100 flex items-center justify-center shadow-lg"
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              >
+                <span className="text-2xl font-bold text-yellow-600">VS</span>
+              </motion.div>
+              <motion.div
+                className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center shadow-lg"
+                animate={{ y: [0, -10, 0], rotate: [0, -10, 10, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
+              >
+                <FaceExpression type="evil" size="small" />
+              </motion.div>
             </div>
 
             <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-4 drop-shadow-lg">
@@ -297,24 +379,20 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
                 transition={{ duration: 2, repeat: Infinity }}
               >
                 <motion.div 
-                  className="text-6xl mb-2"
+                  className="mb-2 flex justify-center"
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 1, repeat: Infinity }}
                 >
-                  😊
+                  <FaceExpression type="happy" size="large" />
                 </motion.div>
                 <p className="font-bold text-white text-xl">PRIETENI</p>
                 <p className="text-green-100 text-sm">Alimente sănătoase</p>
-                <div className="mt-3 flex justify-center gap-1 text-2xl">
-                  {['🍎', '🥕', '🧀', '🥛', '💧'].map((e, i) => (
-                    <motion.span 
-                      key={i}
-                      animate={{ y: [0, -5, 0] }}
-                      transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
-                    >
-                      {e}
-                    </motion.span>
-                  ))}
+                <div className="mt-3 flex justify-center gap-1 text-sm text-white/80">
+                  <span>Măr</span>
+                  <span>•</span>
+                  <span>Morcov</span>
+                  <span>•</span>
+                  <span>Apă</span>
                 </div>
               </motion.div>
               
@@ -325,24 +403,20 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
                 transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
               >
                 <motion.div 
-                  className="text-6xl mb-2"
+                  className="mb-2 flex justify-center"
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 1, repeat: Infinity, delay: 0.5 }}
                 >
-                  😈
+                  <FaceExpression type="evil" size="large" />
                 </motion.div>
                 <p className="font-bold text-white text-xl">DUȘMANI</p>
                 <p className="text-red-100 text-sm">Alimente dăunătoare</p>
-                <div className="mt-3 flex justify-center gap-1 text-2xl">
-                  {['🍬', '🥤', '🍫', '🥔', '🍦'].map((e, i) => (
-                    <motion.span 
-                      key={i}
-                      animate={{ y: [0, -5, 0] }}
-                      transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 + 0.5 }}
-                    >
-                      {e}
-                    </motion.span>
-                  ))}
+                <div className="mt-3 flex justify-center gap-1 text-sm text-white/80">
+                  <span>Suc</span>
+                  <span>•</span>
+                  <span>Bomboane</span>
+                  <span>•</span>
+                  <span>Ciocolată</span>
                 </div>
               </motion.div>
             </div>
@@ -377,7 +451,7 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
                 </div>
               </div>
               <div className="mt-4 p-3 bg-red-50 rounded-xl flex items-center gap-2 text-red-700 font-semibold">
-                <span className="text-xl">⚠️</span>
+                <span className="text-xl">!</span>
                 <span>Ultimele 5 sunt CAPCANE!</span>
               </div>
             </motion.div>
@@ -388,7 +462,7 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
               onClick={startGame}
               className="bg-white text-green-600 text-2xl font-extrabold px-16 py-5 rounded-full shadow-2xl hover:shadow-green-400/50 transition-shadow"
             >
-              🎮 JOACĂ ACUM! 🎮
+              JOACĂ ACUM!
             </motion.button>
           </motion.div>
         </div>
@@ -410,7 +484,7 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
           {[...Array(30)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute text-4xl"
+              className="absolute w-4 h-4 rounded-full"
               initial={{ y: -50, x: Math.random() * window.innerWidth }}
               animate={{ y: window.innerHeight + 50, rotate: Math.random() * 360 }}
               transition={{ 
@@ -418,9 +492,10 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
                 repeat: Infinity, 
                 delay: Math.random() * 2 
               }}
-            >
-              {['🎉', '🎊', '⭐', '🏆', '🎈'][i % 5]}
-            </motion.div>
+              style={{
+                backgroundColor: ['#FFD700', '#FF69B4', '#00CED1', '#7FFF00', '#FF6347'][i % 5]
+              }}
+            />
           ))}
         </div>
 
@@ -429,9 +504,9 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 200 }}
-            className="text-8xl mb-4"
+            className="text-8xl mb-4 flex justify-center"
           >
-            {isPerfect ? '👑' : finalScore >= 150 ? '🏆' : finalScore >= 100 ? '🥇' : '🎮'}
+            <FaceExpression type={isPerfect ? 'happy' : finalScore >= 150 ? 'happy' : finalScore >= 100 ? 'neutral' : 'evil'} size="large" />
           </motion.div>
           
           <motion.h1 
@@ -576,9 +651,9 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
                 <motion.div 
                   animate={{ y: [0, -5, 0] }}
                   transition={{ duration: 1, repeat: Infinity }}
-                  className="text-4xl"
+                  className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-300 to-pink-400 flex items-center justify-center text-xl"
                 >
-                  🧚‍♀️
+                  <Star className="w-6 h-6 text-white" />
                 </motion.div>
                 <p className="text-gray-700 font-medium">{fairyMessage}</p>
               </div>
@@ -648,7 +723,12 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
           className="fixed top-28 left-1/2 transform -translate-x-1/2 z-30"
         >
           <div className="bg-gradient-to-r from-orange-400 to-red-500 text-white px-6 py-2 rounded-full font-bold text-lg shadow-xl flex items-center gap-2">
-            <span className="text-2xl">🔥</span>
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+            >
+              <Star className="w-5 h-5 fill-white" />
+            </motion.div>
             <span>x{streakCount} STREAK!</span>
           </div>
         </motion.div>
@@ -678,14 +758,14 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
             }}
           >
             <motion.div 
-              className="text-7xl mb-2"
+              className="flex justify-center mb-2"
               animate={{ 
                 scale: [1, 1.2, 1],
                 rotate: [0, -10, 10, 0]
               }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              😊
+              <FaceExpression type="happy" size="large" />
             </motion.div>
             <p className="font-black text-white text-2xl">PRIETENI</p>
             <p className="text-green-100 font-medium">Sănătos</p>
@@ -714,14 +794,14 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
             }}
           >
             <motion.div 
-              className="text-7xl mb-2"
+              className="flex justify-center mb-2"
               animate={{ 
                 scale: [1, 1.2, 1],
                 rotate: [0, 10, -10, 0]
               }}
               transition={{ duration: 2, repeat: Infinity, delay: 1 }}
             >
-              😈
+              <FaceExpression type="evil" size="large" />
             </motion.div>
             <p className="font-black text-white text-2xl">DUȘMANI</p>
             <p className="text-red-100 font-medium">Nesănătos</p>
@@ -775,7 +855,7 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
             )}
             
             <motion.div 
-              className="relative w-36 h-36 rounded-3xl shadow-2xl flex flex-col items-center justify-center border-4 border-white"
+              className="relative w-40 h-48 rounded-3xl shadow-2xl flex flex-col items-center justify-center border-4 border-white"
               style={{ backgroundColor: currentFood.color }}
               animate={{
                 boxShadow: isDragging 
@@ -783,51 +863,23 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
                   : '0 10px 30px rgba(0,0,0,0.3)'
               }}
             >
-              {/* Food emoji with face */}
-              <motion.span 
-                className="text-7xl filter drop-shadow-lg"
+              {/* Face expression at top */}
+              <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
+                <FaceExpression type={currentFood.faceExpression} size="large" />
+              </div>
+              
+              {/* Food name in center */}
+              <motion.p 
+                className="text-center font-black text-white text-2xl drop-shadow-lg px-2"
                 animate={{
-                  y: [0, -5, 0],
-                  rotate: currentFood.faceExpression === 'happy' ? [0, 5, -5, 0] : 0,
+                  y: [0, -3, 0],
                 }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
-                {currentFood.emoji}
-              </motion.span>
-              
-              {/* Face expression overlay */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                {currentFood.faceExpression === 'happy' && (
-                  <motion.div 
-                    className="text-3xl mt-4"
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 1, repeat: Infinity }}
-                  >
-                    😊
-                  </motion.div>
-                )}
-                {currentFood.faceExpression === 'evil' && (
-                  <motion.div 
-                    className="text-3xl mt-4"
-                    animate={{ rotate: [0, 10, -10, 0] }}
-                    transition={{ duration: 0.5, repeat: Infinity }}
-                  >
-                    😈
-                  </motion.div>
-                )}
-              </div>
+                {currentFood.name}
+              </motion.p>
             </motion.div>
             
-            {/* Food name */}
-            <motion.p 
-              className="text-center font-bold text-gray-800 mt-4 text-lg bg-white/90 px-4 py-2 rounded-full shadow-lg"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              {currentFood.name}
-            </motion.p>
-
             {/* Drag hint */}
             {!isDragging && (
               <motion.div 
@@ -866,14 +918,14 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
               }`}
             >
               <motion.div 
-                className="text-8xl mb-4"
+                className="mb-4 flex justify-center"
                 animate={{ 
                   scale: [1, 1.3, 1],
                   rotate: feedback.correct ? [0, 10, -10, 0] : [0, -10, 10, 0]
                 }}
                 transition={{ duration: 0.5, repeat: 2 }}
               >
-                {feedback.correct ? '🎉' : '😅'}
+                <FaceExpression type={feedback.correct ? 'happy' : 'neutral'} size="large" />
               </motion.div>
               <motion.p 
                 className="text-3xl font-black text-white mb-2"
@@ -900,15 +952,14 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
                   transition={{ delay: 0.4 }}
                 >
                   {[...Array(5)].map((_, i) => (
-                    <motion.span
+                    <motion.div
                       key={i}
-                      className="text-3xl"
                       initial={{ y: 0 }}
                       animate={{ y: [-20, 0] }}
                       transition={{ delay: 0.5 + i * 0.1, duration: 0.3 }}
                     >
-                      ⭐
-                    </motion.span>
+                      <Star className="w-8 h-8 text-yellow-300 fill-yellow-300" />
+                    </motion.div>
                   ))}
                 </motion.div>
               )}
@@ -936,7 +987,7 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
               }}
               transition={{ duration: 1, repeat: Infinity }}
             >
-              <span className="text-2xl">⚠️</span>
+              <span className="text-2xl">!</span>
               CAPCANE ÎNAINTE!
             </motion.div>
           </motion.div>
