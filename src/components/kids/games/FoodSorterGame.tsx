@@ -40,26 +40,42 @@ const FOODS: FoodItem[] = [
   { id: '20', name: 'Lămâie', emoji: '🍋', isHealthy: false, isTrap: true, explanation: 'Capcană! E acidă!', color: '#FFFF00', faceExpression: 'neutral' },
 ];
 
-// Face expression icons
+// Kid-friendly face expression icons - cute and friendly
 const FaceExpression = ({ type, size = 'large' }: { type: 'happy' | 'neutral' | 'evil'; size?: 'small' | 'large' }) => {
-  const sizeClass = size === 'large' ? 'w-16 h-16' : 'w-8 h-8';
-  const iconSize = size === 'large' ? 32 : 16;
+  const sizeClass = size === 'large' ? 'w-20 h-20' : 'w-10 h-10';
   
   if (type === 'happy') {
     return (
       <motion.div 
-        className={`${sizeClass} rounded-full bg-white flex items-center justify-center shadow-lg`}
+        className={`${sizeClass} rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center shadow-lg border-4 border-green-300`}
         animate={{ scale: [1, 1.1, 1] }}
         transition={{ duration: 1, repeat: Infinity }}
       >
         <div className="relative">
-          {/* Eyes */}
-          <div className="flex gap-2 mb-1">
-            <div className="w-3 h-3 bg-gray-800 rounded-full" />
-            <div className="w-3 h-3 bg-gray-800 rounded-full" />
+          {/* Cute sparkly eyes */}
+          <div className="flex gap-3 mb-2">
+            <motion.div 
+              className="w-4 h-4 bg-gray-800 rounded-full relative"
+              animate={{ scaleY: [1, 0.1, 1] }}
+              transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+            >
+              <div className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-white rounded-full" />
+            </motion.div>
+            <motion.div 
+              className="w-4 h-4 bg-gray-800 rounded-full relative"
+              animate={{ scaleY: [1, 0.1, 1] }}
+              transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+            >
+              <div className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-white rounded-full" />
+            </motion.div>
           </div>
-          {/* Smile */}
-          <div className="w-6 h-3 border-b-4 border-gray-800 rounded-full" />
+          {/* Big happy smile */}
+          <div className="w-8 h-4 bg-pink-400 rounded-full mx-auto">
+            <div className="w-6 h-2 bg-pink-500 rounded-full mx-auto mt-1" />
+          </div>
+          {/* Rosy cheeks */}
+          <div className="absolute top-3 -left-2 w-3 h-2 bg-pink-300 rounded-full opacity-60" />
+          <div className="absolute top-3 -right-2 w-3 h-2 bg-pink-300 rounded-full opacity-60" />
         </div>
       </motion.div>
     );
@@ -68,44 +84,60 @@ const FaceExpression = ({ type, size = 'large' }: { type: 'happy' | 'neutral' | 
   if (type === 'neutral') {
     return (
       <motion.div 
-        className={`${sizeClass} rounded-full bg-yellow-100 flex items-center justify-center shadow-lg`}
+        className={`${sizeClass} rounded-full bg-gradient-to-br from-yellow-100 to-orange-100 flex items-center justify-center shadow-lg border-4 border-yellow-300`}
         animate={{ rotate: [0, 5, -5, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
+        transition={{ duration: 3, repeat: Infinity }}
       >
         <div className="relative">
-          {/* Eyes */}
-          <div className="flex gap-2 mb-1">
-            <div className="w-3 h-3 bg-gray-800 rounded-full" />
-            <div className="w-3 h-3 bg-gray-800 rounded-full" />
+          {/* Curious eyes */}
+          <div className="flex gap-3 mb-2">
+            <div className="w-4 h-4 bg-gray-800 rounded-full relative">
+              <div className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-white rounded-full" />
+            </div>
+            <div className="w-4 h-4 bg-gray-800 rounded-full relative">
+              <div className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-white rounded-full" />
+            </div>
           </div>
-          {/* Neutral mouth */}
-          <div className="w-6 h-1 bg-gray-800 rounded-full mx-auto" />
+          {/* Small o mouth */}
+          <div className="w-3 h-3 bg-pink-400 rounded-full mx-auto" />
+          {/* Rosy cheeks */}
+          <div className="absolute top-3 -left-2 w-3 h-2 bg-orange-300 rounded-full opacity-50" />
+          <div className="absolute top-3 -right-2 w-3 h-2 bg-orange-300 rounded-full opacity-50" />
         </div>
       </motion.div>
     );
   }
   
-  // Evil
+  // "Evil" face - made friendly/cartoony instead of scary
   return (
     <motion.div 
-      className={`${sizeClass} rounded-full bg-red-100 flex items-center justify-center shadow-lg`}
-      animate={{ rotate: [0, 10, -10, 0] }}
-      transition={{ duration: 0.5, repeat: Infinity }}
+      className={`${sizeClass} rounded-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center shadow-lg border-4 border-purple-300`}
+      animate={{ rotate: [0, 8, -8, 0] }}
+      transition={{ duration: 2, repeat: Infinity }}
     >
       <div className="relative">
-        {/* Angry eyes */}
-        <div className="flex gap-2 mb-1">
-          <div className="relative">
-            <div className="w-3 h-3 bg-gray-800 rounded-full" />
-            <div className="absolute -top-1 left-0 w-3 h-1 bg-gray-800 rounded-full transform -rotate-12" />
-          </div>
-          <div className="relative">
-            <div className="w-3 h-3 bg-gray-800 rounded-full" />
-            <div className="absolute -top-1 left-0 w-3 h-1 bg-gray-800 rounded-full transform rotate-12" />
-          </div>
+        {/* Playful mischievous eyes */}
+        <div className="flex gap-3 mb-2">
+          <motion.div 
+            className="w-4 h-4 bg-purple-600 rounded-full relative"
+            animate={{ x: [-1, 1, -1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <div className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-white rounded-full" />
+          </motion.div>
+          <motion.div 
+            className="w-4 h-4 bg-purple-600 rounded-full relative"
+            animate={{ x: [1, -1, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <div className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-white rounded-full" />
+          </motion.div>
         </div>
-        {/* Frown */}
-        <div className="w-6 h-3 border-t-4 border-gray-800 rounded-full" />
+        {/* Playful smirk */}
+        <div className="w-6 h-3 border-b-4 border-purple-600 rounded-full mx-auto" />
+        {/* Rosy cheeks */}
+        <div className="absolute top-3 -left-2 w-3 h-2 bg-pink-300 rounded-full opacity-60" />
+        <div className="absolute top-3 -right-2 w-3 h-2 bg-pink-300 rounded-full opacity-60" />
       </div>
     </motion.div>
   );
@@ -915,7 +947,7 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
             )}
             
             <motion.div 
-              className="relative w-40 h-48 rounded-3xl shadow-2xl flex flex-col items-center justify-center border-4 border-white"
+              className="relative w-44 h-52 rounded-3xl shadow-2xl flex flex-col items-center justify-center border-4 border-white"
               style={{ backgroundColor: currentFood.color }}
               animate={{
                 boxShadow: isDragging 
@@ -923,14 +955,18 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
                   : '0 10px 30px rgba(0,0,0,0.3)'
               }}
             >
-              {/* Face expression at top */}
-              <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
-                <FaceExpression type={currentFood.faceExpression} size="large" />
-              </div>
+              {/* Food emoji at top (no face expression) */}
+              <motion.div 
+                className="text-5xl mb-2"
+                animate={{ y: [0, -5, 0], rotate: [0, 5, -5, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                {currentFood.emoji}
+              </motion.div>
               
               {/* Food name in center */}
               <motion.p 
-                className="text-center font-black text-white text-2xl drop-shadow-lg px-2"
+                className="text-center font-black text-white text-3xl drop-shadow-lg px-2"
                 animate={{
                   y: [0, -3, 0],
                 }}
@@ -939,23 +975,13 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
                 {currentFood.name}
               </motion.p>
               
-              {/* Small emoji at bottom */}
-              <span className="absolute bottom-3 text-2xl">{currentFood.emoji}</span>
+              {/* Hint text at bottom */}
+              <span className="absolute bottom-3 text-white/80 text-sm font-medium">
+                ← Trage →
+              </span>
             </motion.div>
             
-            {/* Drag hint */}
-            {!isDragging && (
-              <motion.div 
-                className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 whitespace-nowrap"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-              >
-                <span className="text-gray-600 font-medium bg-white/80 px-3 py-1 rounded-full text-sm">
-                  ← Trage →
-                </span>
-              </motion.div>
-            )}
+
           </motion.div>
         )}
       </AnimatePresence>
