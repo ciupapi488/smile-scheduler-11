@@ -140,6 +140,7 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
   const [streakCount, setStreakCount] = useState(0);
   const [showFairy, setShowFairy] = useState(false);
   const [fairyMessage, setFairyMessage] = useState('');
+  const [showFoodImage, setShowFoodImage] = useState(true);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const particleIdRef = useRef(0);
@@ -150,6 +151,7 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
     const shuffled = [...FOODS].sort(() => Math.random() - 0.5);
     setFoodsQueue(shuffled);
     setCurrentFood(shuffled[0]);
+    setShowFoodImage(true);
     setGameState('playing');
     setScore(0);
     setTimeLeft(60);
@@ -157,7 +159,7 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
     setWrongCount(0);
     setStreakCount(0);
     setParticles([]);
-    setFairyMessage('Trage alimentele în coșul corect! Hai să învățăm!');
+    setFairyMessage('Uită-te la aliment, apoi sortează!');
     setShowFairy(true);
     setTimeout(() => setShowFairy(false), 3000);
   }, []);
@@ -249,6 +251,7 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
     // Next food
     setTimeout(() => {
       setFeedback(null);
+      setShowFoodImage(true);
       const nextIndex = foodsQueue.findIndex(f => f.id === currentFood.id) + 1;
       
       if (nextIndex < foodsQueue.length) {
@@ -809,11 +812,68 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
         </motion.div>
       </div>
 
-      {/* Draggable food */}
+      {/* Food display - Two stage: Image first, then draggable card */}
       <AnimatePresence mode="wait">
-        {currentFood && !feedback && (
+        {currentFood && !feedback && showFoodImage && (
+          /* STAGE 1: Show just the food emoji/image */
           <motion.div
-            key={currentFood.id}
+            key={`${currentFood.id}-image`}
+            initial={{ y: -100, opacity: 0, scale: 0.5 }}
+            animate={{ 
+              y: 0, 
+              opacity: 1, 
+              scale: 1,
+            }}
+            exit={{ 
+              scale: 0.8,
+              opacity: 0,
+            }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            onClick={() => setShowFoodImage(false)}
+            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 cursor-pointer"
+          >
+            {/* Large food emoji */}
+            <motion.div 
+              className="relative flex items-center justify-center"
+              animate={{ 
+                y: [0, -10, 0],
+                scale: [1, 1.05, 1],
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <span className="text-9xl filter drop-shadow-2xl">{currentFood.emoji}</span>
+              
+              {/* Glow effect */}
+              <motion.div 
+                className="absolute inset-0 rounded-full blur-3xl -z-10"
+                style={{ backgroundColor: currentFood.color }}
+                animate={{ opacity: [0.3, 0.5, 0.3], scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+            </motion.div>
+            
+            {/* Click hint */}
+            <motion.div 
+              className="absolute -bottom-20 left-1/2 transform -translate-x-1/2 whitespace-nowrap"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              <motion.span 
+                className="text-gray-700 font-bold bg-white/90 px-6 py-2 rounded-full text-lg shadow-lg"
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              >
+                Apasă pentru a sorta! 👆
+              </motion.span>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {currentFood && !feedback && !showFoodImage && (
+          /* STAGE 2: Draggable card with face and name */
+          <motion.div
+            key={`${currentFood.id}-card`}
             initial={{ y: -200, opacity: 0, scale: 0.5, rotate: -20 }}
             animate={{ 
               y: 0, 
@@ -878,6 +938,9 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
               >
                 {currentFood.name}
               </motion.p>
+              
+              {/* Small emoji at bottom */}
+              <span className="absolute bottom-3 text-2xl">{currentFood.emoji}</span>
             </motion.div>
             
             {/* Drag hint */}
@@ -886,7 +949,7 @@ export function FoodSorterGame({ onBack }: { onBack: () => void }) {
                 className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 whitespace-nowrap"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1 }}
+                transition={{ delay: 0.5 }}
               >
                 <span className="text-gray-600 font-medium bg-white/80 px-3 py-1 rounded-full text-sm">
                   ← Trage →
