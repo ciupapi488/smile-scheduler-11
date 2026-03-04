@@ -43,9 +43,9 @@ interface Particle {
   life: number;
 }
 
-const GRAVITY = 0.6;
-const JUMP_FORCE = -13;
-const GROUND_Y = 75;
+const GRAVITY = 0.5;
+const JUMP_FORCE = -8;
+const GROUND_Y = 65;
 
 export function FluorAdventure({ onBack }: { onBack: () => void }) {
   const { saveGameSession } = useGameProgress();
@@ -180,7 +180,7 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
         const newObstacle: Obstacle = {
           id: Math.random().toString(36).substr(2, 9),
           x: 110,
-          y: type === 'flying-candy' ? 40 : type === 'pit' ? GROUND_Y + 5 : GROUND_Y - 5,
+          y: type === 'flying-candy' ? GROUND_Y - 25 : type === 'pit' ? GROUND_Y + 2 : GROUND_Y - 5,
           type,
           width: type === 'pit' ? 15 : 6,
           height: type === 'pit' ? 15 : 6,
@@ -195,7 +195,7 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
           setCollectibles(prev => [...prev.slice(-5), {
             id: Math.random().toString(36).substr(2, 9),
             x: 110,
-            y: GROUND_Y - 15 - Math.random() * 25,
+            y: GROUND_Y - 20 - Math.random() * 20,
             type,
             collected: false,
             floatOffset: Math.random() * Math.PI * 2,
@@ -434,25 +434,38 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
 
   return (
     <motion.div 
-      className="min-h-screen bg-gradient-to-b from-blue-300 via-blue-200 to-white overflow-hidden relative"
+      className="min-h-screen overflow-hidden relative"
       style={{ transform: `translate(${screenShake * (Math.random() - 0.5)}px, ${screenShake * (Math.random() - 0.5)}px)` }}
       onClick={jump}
     >
-      {/* Parallax Background */}
+      {/* SEAMLESS BACKGROUND - Sky gradient top ~65%, Ground bottom ~35% */}
       <div className="absolute inset-0">
-        {/* Far layer - teeth */}
-        <div className="absolute inset-0 flex" style={{ transform: `translateX(-${backgroundOffset * 0.3}%)` }}>
-          {[...Array(10)].map((_, i) => (
-            <div key={i} className="text-[200px] opacity-10 select-none" style={{ marginLeft: i === 0 ? '-10%' : '-5%' }}>
-              🦷
-            </div>
+        {/* Sky gradient from deep blue to light blue */}
+        <div className="absolute inset-x-0 top-0 h-[65%] bg-gradient-to-b from-blue-500 via-blue-300 to-blue-100" />
+        
+        {/* Ground gradient - green area */}
+        <div className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-b from-green-400 to-green-500" />
+        
+        {/* Soft clouds in sky */}
+        <div className="absolute inset-0" style={{ transform: `translateX(-${backgroundOffset * 0.2}%)` }}>
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="absolute bg-white/40 rounded-full blur-xl" 
+              style={{ 
+                width: `${120 + i * 30}px`, 
+                height: `${40 + i * 10}px`, 
+                top: `${10 + (i % 3) * 15}%`, 
+                left: `${i * 25}%` 
+              }} 
+            />
           ))}
         </div>
         
-        {/* Mid layer - gums */}
-        <div className="absolute top-20 left-0 right-0 h-32 bg-gradient-to-b from-pink-200/50 to-transparent" 
-          style={{ transform: `translateX(-${backgroundOffset * 0.5}%)` }}
-        />
+        {/* Distant teeth silhouettes on horizon */}
+        <div className="absolute top-[55%] left-0 right-0 h-20 flex items-end opacity-20" style={{ transform: `translateX(-${backgroundOffset * 0.3}%)` }}>
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="text-6xl text-white mx-4">🦷</div>
+          ))}
+        </div>
       </div>
 
       {/* HUD */}
@@ -525,16 +538,8 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
         </motion.div>
       ))}
 
-      {/* Ground */}
-      <div className="absolute bottom-0 left-0 right-0 h-[25%]">
-        <div className="absolute inset-0 bg-gradient-to-t from-green-500 to-green-400" />
-        {/* Ground texture */}
-        <div className="absolute top-0 left-0 right-0 h-4 bg-green-300" style={{ transform: `translateX(-${backgroundOffset}%)` }}>
-          {[...Array(20)].map((_, i) => (
-            <div key={i} className="absolute top-0 w-8 h-4 bg-green-200 rounded-b-full" style={{ left: `${i * 10}%` }} />
-          ))}
-        </div>
-      </div>
+      {/* Horizon line indicator - subtle glow where player runs */}
+      <div className="absolute left-0 right-0 h-1 bg-white/20" style={{ top: `${GROUND_Y}%` }} />
 
       {/* Obstacles */}
       <AnimatePresence>
