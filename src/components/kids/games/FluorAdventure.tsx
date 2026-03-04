@@ -125,23 +125,20 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
     setParticles([]);
     setBackgroundOffset(0);
     startTimeRef.current = Date.now();
-    setFairyMessage('Apasă SPACE sau atinge pentru săritură!');
+    setFairyMessage('Apasă SPACE sau atinge pentru săritură! Așteaptă să aterizezi!');
     setShowFairy(true);
     setTimeout(() => setShowFairy(false), 3000);
   };
 
-  // Jump
+  // Jump - only allowed when on ground (not jumping)
   const jump = useCallback(() => {
     if (!player.isJumping && gameState === 'playing') {
       setPlayer(p => ({ ...p, vy: JUMP_FORCE, isJumping: true, scaleY: 1.3 }));
       createParticles(player.x, player.y + 5, '#4FC3F7', 8);
       if (navigator.vibrate) navigator.vibrate(40);
-    } else if (player.isJumping && player.vy > -3 && gameState === 'playing') {
-      // Double jump
-      setPlayer(p => ({ ...p, vy: JUMP_FORCE * 0.8, scaleY: 1.2 }));
-      createParticles(player.x, player.y + 5, '#81D4FA', 6);
     }
-  }, [player.isJumping, player.vy, player.x, player.y, gameState, createParticles]);
+    // No double jump - player must land first
+  }, [player.isJumping, player.x, player.y, gameState, createParticles]);
 
   // Game loop
   useEffect(() => {
