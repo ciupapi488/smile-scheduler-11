@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { LogOut, Calendar, User, Shield, Users, Images, Briefcase, Home } from "lucide-react";
+import { LogOut, Calendar, User, Shield, Users, Images, Briefcase, Home, Gamepad2 } from "lucide-react";
 import { toast } from "sonner";
 
 export function Header() {
@@ -62,6 +62,12 @@ export function Header() {
             <Link to="/servicii" className="flex items-center gap-2">
               <Briefcase className="h-4 w-4" />
               <span className="hidden sm:inline">{t("nav.services")}</span>
+            </Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/jocuri" className="flex items-center gap-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50">
+              <Gamepad2 className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("nav.kidsZone") || "Zona Copiilor"}</span>
             </Link>
           </Button>
           <LanguageSwitcher />
