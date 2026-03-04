@@ -3,13 +3,13 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, Heart, Star, BookOpen, Gift, Clock, ChevronRight, Volume2, VolumeX, Home, Smile } from 'lucide-react';
+import { Sparkles, Heart, Star, BookOpen, Gift, Clock, ChevronRight, Volume2, VolumeX, Home, Smile, Play, RotateCcw } from 'lucide-react';
 import { ToothFairyAvatar } from './ToothFairyAvatar';
 import { StoryViewer } from './StoryViewer';
 import { StickerBook } from './StickerBook';
 import { BreathingExercise } from './BreathingExercise';
 import { FoodGame } from './FoodGame';
-import { BrushingTimer } from './BrushingTimer';
+import { DinoMascot } from './DinoMascot';
 import stories from '@/data/kidsStories.json';
 import { playRomanianTTS, stopTTS } from '@/utils/tts';
 import confetti from 'canvas-confetti';
@@ -63,7 +63,7 @@ const DAILY_MISSIONS = [
 
 export function ToothFairy({ childName = 'Prietene', appointmentDate, onComplete }: ToothFairyProps) {
   const { language } = useLanguage();
-  const [mode, setMode] = useState<'home' | 'calm' | 'learn' | 'reward' | 'story'>('home');
+  const [mode, setMode] = useState<'home' | 'calm' | 'learn' | 'reward' | 'story' | 'brushing'>('home');
   const [progress, setProgress] = useState<ChildProgress>({
     stickers: [],
     storiesCompleted: [],
@@ -269,6 +269,41 @@ export function ToothFairy({ childName = 'Prietene', appointmentDate, onComplete
               </CardContent>
             </Card>
 
+            {/* PROMINENT BRUSHING TIMER */}
+            <Card 
+              className="cursor-pointer hover:shadow-xl transition-all border-green-300 hover:border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 overflow-hidden"
+              onClick={() => setMode('brushing')}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <DinoMascot size="sm" mood="happy" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-green-700 text-xl mb-1 flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-yellow-500" />
+                      Program de Periaj
+                    </h3>
+                    <p className="text-gray-600 mb-3">Învață să te periezi corect în 2 minute cu Dino!</p>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2 text-sm text-green-600">
+                        <Clock className="h-4 w-4" />
+                        <span>2 minute</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-green-600">
+                        <Star className="h-4 w-4" />
+                        <span>4 zone</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Button className="bg-green-500 hover:bg-green-600 text-white rounded-full px-6">
+                    <Play className="h-4 w-4 mr-2" />
+                    Start
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Mode Selection */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Calm Mode */}
@@ -436,10 +471,43 @@ export function ToothFairy({ childName = 'Prietene', appointmentDate, onComplete
               Învață cu Zâna Măseluță 📚
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
               <FoodGame onComplete={() => awardSticker('detective', 'mission')} />
-              <BrushingTimer onComplete={() => awardSticker('gold-brush', 'mission')} />
+              <Card 
+                className="cursor-pointer hover:shadow-lg transition-all border-green-200 hover:border-green-400"
+                onClick={() => setMode('brushing')}
+              >
+                <CardContent className="p-6 text-center">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Sparkles className="h-8 w-8 text-green-500" />
+                  </div>
+                  <h3 className="font-bold text-green-700 mb-1">Program de Periaj</h3>
+                  <p className="text-sm text-gray-600">Timer de 2 minute cu Dino</p>
+                </CardContent>
+              </Card>
             </div>
+          </div>
+        )}
+
+        {/* BRUSHING MODE - Integrated Dino Trainer */}
+        {mode === 'brushing' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <Button variant="ghost" onClick={() => setMode('home')}>
+                <Home className="h-4 w-4 mr-2" /> Înapoi la Zână
+              </Button>
+              <h2 className="text-xl font-bold text-green-700">Program de Periaj</h2>
+              <div className="w-24" />
+            </div>
+            
+            {/* Simple Integrated Brushing Timer */}
+            <BrushingTimerSimple 
+              onComplete={() => {
+                awardSticker('gold-brush', 'mission');
+                setMode('home');
+              }}
+              onBack={() => setMode('home')}
+            />
           </div>
         )}
 
@@ -523,6 +591,175 @@ export function ToothFairy({ childName = 'Prietene', appointmentDate, onComplete
           </Card>
         </div>
       )}
+    </div>
+  );
+}
+
+// Simple Brushing Timer Component
+interface BrushingTimerSimpleProps {
+  onComplete: () => void;
+  onBack: () => void;
+}
+
+function BrushingTimerSimple({ onComplete, onBack }: BrushingTimerSimpleProps) {
+  const [seconds, setSeconds] = useState(0);
+  const [isActive, setIsActive] = useState(false);
+  const [currentZone, setCurrentZone] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  const ZONES = [
+    { name: 'Dreapta Sus', icon: '↗️', color: 'bg-blue-400' },
+    { name: 'Stânga Sus', icon: '↖️', color: 'bg-green-400' },
+    { name: 'Dreapta Jos', icon: '↘️', color: 'bg-yellow-400' },
+    { name: 'Stânga Jos', icon: '↙️', color: 'bg-pink-400' },
+  ];
+
+  const TOTAL_TIME = 120; // 2 minutes
+  const ZONE_TIME = 30; // 30 seconds per zone
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isActive && !isPaused && seconds < TOTAL_TIME) {
+      interval = setInterval(() => {
+        setSeconds(s => {
+          const newSeconds = s + 1;
+          const newZone = Math.min(Math.floor(newSeconds / ZONE_TIME), 3);
+          setCurrentZone(newZone);
+          
+          if (newSeconds >= TOTAL_TIME) {
+            setIsActive(false);
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+            onComplete();
+          }
+          return newSeconds;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isActive, isPaused, seconds, onComplete]);
+
+  const toggleTimer = () => {
+    if (!isActive) {
+      setIsActive(true);
+      setIsPaused(false);
+    } else {
+      setIsPaused(!isPaused);
+    }
+  };
+
+  const resetTimer = () => {
+    setSeconds(0);
+    setIsActive(false);
+    setIsPaused(false);
+    setCurrentZone(0);
+  };
+
+  const formatTime = (s: number) => {
+    const mins = Math.floor(s / 60);
+    const secs = s % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const progress = (seconds / TOTAL_TIME) * 100;
+
+  return (
+    <div className="max-w-2xl mx-auto">
+      {/* Dino Mascot */}
+      <div className="flex justify-center mb-6">
+        <DinoMascot 
+          size="lg" 
+          mood={isActive ? 'encouraging' : 'happy'} 
+          isSpeaking={isActive && seconds % 5 === 0}
+        />
+      </div>
+
+      {/* Timer Display */}
+      <Card className="mb-6 border-green-200">
+        <CardContent className="p-8 text-center">
+          <div className="text-7xl font-black text-green-600 mb-4">
+            {formatTime(seconds)}
+          </div>
+          <Progress value={progress} className="h-4 mb-4" />
+          <p className="text-gray-600">
+            {isActive 
+              ? (isPaused ? 'Pauză...' : 'Periază cu Dino! 🪥')
+              : 'Gata să începem?'
+            }
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Current Zone */}
+      <div className="grid grid-cols-4 gap-2 mb-6">
+        {ZONES.map((zone, idx) => (
+          <div
+            key={idx}
+            className={`p-4 rounded-2xl text-center transition-all ${
+              currentZone === idx && isActive
+                ? `${zone.color} text-white scale-110 shadow-lg`
+                : currentZone > idx
+                ? 'bg-green-100 text-green-700'
+                : 'bg-gray-100 text-gray-400'
+            }`}
+          >
+            <div className="text-3xl mb-1">{zone.icon}</div>
+            <div className="text-xs font-bold">{zone.name}</div>
+            {currentZone === idx && isActive && (
+              <div className="text-xs mt-1 animate-pulse">Acum!</div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Instructions */}
+      {isActive && currentZone < 4 && (
+        <Card className="mb-6 bg-blue-50 border-blue-200">
+          <CardContent className="p-4 text-center">
+            <p className="text-lg font-bold text-blue-700">
+              {ZONES[currentZone].icon} {ZONES[currentZone].name}
+            </p>
+            <p className="text-blue-600">
+              {currentZone === 0 && 'Periază circular, ca un elicopter! 🚁'}
+              {currentZone === 1 && 'Nu uita dinții din spate! 👈'}
+              {currentZone === 2 && 'Periază ușor gingiile! 🦷'}
+              {currentZone === 3 && 'Termină tare! Ești aproape gata! 💪'}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Control Buttons */}
+      <div className="flex gap-4 justify-center">
+        <Button
+          size="lg"
+          className={`rounded-full px-12 py-6 text-xl font-bold ${
+            isActive && !isPaused
+              ? 'bg-yellow-500 hover:bg-yellow-600'
+              : 'bg-green-500 hover:bg-green-600'
+          }`}
+          onClick={toggleTimer}
+        >
+          {isActive ? (isPaused ? '▶️ Continuă' : '⏸️ Pauză') : '▶️ Start'}
+        </Button>
+        
+        {seconds > 0 && (
+          <Button
+            variant="outline"
+            size="lg"
+            className="rounded-full px-6"
+            onClick={resetTimer}
+          >
+            <RotateCcw className="h-5 w-5 mr-2" />
+            Reset
+          </Button>
+        )}
+      </div>
+
+      {/* Tips */}
+      <div className="mt-6 text-center text-sm text-gray-500">
+        <p>💡 Sfaturi: Periază timp de 2 minute, de 2 ori pe zi!</p>
+        <p>🪥 Folosește o periuță moale și paste cu fluor!</p>
+      </div>
     </div>
   );
 }
