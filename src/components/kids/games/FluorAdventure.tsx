@@ -80,6 +80,18 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
   const lastSpawnRef = useRef(0);
   const particleIdRef = useRef(0);
   const startTimeRef = useRef(0);
+  const speedRef = useRef(2.5);
+  const levelRef = useRef(1);
+  const obstaclesRef = useRef<Obstacle[]>([]);
+  const collectiblesRef = useRef<Collectible[]>([]);
+  const scoreRef = useRef(0);
+  const livesRef = useRef(3);
+
+  // Sync refs with state for game loop access
+  useEffect(() => { obstaclesRef.current = obstacles; }, [obstacles]);
+  useEffect(() => { collectiblesRef.current = collectibles; }, [collectibles]);
+  useEffect(() => { scoreRef.current = score; }, [score]);
+  useEffect(() => { livesRef.current = lives; }, [lives]);
 
   // Create particles
   const createParticles = useCallback((x: number, y: number, color: string, count: number = 10) => {
@@ -125,6 +137,13 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
     setParticles([]);
     setBackgroundOffset(0);
     startTimeRef.current = Date.now();
+    // Reset all refs
+    speedRef.current = 2.5;
+    levelRef.current = 1;
+    obstaclesRef.current = [];
+    collectiblesRef.current = [];
+    scoreRef.current = 0;
+    livesRef.current = 3;
     setFairyMessage('Apasă SPACE sau atinge pentru săritură! Așteaptă să aterizezi!');
     setShowFairy(true);
     setTimeout(() => setShowFairy(false), 3000);
@@ -149,25 +168,29 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
       const elapsed = (now - startTimeRef.current) / 1000;
       setGameTime(elapsed);
       
-      // Level progression
-      if (elapsed > 30 && level === 1) {
+      // Level progression - speed only increases when level changes
+      if (elapsed > 30 && levelRef.current === 1) {
+        levelRef.current = 2;
+        speedRef.current = 3.3; // Level 2 speed
         setLevel(2);
         setFairyMessage('Nivelul 2! Viteza crește!');
         setShowFairy(true);
         setTimeout(() => setShowFairy(false), 2500);
-      } else if (elapsed > 60 && level === 2) {
+      } else if (elapsed > 60 && levelRef.current === 2) {
+        levelRef.current = 3;
+        speedRef.current = 4.1; // Level 3 speed
         setLevel(3);
         setFairyMessage('Nivelul 3! Finalul!');
         setShowFairy(true);
         setTimeout(() => setShowFairy(false), 2500);
       } else if (elapsed > 90) {
         setGameState('victory');
-        saveGameSession({ gameId: 'fluor', score: score + lives * 100, duration: elapsed, level: 3 });
+        saveGameSession({ gameId: 'fluor', score: scoreRef.current + livesRef.current * 100, duration: elapsed, level: 3 });
         return;
       }
 
-      // Spawn obstacles
-      const spawnRate = Math.max(1500, 2500 - level * 400);
+      // Spawn obstacles - spawn rate based on level ref
+      const spawnRate = Math.max(1500, 2500 - levelRef.current * 400);
       if (now - lastSpawnRef.current > spawnRate) {
         lastSpawnRef.current = now;
         const types: Obstacle['type'][] = ['candy', 'bacteria', 'candy', 'flying-candy'];
@@ -200,7 +223,8 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
         }
       }
 
-      const speed = 2.5 + level * 0.8;
+      // Use constant speed from ref - only changes when level changes
+      const speed = speedRef.current;
       setDistance(d => d + speed * 0.05);
       setBackgroundOffset(o => (o + speed * 0.02) % 100);
 
@@ -240,8 +264,8 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
         x: c.x - speed,
       })).filter(c => c.x > -10 && !c.collected));
 
-      // Collision detection
-      obstacles.forEach(obs => {
+      // Collision detection - use refs for latest values
+      obstaclesRef.current.forEach(obs => {
         const dx = obs.x - player.x;
         const dy = obs.y - player.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -249,6 +273,7 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
         if (dist < 10 && !player.invincible) {
           setLives(l => {
             const newLives = l - 1;
+            livesRef.current = newLives;
             setPlayer(p => ({ ...p, invincible: true, scaleY: 0.8 }));
             setInvincibleTime(3);
             setScreenShake(10);
@@ -257,7 +282,7 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
             
             if (newLives <= 0) {
               setGameState('gameOver');
-              saveGameSession({ gameId: 'fluor', score, duration: elapsed, level });
+              saveGameSession({ gameId: 'fluor', score: scoreRef.current, duration: elapsed, level: levelRef.current });
             } else {
               setFairyMessage(`Ai! Mai ai ${newLives} vieți!`);
               setShowFairy(true);
@@ -268,8 +293,8 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
         }
       });
 
-      // Collectible collision
-      collectibles.forEach(col => {
+      // Collectible collision - use refs for latest values
+      collectiblesRef.current.forEach(col => {
         if (!col.collected) {
           const dx = col.x - player.x;
           const dy = col.y - player.y;
@@ -279,10 +304,10 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
             setCollectibles(prev => prev.map(c => c.id === col.id ? { ...c, collected: true } : c));
             
             if (col.type === 'coin') {
-              setScore(s => s + 10);
+              setScore(s => { scoreRef.current = s + 10; return s + 10; });
               createParticles(col.x, col.y, '#FFD700', 8);
             } else if (col.type === 'toothbrush') {
-              setScore(s => s + 50);
+              setScore(s => { scoreRef.current = s + 50; return s + 50; });
               createParticles(col.x, col.y, '#4FC3F7', 15);
               setFairyMessage('+50 Periuță!');
               setShowFairy(true);
@@ -317,7 +342,7 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
     return () => {
       if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
     };
-  }, [gameState, level, player.invincible, obstacles, collectibles, score, lives, createParticles, saveGameSession]);
+  }, [gameState, player.invincible, createParticles, saveGameSession]);
 
   // Keyboard controls
   useEffect(() => {
