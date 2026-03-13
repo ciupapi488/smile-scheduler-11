@@ -250,13 +250,13 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
         return { ...p, y: newY, vy: newVy, isJumping, scaleY, rotation };
       });
 
-      // Move obstacles
+      // Move obstacles - let them go all the way off screen before removing
       setObstacles(prev => prev.map(o => ({
         ...o,
         x: o.x - speed,
         rotation: o.rotation + 2,
         y: o.type === 'flying-candy' ? o.y + Math.sin(now / 300) * 0.5 : o.y,
-      })).filter(o => o.x > -15));
+      })).filter(o => o.x > -20)); // Remove only when fully off screen
 
       // Move collectibles
       setCollectibles(prev => prev.map(c => ({
