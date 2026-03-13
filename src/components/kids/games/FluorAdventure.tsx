@@ -168,17 +168,15 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
       const elapsed = (now - startTimeRef.current) / 1000;
       setGameTime(elapsed);
       
-      // Level progression - speed only increases when level changes
+      // Level progression - speed stays constant
       if (elapsed > 30 && levelRef.current === 1) {
         levelRef.current = 2;
-        speedRef.current = 3.3; // Level 2 speed
         setLevel(2);
-        setFairyMessage('Nivelul 2! Viteza crește!');
+        setFairyMessage('Nivelul 2! Continuă!');
         setShowFairy(true);
         setTimeout(() => setShowFairy(false), 2500);
       } else if (elapsed > 60 && levelRef.current === 2) {
         levelRef.current = 3;
-        speedRef.current = 4.1; // Level 3 speed
         setLevel(3);
         setFairyMessage('Nivelul 3! Finalul!');
         setShowFairy(true);
