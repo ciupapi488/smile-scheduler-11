@@ -207,6 +207,8 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
           rotation: 0,
         };
         setObstacles(prev => [...prev.slice(-6), newObstacle]);
+        // Also update ref immediately for collision detection
+        obstaclesRef.current = [...obstaclesRef.current.slice(-6), newObstacle];
         
         // Spawn collectible
         if (Math.random() > 0.4) {
@@ -250,27 +252,39 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
         return { ...p, y: newY, vy: newVy, isJumping, scaleY, rotation };
       });
 
-      // Move obstacles - let them go all the way off screen before removing
-      setObstacles(prev => prev.map(o => ({
+      // Move obstacles - update ref immediately for collision detection
+      const updatedObstacles = obstaclesRef.current.map(o => ({
         ...o,
         x: o.x - speed,
         rotation: o.rotation + 2,
         y: o.type === 'flying-candy' ? o.y + Math.sin(now / 300) * 0.5 : o.y,
-      })).filter(o => o.x > -20)); // Remove only when fully off screen
+      })).filter(o => o.x > -20);
+      obstaclesRef.current = updatedObstacles;
+      setObstacles(updatedObstacles);
 
-      // Move collectibles
-      setCollectibles(prev => prev.map(c => ({
+      // Move collectibles - update ref immediately
+      const updatedCollectibles = collectiblesRef.current.map(c => ({
         ...c,
         x: c.x - speed,
-      })).filter(c => c.x > -10 && !c.collected));
+      })).filter(c => c.x > -10 && !c.collected);
+      collectiblesRef.current = updatedCollectibles;
+      setCollectibles(updatedCollectibles);
 
       // Collision detection - use refs for latest values
       obstaclesRef.current.forEach(obs => {
+        // Calculate distance between player and obstacle (both in percentage coordinates)
         const dx = obs.x - player.x;
         const dy = obs.y - player.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         
-        if (dist < 10 && !player.invincible) {
+        // Debug collision
+        if (dist < 15) {
+          console.log('Near collision:', { obsX: obs.x, obsY: obs.y, playerX: player.x, playerY: player.y, dist, invincible: player.invincible });
+        }
+        
+        // Increased collision threshold from 10 to 12 for better detection
+        if (dist < 12 && !player.invincible) {
+          console.log('COLLISION! Lives before:', livesRef.current);
           setLives(l => {
             const newLives = l - 1;
             livesRef.current = newLives;
@@ -301,7 +315,10 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
           const dist = Math.sqrt(dx * dx + dy * dy);
           
           if (dist < 12) {
-            setCollectibles(prev => prev.map(c => c.id === col.id ? { ...c, collected: true } : c));
+            // Update both state and ref
+            const updatedCols = collectiblesRef.current.map(c => c.id === col.id ? { ...c, collected: true } : c);
+            collectiblesRef.current = updatedCols;
+            setCollectibles(updatedCols);
             
             if (col.type === 'coin') {
               setScore(s => { scoreRef.current = s + 10; return s + 10; });
