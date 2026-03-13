@@ -28,20 +28,20 @@ const checkAdminWithTimeout = async (userId: string, timeoutMs = 2000): Promise<
       .then(({ data, error }) => {
         if (error) {
           // Table might not exist or RLS error - silently fail
-          console.warn("Admin check warning (non-critical):", error.message);
+          // Only log in development, suppress in production
+          if (import.meta.env.DEV && !error.message?.includes('user_roles')) {
+            console.warn("Admin check warning:", error.message);
+          }
           return false;
         }
         return !!data;
       })
       .catch((err) => {
-        console.warn("Admin check failed (non-critical):", err.message);
+        // Silently fail - admin check is not critical
         return false;
       }),
     new Promise<boolean>((resolve) => 
-      setTimeout(() => {
-        console.warn("Admin check timeout");
-        resolve(false);
-      }, timeoutMs)
+      setTimeout(() => resolve(false), timeoutMs)
     )
   ]);
 };
@@ -58,10 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Failsafe: force loading to false after 3 seconds
     initTimeout = setTimeout(() => {
-      if (mounted && isLoading) {
-        console.warn("Auth init timeout - forcing isLoading to false");
-        setIsLoading(false);
-      }
+      if (mounted) setIsLoading(false);
     }, 3000);
 
     // Set up auth state listener FIRST
