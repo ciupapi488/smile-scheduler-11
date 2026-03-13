@@ -130,13 +130,20 @@ export default function BookingFormNew() {
     try {
       const dateStr = date.toISOString().split('T')[0];
       const baseUrl = import.meta.env.DEV ? 'http://localhost:5001' : API_URL;
-      const response = await fetch(`${baseUrl}/api/available-slots?date=${dateStr}&dentist_id=${dentistId}`);
+      const url = `${baseUrl}/api/available-slots?date=${dateStr}&dentist_id=${dentistId}`;
+      console.log('Loading slots from:', url);
+      
+      const response = await fetch(url);
       const data = await response.json();
+      console.log('Slots data:', data);
+      
       setAvailableSlots(data.availableSlots || ALL_TIME_SLOTS);
       // Store booked slots for visual indication
       const booked = data.bookedSlots || [];
+      console.log('Booked slots:', booked);
       setBookedSlots(booked);
     } catch (err) {
+      console.error('Error loading slots:', err);
       setAvailableSlots(ALL_TIME_SLOTS);
       setBookedSlots([]);
     }
@@ -353,12 +360,22 @@ export default function BookingFormNew() {
           {step === 3 && (
             <TooltipProvider>
               <div>
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center justify-between mb-4">
                   <Button variant="ghost" size="sm" onClick={() => setStep(2)}>← Înapoi la dată</Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => selectedDate && selectedDentist && loadSlots(selectedDate, selectedDentist.id)}
+                  >
+                    ↻ Actualizează
+                  </Button>
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Alege Ora</h3>
                 <p className="text-gray-500 mb-2">
                   {selectedDate && formatDate(selectedDate)}
+                </p>
+                <p className="text-sm text-gray-400 mb-4">
+                  {ALL_TIME_SLOTS.length - bookedSlots.length} locuri disponibile • {bookedSlots.length} ocupate
                 </p>
                 
                 {/* Legend */}

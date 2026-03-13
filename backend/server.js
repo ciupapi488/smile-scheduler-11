@@ -75,20 +75,38 @@ app.get('/api/available-slots', async (req, res) => {
   const { date, dentist_id } = req.query;
   if (!date) return res.status(400).json({ error: 'Date required' });
   
+  console.log('GET /api/available-slots - date:', date, 'dentist_id:', dentist_id);
+  
   try {
     const allSlots = ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00'];
     
     let query = supabase
       .from('appointment_slots')
-      .select('slot_time')
+      .select('slot_time, dentist_id')
       .eq('slot_date', date)
       .eq('status', 'booked');
     
-    if (dentist_id) query = query.eq('dentist_id', dentist_id);
+    if (dentist_id) {
+      query = query.eq('dentist_id', dentist_id);
+    }
     
-    const { data: bookedData } = await query;
-    const bookedTimes = bookedData?.map(row => row.slot_time?.substring(0, 5)) || [];
+    const { data: bookedData, error } = await query;
+    
+    if (error) {
+      console.error('Supabase error:', error);
+    }
+    
+    console.log('Booked slots found:', bookedData);
+    
+    // Normalize time format (handle both "09:00" and "09:00:00")
+    const bookedTimes = bookedData?.map(row => {
+      const time = row.slot_time;
+      return time?.length > 5 ? time.substring(0, 5) : time;
+    }) || [];
+    
     const availableSlots = allSlots.filter(slot => !bookedTimes.includes(slot));
+    
+    console.log('Available:', availableSlots, 'Booked:', bookedTimes);
     
     res.json({ date, availableSlots, bookedSlots: bookedTimes });
   } catch (err) {
