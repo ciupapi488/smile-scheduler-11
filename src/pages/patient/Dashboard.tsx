@@ -95,7 +95,8 @@ export default function PatientDashboard() {
 
   const loadCancellationCount = async (userEmail: string) => {
     try {
-      const response = await fetch(`${API_URL}/api/patient/cancellations?email=${encodeURIComponent(userEmail)}`);
+      const baseUrl = import.meta.env.DEV ? 'http://localhost:5001' : API_URL;
+      const response = await fetch(`${baseUrl}/api/patient/cancellations?email=${encodeURIComponent(userEmail)}`);
       if (response.ok) {
         const data = await response.json();
         setCancellationData(data);
@@ -107,7 +108,9 @@ export default function PatientDashboard() {
 
   const loadAppointments = async (userEmail: string) => {
     try {
-      const url = `${API_URL}/api/patient/appointments?email=${encodeURIComponent(userEmail)}`;
+      // Use full backend URL in development to avoid proxy issues
+      const baseUrl = import.meta.env.DEV ? 'http://localhost:5001' : API_URL;
+      const url = `${baseUrl}/api/patient/appointments?email=${encodeURIComponent(userEmail)}`;
       console.log('Fetching appointments from:', url);
       
       const response = await fetch(url);
@@ -149,7 +152,8 @@ export default function PatientDashboard() {
 
     setCancelling(appointmentId);
     try {
-      const response = await fetch(`${API_URL}/api/patient/appointments/${appointmentId}/cancel`, {
+      const baseUrl = import.meta.env.DEV ? 'http://localhost:5001' : API_URL;
+      const response = await fetch(`${baseUrl}/api/patient/appointments/${appointmentId}/cancel`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user?.email })

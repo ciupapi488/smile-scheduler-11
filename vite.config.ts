@@ -15,6 +15,16 @@ export default defineConfig(({ mode }) => ({
       '/api': {
         target: 'http://localhost:5001',
         changeOrigin: true,
+        secure: false,
+        ws: true,
+        configure: (proxy, options) => {
+          proxy.on('error', (err, req, res) => {
+            console.log('Proxy error:', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            console.log('Proxying:', req.method, req.url, '→', options.target + proxyReq.path);
+          });
+        },
       },
     },
   },
