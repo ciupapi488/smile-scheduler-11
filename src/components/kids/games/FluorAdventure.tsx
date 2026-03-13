@@ -86,12 +86,14 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
   const collectiblesRef = useRef<Collectible[]>([]);
   const scoreRef = useRef(0);
   const livesRef = useRef(3);
+  const playerRef = useRef(player);
 
   // Sync refs with state for game loop access
   useEffect(() => { obstaclesRef.current = obstacles; }, [obstacles]);
   useEffect(() => { collectiblesRef.current = collectibles; }, [collectibles]);
   useEffect(() => { scoreRef.current = score; }, [score]);
   useEffect(() => { livesRef.current = lives; }, [lives]);
+  useEffect(() => { playerRef.current = player; }, [player]);
 
   // Create particles
   const createParticles = useCallback((x: number, y: number, color: string, count: number = 10) => {
@@ -269,16 +271,14 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
       collectiblesRef.current = updatedCollectibles;
       setCollectibles(updatedCollectibles);
 
-      // Collision detection - SIMPLE: check if obstacle overlaps with player
-      // Player is at fixed x=15%, y=GROUND_Y with size ~5%
-      // Obstacles move from right to left
+      // Collision detection - use playerRef for latest player state
+      const currentPlayer = playerRef.current;
       obstaclesRef.current.forEach(obs => {
-        // Simple box collision - player is roughly at x=15, y=GROUND_Y
-        // Player width ~5%, height ~8%
-        const playerLeft = player.x - 3;
-        const playerRight = player.x + 3;
-        const playerTop = player.y - 4;
-        const playerBottom = player.y + 4;
+        // Simple box collision
+        const playerLeft = currentPlayer.x - 3;
+        const playerRight = currentPlayer.x + 3;
+        const playerTop = currentPlayer.y - 4;
+        const playerBottom = currentPlayer.y + 4;
         
         const obsLeft = obs.x - 4;
         const obsRight = obs.x + 4;
@@ -289,14 +289,14 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
         const collideX = playerLeft < obsRight && playerRight > obsLeft;
         const collideY = playerTop < obsBottom && playerBottom > obsTop;
         
-        if (collideX && collideY && !player.invincible) {
+        if (collideX && collideY && !currentPlayer.invincible) {
           setLives(l => {
             const newLives = l - 1;
             livesRef.current = newLives;
             setPlayer(p => ({ ...p, invincible: true, scaleY: 0.8 }));
             setInvincibleTime(3);
             setScreenShake(10);
-            createParticles(player.x, player.y, '#EF5350', 20);
+            createParticles(currentPlayer.x, currentPlayer.y, '#EF5350', 20);
             if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
             
             if (newLives <= 0) {
@@ -312,11 +312,11 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
         }
       });
 
-      // Collectible collision - use refs for latest values
+      // Collectible collision - use playerRef for latest player state
       collectiblesRef.current.forEach(col => {
         if (!col.collected) {
-          const dx = col.x - player.x;
-          const dy = col.y - player.y;
+          const dx = col.x - currentPlayer.x;
+          const dy = col.y - currentPlayer.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           
           if (dist < 12) {
@@ -349,10 +349,10 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
       // Screen shake decay
       setScreenShake(s => Math.max(0, s - 1));
 
-      // Invincibility
+      // Invincibility - use playerRef
       if (invincibleTime > 0) {
         setInvincibleTime(t => t - 0.016);
-      } else if (player.invincible) {
+      } else if (playerRef.current.invincible) {
         setPlayer(p => ({ ...p, invincible: false }));
       }
 
@@ -364,7 +364,7 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
     return () => {
       if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
     };
-  }, [gameState, player.invincible, createParticles, saveGameSession]);
+  }, [gameState, createParticles, saveGameSession]);
 
   // Keyboard controls
   useEffect(() => {
