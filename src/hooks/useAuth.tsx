@@ -16,8 +16,13 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
 });
 
-// Helper to check admin with timeout - checks user_roles table
-const checkAdminWithTimeout = async (userId: string, timeoutMs = 2000): Promise<boolean> => {
+// Helper to check admin - disabled to prevent console errors
+// The user_roles table doesn't exist in the database
+// Re-enable this if you create the user_roles table
+const checkAdminWithTimeout = async (_userId: string, _timeoutMs = 2000): Promise<boolean> => {
+  // Admin check disabled - table user_roles doesn't exist
+  // To enable admin functionality, create the table and uncomment below:
+  /*
   return Promise.race([
     supabase
       .from("user_roles")
@@ -26,24 +31,16 @@ const checkAdminWithTimeout = async (userId: string, timeoutMs = 2000): Promise<
       .eq("role", "admin")
       .maybeSingle()
       .then(({ data, error }) => {
-        if (error) {
-          // Table might not exist or RLS error - silently fail
-          // Only log in development, suppress in production
-          if (import.meta.env.DEV && !error.message?.includes('user_roles')) {
-            console.warn("Admin check warning:", error.message);
-          }
-          return false;
-        }
+        if (error) return false;
         return !!data;
       })
-      .catch((err) => {
-        // Silently fail - admin check is not critical
-        return false;
-      }),
+      .catch(() => false),
     new Promise<boolean>((resolve) => 
       setTimeout(() => resolve(false), timeoutMs)
     )
   ]);
+  */
+  return false;
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
