@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useNavigate } from 'react-router-dom';
 import { Calendar as CalendarIcon, Clock, CheckCircle, AlertCircle, Loader2, Stethoscope, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -51,6 +52,7 @@ export default function BookingFormNew() {
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [selectedService, setSelectedService] = useState<string>('');
   const [availableSlots, setAvailableSlots] = useState<string[]>(ALL_TIME_SLOTS);
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -124,8 +126,12 @@ export default function BookingFormNew() {
       const response = await fetch(`${baseUrl}/api/available-slots?date=${dateStr}&dentist_id=${dentistId}`);
       const data = await response.json();
       setAvailableSlots(data.availableSlots || ALL_TIME_SLOTS);
+      // Store booked slots for visual indication
+      const booked = data.bookedSlots || [];
+      setBookedSlots(booked);
     } catch (err) {
       setAvailableSlots(ALL_TIME_SLOTS);
+      setBookedSlots([]);
     }
   };
 
@@ -334,28 +340,83 @@ export default function BookingFormNew() {
 
           {/* Step 3: Select Time */}
           {step === 3 && (
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Button variant="ghost" size="sm" onClick={() => setStep(2)}>← Înapoi la dată</Button>
+            <TooltipProvider>
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Button variant="ghost" size="sm" onClick={() => setStep(2)}>← Înapoi la dată</Button>
+                </div>
+                <h3 className="text-lg font-semibold mb-2">Alege Ora</h3>
+                <p className="text-gray-500 mb-2">
+                  {selectedDate && formatDate(selectedDate)}
+                </p>
+                
+                {/* Legend */}
+                <div className="flex items-center gap-4 mb-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded bg-green-500"></div>
+                    <span className="text-gray-600">Disponibil</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded bg-red-400"></div>
+                    <span className="text-gray-600">Ocupat</span>
+                  </div>
+                </div>
+
+                {/* All slots grid - shows both available and booked */}
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                  {ALL_TIME_SLOTS.map((time) => {
+                    const isBooked = bookedSlots.includes(time);
+                    const isAvailable = availableSlots.includes(time) && !isBooked;
+                    const isSelected = selectedTime === time;
+
+                    if (isBooked) {
+                      return (
+                        <Tooltip key={time}>
+                          <TooltipTrigger asChild>
+                            <div
+                              className="relative min-w-[80px] min-h-[50px] rounded-lg border-2 border-red-300 bg-red-50 flex flex-col items-center justify-center cursor-not-allowed opacity-70"
+                            >
+                              <span className="text-sm font-medium text-red-800 line-through">{time}</span>
+                              <span className="text-xs font-bold text-red-600 mt-0.5">OCUPAT</span>
+                              <div className="absolute inset-0 bg-red-100/30 rounded-lg"></div>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Această oră este deja rezervată</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    }
+
+                    return (
+                      <button
+                        key={time}
+                        onClick={() => handleTimeSelect(time)}
+                        disabled={!isAvailable}
+                        className={`
+                          min-w-[80px] min-h-[50px] rounded-lg border-2 flex flex-col items-center justify-center
+                          transition-all duration-200
+                          ${isSelected 
+                            ? 'bg-blue-600 border-blue-600 text-white shadow-lg scale-105' 
+                            : isAvailable
+                              ? 'bg-green-50 border-green-400 text-green-800 hover:bg-green-100 hover:border-green-500 hover:shadow-md'
+                              : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+                          }
+                        `}
+                      >
+                        <Clock className={`h-4 w-4 mb-1 ${isSelected ? 'text-white' : isAvailable ? 'text-green-600' : 'text-gray-400'}`} />
+                        <span className="text-sm font-semibold">{time}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Helper text */}
+                <p className="text-xs text-gray-500 mt-4 text-center">
+                  Click pe o oră verde pentru a o selecta
+                </p>
               </div>
-              <h3 className="text-lg font-semibold mb-2">Alege Ora</h3>
-              <p className="text-gray-500 mb-4">
-                {selectedDate && formatDate(selectedDate)}
-              </p>
-              <div className="grid grid-cols-4 gap-3">
-                {availableSlots.map((time) => (
-                  <Button
-                    key={time}
-                    variant={selectedTime === time ? "default" : "outline"}
-                    onClick={() => handleTimeSelect(time)}
-                    className="w-full"
-                  >
-                    <Clock className="h-4 w-4 mr-2" />
-                    {time}
-                  </Button>
-                ))}
-              </div>
-            </div>
+            </TooltipProvider>
           )}
 
           {/* Step 4: Select Service */}
