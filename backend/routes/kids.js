@@ -2,10 +2,19 @@ const express = require('express');
 const router = express.Router();
 const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+// Lazy initialization - create client when first needed
+let supabase = null;
+const getSupabase = () => {
+  if (!supabase) {
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+    if (!url || !key) {
+      console.error('Missing Supabase credentials in environment variables');
+    }
+    supabase = createClient(url, key);
+  }
+  return supabase;
+};
 
 // POST /api/kids/brushing-complete - Save brushing session
 router.post('/brushing-complete', async (req, res) => {
@@ -29,7 +38,7 @@ router.post('/brushing-complete', async (req, res) => {
     }
 
     // Save session to database
-    const { data: session, error: sessionError } = await supabase
+    const { data: session, error: sessionError } = await getSupabase()
       .from('brushing_sessions')
       .insert([{
         child_id: childId,
@@ -49,7 +58,7 @@ router.post('/brushing-complete', async (req, res) => {
     }
 
     // Update or create child's progress
-    const { data: existingProgress } = await supabase
+    const { data: existingProgress } = await getSupabase()
       .from('brushing_progress')
       .select('*')
       .eq('child_id', childId)
@@ -76,7 +85,7 @@ router.post('/brushing-complete', async (req, res) => {
       // Merge badges
       const allBadges = [...new Set([...existingProgress.badges, ...(badgesEarned || [])])];
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await getSupabase()
         .from('brushing_progress')
         .update({
           total_sessions: existingProgress.total_sessions + 1,
@@ -94,7 +103,7 @@ router.post('/brushing-complete', async (req, res) => {
       }
     } else {
       // Create new progress record
-      const { error: insertError } = await supabase
+      const { error: insertError } = await getSupabase()
         .from('brushing_progress')
         .insert([{
           child_id: childId,
@@ -128,7 +137,7 @@ router.get('/progress/:childId', async (req, res) => {
   try {
     const { childId } = req.params;
 
-    const { data: progress, error } = await supabase
+    const { data: progress, error } = await getSupabase()
       .from('brushing_progress')
       .select('*')
       .eq('child_id', childId)
@@ -140,7 +149,7 @@ router.get('/progress/:childId', async (req, res) => {
     }
 
     // Get recent sessions
-    const { data: sessions } = await supabase
+    const { data: sessions } = await getSupabase()
       .from('brushing_sessions')
       .select('*')
       .eq('child_id', childId)
@@ -169,7 +178,7 @@ router.get('/leaderboard', async (req, res) => {
   try {
     const { limit = 10 } = req.query;
 
-    const { data: leaders, error } = await supabase
+    const { data: leaders, error } = await getSupabase()
       .from('brushing_progress')
       .select('child_name, total_sessions, current_streak, badges')
       .order('total_sessions', { ascending: false })
@@ -207,7 +216,7 @@ router.post('/validate-badge', async (req, res) => {
     }
 
     // Get child's progress
-    const { data: progress } = await supabase
+    const { data: progress } = await getSupabase()
       .from('brushing_progress')
       .select('*')
       .eq('child_id', childId)
