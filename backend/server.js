@@ -176,7 +176,8 @@ app.post('/api/appointments', async (req, res) => {
         status: 'booked',
         patient_name: name,
         patient_phone: phone,
-        booked_by: email
+        booked_by: email,
+        ...(dentist_id && { dentist_id: dentist_id })
       };
       
       console.log('Creating new slot:', slotData);

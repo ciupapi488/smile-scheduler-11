@@ -217,13 +217,21 @@ END:VCALENDAR`;
     URL.revokeObjectURL(url);
   };
 
-  const upcomingAppointments = appointments.filter(
-    apt => new Date(apt.appointment_date) >= new Date() && apt.status !== 'cancelled'
-  );
+  // Fix date comparison - compare dates without time to avoid timezone issues
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const upcomingAppointments = appointments.filter(apt => {
+    const aptDate = new Date(apt.appointment_date);
+    aptDate.setHours(0, 0, 0, 0);
+    return aptDate >= today && apt.status !== 'cancelled';
+  });
 
-  const pastAppointments = appointments.filter(
-    apt => new Date(apt.appointment_date) < new Date() || apt.status === 'cancelled'
-  );
+  const pastAppointments = appointments.filter(apt => {
+    const aptDate = new Date(apt.appointment_date);
+    aptDate.setHours(0, 0, 0, 0);
+    return aptDate < today || apt.status === 'cancelled';
+  });
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {

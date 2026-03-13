@@ -64,6 +64,13 @@ export default function BookingFormNew() {
     loadDentists();
   }, []);
 
+  // Refresh slots when returning to time selection (step 3)
+  useEffect(() => {
+    if (step === 3 && selectedDate && selectedDentist) {
+      loadSlots(selectedDate, selectedDentist.id);
+    }
+  }, [step, selectedDate, selectedDentist]);
+
   const checkAuth = async () => {
     setCheckingAuth(true);
     try {
@@ -189,6 +196,10 @@ export default function BookingFormNew() {
 
       if (response.ok && result.success) {
         setSuccess(true);
+        // Refresh slots to show the newly booked slot as occupied
+        if (selectedDate && selectedDentist) {
+          loadSlots(selectedDate, selectedDentist.id);
+        }
       } else if (result.code === 'ACCOUNT_BLOCKED') {
         setError(t('booking.accountBlocked') || 'Contul dumneavoastră este blocat din cauza anulărilor excesive. Contactați clinica.');
       } else if (result.code === 'DOUBLE_BOOKING') {
