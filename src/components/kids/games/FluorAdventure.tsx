@@ -197,13 +197,14 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
         if (level >= 2) types.push('pit');
         
         const type = types[Math.floor(Math.random() * types.length)];
+        // All obstacles at player path level for guaranteed collision
         const newObstacle: Obstacle = {
           id: Math.random().toString(36).substr(2, 9),
           x: 110,
-          y: type === 'flying-candy' ? GROUND_Y - 25 : type === 'pit' ? GROUND_Y + 2 : GROUND_Y - 5,
+          y: GROUND_Y, // All at player level
           type,
-          width: type === 'pit' ? 15 : 6,
-          height: type === 'pit' ? 15 : 6,
+          width: 10,
+          height: 10,
           rotation: 0,
         };
         setObstacles(prev => [...prev.slice(-6), newObstacle]);
@@ -270,21 +271,27 @@ export function FluorAdventure({ onBack }: { onBack: () => void }) {
       collectiblesRef.current = updatedCollectibles;
       setCollectibles(updatedCollectibles);
 
-      // Collision detection - use refs for latest values
+      // Collision detection - SIMPLE: check if obstacle overlaps with player
+      // Player is at fixed x=15%, y=GROUND_Y with size ~5%
+      // Obstacles move from right to left
       obstaclesRef.current.forEach(obs => {
-        // Calculate distance between player and obstacle (both in percentage coordinates)
-        const dx = obs.x - player.x;
-        const dy = obs.y - player.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+        // Simple box collision - player is roughly at x=15, y=GROUND_Y
+        // Player width ~5%, height ~8%
+        const playerLeft = player.x - 3;
+        const playerRight = player.x + 3;
+        const playerTop = player.y - 4;
+        const playerBottom = player.y + 4;
         
-        // Debug collision
-        if (dist < 15) {
-          console.log('Near collision:', { obsX: obs.x, obsY: obs.y, playerX: player.x, playerY: player.y, dist, invincible: player.invincible });
-        }
+        const obsLeft = obs.x - 4;
+        const obsRight = obs.x + 4;
+        const obsTop = obs.y - 4;
+        const obsBottom = obs.y + 4;
         
-        // Increased collision threshold from 10 to 12 for better detection
-        if (dist < 12 && !player.invincible) {
-          console.log('COLLISION! Lives before:', livesRef.current);
+        // Check if boxes overlap
+        const collideX = playerLeft < obsRight && playerRight > obsLeft;
+        const collideY = playerTop < obsBottom && playerBottom > obsTop;
+        
+        if (collideX && collideY && !player.invincible) {
           setLives(l => {
             const newLives = l - 1;
             livesRef.current = newLives;
