@@ -4,11 +4,11 @@ import { ArrowLeft, Trophy, Star, Gamepad2, Sparkles } from 'lucide-react';
 import { FoodSorterGame } from './FoodSorterGame';
 import { TongueGoalGame } from './TongueGoalGame';
 import { FluorAdventure } from './FluorAdventure';
-import { BacteriaWars } from './BacteriaWars';
+
 import { GameLeaderboard } from './GameLeaderboard';
 import { useGameProgress } from '@/hooks/useGameProgress';
 
-type GameType = 'hub' | 'sorter' | 'tongue' | 'fluor' | 'bacteria';
+type GameType = 'hub' | 'sorter' | 'tongue' | 'fluor';
 
 const GAMES = [
   {
@@ -38,15 +38,7 @@ const GAMES = [
     description: 'Ajuțilă pe Fluor să salveze Orașul Dinților de bacterii!',
     features: ['Platformer', 'Power-ups', '90 sec'],
   },
-  {
-    id: 'bacteria' as GameType,
-    name: 'Războiul Bacteriilor',
-    emoji: '⚔️',
-    color: 'from-red-400 to-red-700',
-    difficulty: 'Expert',
-    description: 'Apară dintele de armatele de bacterii până la valul 20!',
-    features: ['Tower Defense', 'Ritm', 'Boss fight'],
-  },
+
 ];
 
 export function GameHub() {
@@ -64,10 +56,6 @@ export function GameHub() {
 
   if (currentGame === 'fluor') {
     return <FluorAdventure onBack={() => setCurrentGame('hub')} />;
-  }
-
-  if (currentGame === 'bacteria') {
-    return <BacteriaWars onBack={() => setCurrentGame('hub')} />;
   }
 
   return (
@@ -141,7 +129,7 @@ export function GameHub() {
             🎮 Jocurile Zânei
           </h1>
           <p className="text-xl text-white/80 max-w-2xl mx-auto">
-            Învață despre igiena dentară jucându-te! 4 jocuri educative te așteaptă.
+            Învață despre igiena dentară jucându-te! 3 jocuri educative te așteaptă.
           </p>
         </motion.div>
 

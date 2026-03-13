@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, BookOpen, Star, ChevronRight, ChevronLeft, Heart, Shield } from 'lucide-react';
+import { Sparkles, BookOpen, Star, ChevronRight, ChevronLeft, Heart, Shield, Timer, Globe } from 'lucide-react';
 import { ToothFairyAvatar } from './ToothFairyAvatar';
 import kidsStoriesData from '@/data/kidsStories.json';
 import { earnSticker, hasSticker, getEarnedStickers, getTotalStickers, type Sticker } from '@/lib/stickersStorage';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useLanguage } from '@/hooks/useLanguage';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 // Define the story types
 interface StoryChoiceOption {
@@ -55,7 +56,7 @@ interface Story {
 
 const kidsStories: Story[] = kidsStoriesData as unknown as Story[];
 
-type View = 'menu' | 'story' | 'sticker-book' | 'prep-mode';
+type View = 'menu' | 'story' | 'sticker-book' | 'prep-mode' | 'brushing';
 
 export function ToothFairyKids() {
   const { t, language } = useLanguage();
@@ -65,6 +66,9 @@ export function ToothFairyKids() {
   const [stickers, setStickers] = useState<Sticker[]>([]);
   const [showNewSticker, setShowNewSticker] = useState<Sticker | null>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [brushingTime, setBrushingTime] = useState(0);
+  const [isBrushing, setIsBrushing] = useState(false);
+  const [brushingZone, setBrushingZone] = useState(0);
 
   // Load stickers on mount
   useEffect(() => {
@@ -136,19 +140,47 @@ export function ToothFairyKids() {
     }
   };
 
+  // Brushing timer effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isBrushing && brushingTime < 120) {
+      interval = setInterval(() => {
+        setBrushingTime(t => {
+          const newTime = t + 1;
+          // Change zone every 30 seconds
+          setBrushingZone(Math.floor(newTime / 30));
+          return newTime;
+        });
+      }, 1000);
+    } else if (brushingTime >= 120) {
+      setIsBrushing(false);
+    }
+    return () => clearInterval(interval);
+  }, [isBrushing, brushingTime]);
+
+  const formatBrushingTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const BRUSHING_ZONES = [
+    { name: { ro: 'Dreapta Sus', en: 'Upper Right' }, icon: '↗️' },
+    { name: { ro: 'Stânga Sus', en: 'Upper Left' }, icon: '↖️' },
+    { name: { ro: 'Dreapta Jos', en: 'Lower Right' }, icon: '↘️' },
+    { name: { ro: 'Stânga Jos', en: 'Lower Left' }, icon: '↙️' },
+  ];
+
   // Menu View
   if (view === 'menu') {
     return (
       <div className="min-h-screen bg-gradient-to-b from-pink-50 via-purple-50 to-blue-50 p-4">
         {/* Header */}
         <div className="max-w-4xl mx-auto text-center pt-8 pb-6">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="flex justify-center mb-4"
-          >
+          <div className="flex justify-center items-center gap-4 mb-4">
             <ToothFairyAvatar size="lg" />
-          </motion.div>
+            <LanguageSwitcher />
+          </div>
           <h1 className="text-4xl md:text-5xl font-bold text-pink-600 mb-2">
             ✨ {language === 'ro' ? 'Zâna Măseluță' : 'Tooth Fairy'} ✨
           </h1>
@@ -156,7 +188,7 @@ export function ToothFairyKids() {
         </div>
 
         {/* Main Options */}
-        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6 mb-8">
+        <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-6 mb-8">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -166,6 +198,17 @@ export function ToothFairyKids() {
             <div className="text-6xl mb-4">📚</div>
             <h2 className="text-2xl font-bold text-pink-600 mb-2">{language === 'ro' ? 'Povești Interactive' : 'Interactive Stories'}</h2>
             <p className="text-gray-600">{language === 'ro' ? 'Aventuri educative despre dinți sănătoși' : 'Educational adventures about healthy teeth'}</p>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setView('brushing')}
+            className="bg-white rounded-3xl p-8 shadow-lg border-4 border-green-200 hover:border-green-400 transition-colors"
+          >
+            <div className="text-6xl mb-4">🦖</div>
+            <h2 className="text-2xl font-bold text-green-600 mb-2">{language === 'ro' ? 'Periază cu Dino' : 'Brush with Dino'}</h2>
+            <p className="text-gray-600">{language === 'ro' ? 'Timer de 2 minute pentru periaj corect' : '2-minute timer for proper brushing'}</p>
           </motion.button>
 
           <motion.button
@@ -469,6 +512,159 @@ export function ToothFairyKids() {
                   : `${getTotalStickers() - stickers.length} more stickers to discover!`}
               </p>
             )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Brushing Timer View with Dino
+  if (view === 'brushing') {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-green-50 via-blue-50 to-green-100 p-4">
+        <div className="max-w-2xl mx-auto">
+          {/* Header */}
+          <div className="flex items-center justify-between py-6">
+            <button
+              onClick={() => {
+                setIsBrushing(false);
+                setBrushingTime(0);
+                setBrushingZone(0);
+                setView('menu');
+              }}
+              className="text-gray-600 hover:text-gray-800 flex items-center gap-1"
+            >
+              <ChevronLeft className="w-5 h-5" /> {language === 'ro' ? 'Înapoi' : 'Back'}
+            </button>
+            <h1 className="text-3xl font-bold text-green-600">
+              🦖 {language === 'ro' ? 'Periază cu Dino' : 'Brush with Dino'}
+            </h1>
+            <div className="w-20" />
+          </div>
+
+          {/* Dino Mascot */}
+          <div className="flex justify-center mb-6">
+            <motion.div
+              animate={{ 
+                y: isBrushing ? [0, -10, 0] : 0,
+                rotate: isBrushing ? [0, 5, -5, 0] : 0
+              }}
+              transition={{ duration: 0.5, repeat: isBrushing ? Infinity : 0 }}
+              className="text-8xl"
+            >
+              🦖
+            </motion.div>
+          </div>
+
+          {/* Timer Display */}
+          <Card className="mb-6 border-green-200">
+            <div className="p-8 text-center">
+              <div className={`text-7xl font-black mb-4 ${brushingTime >= 120 ? 'text-green-600' : 'text-green-500'}`}>
+                {formatBrushingTime(brushingTime)}
+              </div>
+              <div className="h-4 bg-gray-200 rounded-full overflow-hidden mb-4">
+                <motion.div 
+                  className="h-full bg-green-500 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(brushingTime / 120) * 100}%` }}
+                  transition={{ duration: 0.5 }}
+                />
+              </div>
+              <p className="text-gray-600">
+                {isBrushing 
+                  ? (language === 'ro' ? 'Periază împreună cu Dino! 🪥' : 'Brush together with Dino! 🪥')
+                  : (brushingTime >= 120 
+                    ? (language === 'ro' ? 'Bravo! Ai terminat!' : 'Great job! You finished!')
+                    : (language === 'ro' ? 'Gata să începi?' : 'Ready to start?'))
+                }
+              </p>
+            </div>
+          </Card>
+
+          {/* Current Zone */}
+          <div className="grid grid-cols-4 gap-2 mb-6">
+            {BRUSHING_ZONES.map((zone, idx) => (
+              <div
+                key={idx}
+                className={`p-4 rounded-2xl text-center transition-all ${
+                  brushingZone === idx && isBrushing
+                    ? 'bg-green-400 text-white scale-110 shadow-lg'
+                    : brushingZone > idx
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-gray-100 text-gray-400'
+                }`}
+              >
+                <div className="text-2xl mb-1">{zone.icon}</div>
+                <div className="text-xs font-bold">{zone.name[language]}</div>
+                {brushingZone === idx && isBrushing && (
+                  <div className="text-xs mt-1 animate-pulse">
+                    {language === 'ro' ? 'Acum!' : 'Now!'}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Zone Instructions */}
+          {isBrushing && brushingZone < 4 && (
+            <Card className="mb-6 bg-blue-50 border-blue-200">
+              <div className="p-4 text-center">
+                <p className="text-lg font-bold text-blue-700">
+                  {BRUSHING_ZONES[brushingZone].icon} {BRUSHING_ZONES[brushingZone].name[language]}
+                </p>
+                <p className="text-blue-600">
+                  {brushingZone === 0 && (language === 'ro' ? 'Periază circular, ca un elicopter! 🚁' : 'Brush in circles, like a helicopter! 🚁')}
+                  {brushingZone === 1 && (language === 'ro' ? 'Nu uita dinții din spate! 👈' : 'Don\'t forget the back teeth! 👈')}
+                  {brushingZone === 2 && (language === 'ro' ? 'Periază ușor gingiile! 🦷' : 'Brush your gums gently! 🦷')}
+                  {brushingZone === 3 && (language === 'ro' ? 'Termină tare! Ești aproape gata! 💪' : 'Finish strong! You\'re almost done! 💪')}
+                </p>
+              </div>
+            </Card>
+          )}
+
+          {/* Control Button */}
+          <div className="flex gap-4 justify-center">
+            {!isBrushing && brushingTime < 120 && (
+              <Button
+                size="lg"
+                className="rounded-full px-12 py-6 text-xl font-bold bg-green-500 hover:bg-green-600"
+                onClick={() => setIsBrushing(true)}
+              >
+                ▶️ {language === 'ro' ? 'Start' : 'Start'}
+              </Button>
+            )}
+            
+            {isBrushing && (
+              <Button
+                size="lg"
+                variant="outline"
+                className="rounded-full px-8"
+                onClick={() => setIsBrushing(false)}
+              >
+                ⏸️ {language === 'ro' ? 'Pauză' : 'Pause'}
+              </Button>
+            )}
+            
+            {(brushingTime > 0 || isBrushing) && (
+              <Button
+                size="lg"
+                variant="outline"
+                className="rounded-full px-8"
+                onClick={() => {
+                  setIsBrushing(false);
+                  setBrushingTime(0);
+                  setBrushingZone(0);
+                }}
+              >
+                ↻ {language === 'ro' ? 'Reset' : 'Reset'}
+              </Button>
+            )}
+          </div>
+
+          {/* Tips */}
+          <div className="mt-8 text-center text-sm text-gray-500">
+            <p>💡 {language === 'ro' ? 'Sfaturi: Periază timp de 2 minute, de 2 ori pe zi!' : 'Tips: Brush for 2 minutes, twice a day!'}</p>
+            <p>🪥 {language === 'ro' ? 'Folosește o periuță moale și paste cu fluor!' : 'Use a soft brush and fluoride toothpaste!'}</p>
           </div>
         </div>
       </div>
