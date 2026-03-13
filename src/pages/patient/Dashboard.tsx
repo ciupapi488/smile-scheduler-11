@@ -107,10 +107,20 @@ export default function PatientDashboard() {
 
   const loadAppointments = async (userEmail: string) => {
     try {
-      const response = await fetch(`${API_URL}/api/patient/appointments?email=${encodeURIComponent(userEmail)}`);
-      if (!response.ok) throw new Error('Failed to fetch');
+      const url = `${API_URL}/api/patient/appointments?email=${encodeURIComponent(userEmail)}`;
+      console.log('Fetching appointments from:', url);
+      
+      const response = await fetch(url);
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Failed to fetch: ${response.status} ${errorText}`);
+      }
       
       const data = await response.json();
+      console.log('Appointments loaded:', data.appointments?.length || 0);
       setAppointments(data.appointments || []);
     } catch (err) {
       console.error('Error loading appointments:', err);

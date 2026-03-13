@@ -436,24 +436,34 @@ app.get('/api/auth/check-verification', async (req, res) => {
 app.get('/api/patient/appointments', async (req, res) => {
   const { email } = req.query;
   
+  console.log('GET /api/patient/appointments - email:', email);
+  
   if (!email) {
+    console.log('Error: Email parameter missing');
     return res.status(400).json({ error: 'Email required' });
   }
   
   try {
+    const normalizedEmail = email.toLowerCase().trim();
+    console.log('Fetching appointments for:', normalizedEmail);
+    
     const { data, error } = await supabase
       .from('appointments')
       .select('*')
-      .eq('email', email.toLowerCase().trim())
+      .eq('email', normalizedEmail)
       .order('appointment_date', { ascending: false })
       .limit(100);
     
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error fetching appointments:', error);
+      throw error;
+    }
     
+    console.log(`Found ${data?.length || 0} appointments`);
     res.json({ appointments: data || [] });
   } catch (err) {
     console.error('Error fetching patient appointments:', err);
-    res.json({ appointments: [] });
+    res.status(500).json({ error: 'Failed to fetch appointments', appointments: [] });
   }
 });
 
@@ -685,3 +695,21 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+// ============================================
+// ERROR HANDLING
+// ============================================
+
+// 404 handler - catch all unmatched routes
+app.use((req, res, next) => {
+  console.log('404 Not Found:', req.method, req.url);
+  res.status(404).json({ error: 'Route not found', path: req.url });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Server error:', err);
+  res.status(500).json({ error: 'Internal server error', message: err.message });
+});
+
