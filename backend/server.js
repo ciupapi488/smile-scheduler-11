@@ -41,20 +41,26 @@ app.get('/api/test', (req, res) => {
 
 // Get dentists (with mock fallback)
 app.get('/api/dentists', async (req, res) => {
+  console.log('GET /api/dentists - request received');
   try {
     const { data, error } = await supabase
       .rpc('get_available_dentists', { p_date: new Date().toISOString().split('T')[0] });
     
-    if (error) throw error;
+    if (error) {
+      console.log('DB dentists error:', error.message);
+      throw error;
+    }
     
     if (data && data.length > 0) {
+      console.log(`Returning ${data.length} dentists from DB`);
       return res.json({ dentists: data });
     }
   } catch (err) {
-    console.log('DB dentists failed, using mock data');
+    console.log('DB dentists failed, using mock data:', err.message);
   }
   
   // Mock dentists fallback
+  console.log('Returning mock dentists');
   res.json({
     dentists: [
       { id: 'd1', first_name: 'Andrei', last_name: 'Ionescu', full_name: 'Andrei Ionescu', specialization: 'Stomatologie generala', bio: '10+ ani experienta', color_code: '#3B82F6', rating_avg: 4.8, total_reviews: 24, is_available: true },

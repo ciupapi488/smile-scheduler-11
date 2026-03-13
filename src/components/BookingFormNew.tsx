@@ -108,7 +108,8 @@ export default function BookingFormNew() {
 
   const loadDentists = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/dentists`);
+      const baseUrl = import.meta.env.DEV ? 'http://localhost:5001' : API_URL;
+      const response = await fetch(`${baseUrl}/api/dentists`);
       const data = await response.json();
       if (data.dentists?.length > 0) setDentists(data.dentists);
     } catch (err) {
@@ -119,7 +120,8 @@ export default function BookingFormNew() {
   const loadSlots = async (date: Date, dentistId: string) => {
     try {
       const dateStr = date.toISOString().split('T')[0];
-      const response = await fetch(`${API_URL}/api/available-slots?date=${dateStr}&dentist_id=${dentistId}`);
+      const baseUrl = import.meta.env.DEV ? 'http://localhost:5001' : API_URL;
+      const response = await fetch(`${baseUrl}/api/available-slots?date=${dateStr}&dentist_id=${dentistId}`);
       const data = await response.json();
       setAvailableSlots(data.availableSlots || ALL_TIME_SLOTS);
     } catch (err) {
@@ -162,7 +164,8 @@ export default function BookingFormNew() {
       const dateStr = selectedDate.toISOString().split('T')[0];
       const service = services.find(s => s.id === selectedService);
       
-      const response = await fetch(`${API_URL}/api/appointments`, {
+      const baseUrl = import.meta.env.DEV ? 'http://localhost:5001' : API_URL;
+      const response = await fetch(`${baseUrl}/api/appointments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
